@@ -78,6 +78,8 @@ public class ModuleIOSim implements ModuleIO {
     inputs.turnVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
     inputs.turnAppliedVolts = turnAppliedVolts;
     inputs.turnCurrentAmps = Math.abs(turnSim.getCurrentDrawAmps());
+    inputs.absoluteEncoderConnected = true;
+    inputs.absolutePosition = new Rotation2d(turnSim.getAngularPositionRad());
 
     // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't
     // matter)
