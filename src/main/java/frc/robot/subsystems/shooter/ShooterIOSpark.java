@@ -17,8 +17,8 @@ import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class ShooterIOSpark implements ShooterIO {
-  private SparkMax shooterMotor;
-  private RelativeEncoder shooterEncoder;
+  private final SparkMax shooterMotor;
+  private final RelativeEncoder shooterEncoder;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
   public ShooterIOSpark() {
@@ -50,7 +50,6 @@ public class ShooterIOSpark implements ShooterIO {
   }
 
   public void updateInputs(ShooterIOInputs inputs) {
-    double[] current = {0.0, 0.0};
     sparkStickyFault = false;
     ifOk(shooterMotor, shooterEncoder::getPosition, (value) -> inputs.positionRotations = value);
     ifOk(shooterMotor, shooterEncoder::getVelocity, (value) -> inputs.velocityRPM = value);
@@ -58,7 +57,7 @@ public class ShooterIOSpark implements ShooterIO {
         shooterMotor,
         new DoubleSupplier[] {shooterMotor::getAppliedOutput, shooterMotor::getBusVoltage},
         (values) -> inputs.appliedVolts = values[0] * values[1]);
-    ifOk(shooterMotor, shooterMotor::getOutputCurrent, (value) -> current[0] = value);
+    ifOk(shooterMotor, shooterMotor::getOutputCurrent, (value) -> inputs.currentAmps = value);
     inputs.motorConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
   }
 

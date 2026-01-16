@@ -18,7 +18,7 @@ public class ShooterIOSim implements ShooterIO {
     flywheelSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getNEO(1), 0.001, ShooterConstants.gearRatio),
+                DCMotor.getNEO(1), ShooterConstants.momentOfInertia, ShooterConstants.gearRatio),
             DCMotor.getNEO(1));
   }
 

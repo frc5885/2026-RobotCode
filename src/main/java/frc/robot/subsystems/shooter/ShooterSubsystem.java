@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
   private static ShooterSubsystem INSTANCE = null;
@@ -40,15 +42,18 @@ public class ShooterSubsystem extends SubsystemBase {
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   /** Creates a new Shooter. */
-  public ShooterSubsystem(ShooterIO io) {
+  private ShooterSubsystem(ShooterIO io) {
     shooterIO = io;
     motorDisconnectedAlert = new Alert("Shooter motor disconnected!", AlertType.kError);
+
+    AutoLogOutputManager.addObject(this);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     shooterIO.updateInputs(inputs);
+    Logger.processInputs("Shooter", inputs);
     motorDisconnectedAlert.set(!inputs.motorConnected);
   }
 
