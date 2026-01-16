@@ -6,8 +6,9 @@ package frc.robot;
 
 import frc.robot.subsystems.drive.DriveSubsystem;
 
-/** Add your docs here. */
-public interface SubsystemFactory {
+/** Factory for centralized subsystem initialization. */
+public final class SubsystemFactory {
+  private SubsystemFactory() {}
 
   public static void initAllSubsystems() {
     DriveSubsystem.getInstance();
