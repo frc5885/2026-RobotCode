@@ -9,7 +9,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 /** Add your docs here. */
 public interface SubsystemFactory {
 
-  public static void initAllSubystems() {
+  public static void initAllSubsystems() {
     DriveSubsystem.getInstance();
   }
 }
