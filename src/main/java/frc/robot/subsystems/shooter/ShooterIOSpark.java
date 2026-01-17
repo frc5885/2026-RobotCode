@@ -31,7 +31,12 @@ public class ShooterIOSpark implements ShooterIO {
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(ShooterConstants.currentLimit)
         .voltageCompensation(12.0);
-    shooterConfig.encoder.uvwMeasurementPeriod(10).uvwAverageDepth(2);
+    shooterConfig
+        .encoder
+        .uvwMeasurementPeriod(10)
+        .uvwAverageDepth(2)
+        .positionConversionFactor(ShooterConstants.positionConversionFactor)
+        .velocityConversionFactor(ShooterConstants.velocityConversionFactor);
     shooterConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)

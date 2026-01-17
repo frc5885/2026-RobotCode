@@ -10,7 +10,11 @@ package frc.robot.subsystems.shooter;
 public class ShooterConstants {
   public static final double gearRatio = 10.0 / 1.0;
   public static final double momentOfInertia = 0.001; // kg*m^2
-  public static final int canId = 55;
+  public static final int canId = 33;
   public static final boolean motorInverted = false;
   public static final int currentLimit = 30;
+  // Motor Rotations -> Flywheel Rotations
+  public static final double positionConversionFactor = 1 / gearRatio;
+  // Motor RPM -> Flywheel RPM
+  public static final double velocityConversionFactor = positionConversionFactor;
 }
