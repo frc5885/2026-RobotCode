@@ -41,12 +41,15 @@ import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
   private static DriveSubsystem INSTANCE = null;
+  private static SwerveDriveSimulation swerveDriveSimulation = null;
 
   public static DriveSubsystem getInstance() {
     if (INSTANCE == null) {
@@ -64,13 +67,20 @@ public class DriveSubsystem extends SubsystemBase {
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
+          // Maple sim setup
+          swerveDriveSimulation =
+              new SwerveDriveSimulation(
+                  DriveConstants.driveTrainSimulationConfig, DriveConstants.simStartingPose);
+          SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
+
           INSTANCE =
               new DriveSubsystem(
-                  new GyroIO() {},
-                  new ModuleIOSim(),
-                  new ModuleIOSim(),
-                  new ModuleIOSim(),
-                  new ModuleIOSim());
+                  new GyroIOSim(swerveDriveSimulation.getGyroSimulation()),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[0]),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[1]),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[2]),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[3]));
+          INSTANCE.setPose(DriveConstants.simStartingPose);
           break;
 
         default:
@@ -328,7 +338,12 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return poseEstimator.getEstimatedPosition();
+    // return poseEstimator.getEstimatedPosition();
+    // TODO: Remove this after vision is implemented, vision keeps poseEstimator synced to
+    // MapleSwerveSimulation drivetrain pose
+    return Constants.currentMode == Mode.SIM
+        ? swerveDriveSimulation.getSimulatedDriveTrainPose()
+        : poseEstimator.getEstimatedPosition();
   }
 
   /** Returns the current odometry rotation. */
@@ -339,6 +354,9 @@ public class DriveSubsystem extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    if (Constants.currentMode == Mode.SIM) {
+      swerveDriveSimulation.setSimulationWorldPose(pose);
+    }
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -358,5 +376,10 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  /** Returns the maple sim drivetrain. */
+  public SwerveDriveSimulation getSwerveDriveSimulation() {
+    return swerveDriveSimulation;
   }
 }
