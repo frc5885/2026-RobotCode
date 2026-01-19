@@ -10,6 +10,10 @@ package frc.robot;
 import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.drive.MapleSwerveSimulation;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -147,9 +151,31 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    resetSimulationField();
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    updateSimulation();
+  }
+
+  public void resetSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
+    DriveSubsystem.getInstance().setPose(DriveConstants.simStartingPose);
+    SimulatedArena.getInstance().resetFieldForAuto();
+  }
+
+  public void updateSimulation() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
+    SimulatedArena.getInstance().simulationPeriodic();
+    Logger.recordOutput(
+        "FieldSimulation/RobotPosition",
+        MapleSwerveSimulation.getInstance().getSimulatedDriveTrainPose());
+    Logger.recordOutput(
+        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+  }
 }

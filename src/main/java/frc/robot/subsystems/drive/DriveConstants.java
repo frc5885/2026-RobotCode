@@ -7,12 +7,17 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = Units.feetToMeters(15.1);
@@ -20,6 +25,7 @@ public class DriveConstants {
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
+  public static final double bumperWidth = Units.inchesToMeters(3.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
         new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
@@ -110,4 +116,23 @@ public class DriveConstants {
               driveMotorCurrentLimit,
               1),
           moduleTranslations);
+
+  // Create and configure a drivetrain simulation configuration
+  public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
+      DriveTrainSimulationConfig.Default()
+          // Specify gyro type (for realistic gyro drifting and error simulation)
+          .withGyro(COTS.ofNav2X())
+          // Specify swerve module (for realistic swerve dynamics)
+          .withSwerveModule(
+              COTS.ofMark4i(
+                  DCMotor.getNEO(1), // Drive motor is a NEO
+                  DCMotor.getNEO(1), // Steer motor is a NEO
+                  COTS.WHEELS.COLSONS.cof, // Use the COF for Colson Wheels
+                  2)) // L2 Gear ratio
+          // Configures the track length and track width (spacing between swerve modules)
+          .withTrackLengthTrackWidth(Meters.of(wheelBase), Meters.of(trackWidth))
+          // Configures the bumper size (dimensions of the robot bumper)
+          .withBumperSize(Meters.of(trackWidth + bumperWidth), Meters.of(wheelBase + bumperWidth));
+
+  public static final Pose2d simStartingPose = new Pose2d(3, 3, new Rotation2d());
 }
