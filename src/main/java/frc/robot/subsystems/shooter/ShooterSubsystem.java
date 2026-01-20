@@ -65,7 +65,7 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
   }
 
-  public void setFlyWheelVoltage(double volts) {
+  public void setFlywheelVoltage(double volts) {
     shooterIO.setFlywheelVoltage(volts);
   }
 

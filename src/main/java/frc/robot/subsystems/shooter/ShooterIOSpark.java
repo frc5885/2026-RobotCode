@@ -9,31 +9,35 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class ShooterIOSpark implements ShooterIO {
-  private final SparkMax flywheelLeftMotor;
-  private final SparkMax flywheelRightMotor;
+  private final SparkFlex flywheelLeftMotor;
+  private final SparkFlex flywheelRightMotor;
   private final RelativeEncoder flywheelLeftEncoder;
   private final SparkMax hoodMotor;
   private final RelativeEncoder hoodEncoder;
-  private final Debouncer flywheelMotorConnectedDebounce = new Debouncer(0.5);
+  private final Debouncer flywheelLeftMotorConnectedDebounce = new Debouncer(0.5);
+  private final Debouncer flywheelRightMotorConnectedDebounce = new Debouncer(0.5);
   private final Debouncer hoodMotorConnectedDebounce = new Debouncer(0.5);
 
   public ShooterIOSpark() {
-    flywheelLeftMotor = new SparkMax(ShooterConstants.flywheelLeftCanId, MotorType.kBrushless);
-    flywheelRightMotor = new SparkMax(ShooterConstants.flywheelRightCanId, MotorType.kBrushless);
+    flywheelLeftMotor = new SparkFlex(ShooterConstants.flywheelLeftCanId, MotorType.kBrushless);
+    flywheelRightMotor = new SparkFlex(ShooterConstants.flywheelRightCanId, MotorType.kBrushless);
     flywheelLeftEncoder = flywheelLeftMotor.getEncoder();
 
     hoodMotor = new SparkMax(ShooterConstants.hoodCanId, MotorType.kBrushless);
     hoodEncoder = hoodMotor.getEncoder();
 
-    SparkMaxConfig flywheelLeftMotorConfig = new SparkMaxConfig();
+    SparkFlexConfig flywheelLeftMotorConfig = new SparkFlexConfig();
     flywheelLeftMotorConfig
         .inverted(ShooterConstants.flywheelLeftMotorInverted)
         .idleMode(IdleMode.kCoast)
@@ -62,9 +66,9 @@ public class ShooterIOSpark implements ShooterIO {
                 flywheelLeftMotorConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
-    SparkMaxConfig flywheelRightMotorConfig = flywheelLeftMotorConfig;
-    flywheelRightMotorConfig.follow(
-        flywheelLeftMotor, ShooterConstants.flywheelMotorsOppositeDirections);
+    SparkBaseConfig flywheelRightMotorConfig =
+        flywheelLeftMotorConfig.follow(
+            flywheelLeftMotor, ShooterConstants.flywheelMotorsOppositeDirections);
     tryUntilOk(
         flywheelRightMotor,
         5,
@@ -103,6 +107,7 @@ public class ShooterIOSpark implements ShooterIO {
                 hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
+  @Override
   public void updateInputs(ShooterIOInputs inputs) {
     double[] flywheelCurrents = {0.0, 0.0};
     sparkStickyFault = false;
@@ -124,7 +129,8 @@ public class ShooterIOSpark implements ShooterIO {
         flywheelLeftMotor,
         flywheelLeftMotor::getOutputCurrent,
         (value) -> flywheelCurrents[0] = value);
-    inputs.flywheelLeftMotorConnected = flywheelMotorConnectedDebounce.calculate(!sparkStickyFault);
+    inputs.flywheelLeftMotorConnected =
+        flywheelLeftMotorConnectedDebounce.calculate(!sparkStickyFault);
 
     sparkStickyFault = false;
     ifOk(
@@ -132,7 +138,7 @@ public class ShooterIOSpark implements ShooterIO {
         flywheelRightMotor::getOutputCurrent,
         (value) -> flywheelCurrents[1] = value);
     inputs.flywheelRightMotorConnected =
-        flywheelMotorConnectedDebounce.calculate(!sparkStickyFault);
+        flywheelRightMotorConnectedDebounce.calculate(!sparkStickyFault);
     inputs.flywheelCurrentAmps = flywheelCurrents;
 
     sparkStickyFault = false;
