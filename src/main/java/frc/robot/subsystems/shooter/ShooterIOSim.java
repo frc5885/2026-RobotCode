@@ -7,34 +7,64 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Sim shooter implementation */
 public class ShooterIOSim implements ShooterIO {
 
-  private double appliedVolts;
+  private double flywheelAppliedVolts;
+  private double hoodAppliedVolts;
   private FlywheelSim flywheelSim;
+  private SingleJointedArmSim hoodSim;
 
   public ShooterIOSim() {
     flywheelSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getNEO(1), ShooterConstants.momentOfInertia, ShooterConstants.gearRatio),
+                DCMotor.getNEO(1),
+                ShooterConstants.flywheelMomentOfInertia,
+                ShooterConstants.flywheelGearRatio),
             DCMotor.getNEO(1));
+
+    hoodSim =
+        new SingleJointedArmSim(
+            DCMotor.getNeo550(1),
+            ShooterConstants.hoodGearRatio,
+            SingleJointedArmSim.estimateMOI(
+                ShooterConstants.hoodArmLengthMeters, ShooterConstants.hoodArmMassKG),
+            ShooterConstants.hoodArmLengthMeters,
+            ShooterConstants.hoodMinAngleRadians,
+            ShooterConstants.hoodMaxAngleRadians,
+            true,
+            ShooterConstants.hoodStartingAngleRadians);
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
     flywheelSim.update(0.02);
-    inputs.positionRotations = 0.0;
-    inputs.velocityRPM = flywheelSim.getAngularVelocityRPM();
-    inputs.appliedVolts = appliedVolts;
-    inputs.currentAmps = flywheelSim.getCurrentDrawAmps();
-    inputs.motorConnected = true;
+    inputs.flywheelPositionRotations = 0.0;
+    inputs.flywheelVelocityRPM = flywheelSim.getAngularVelocityRPM();
+    inputs.flywheelAppliedVolts = flywheelAppliedVolts;
+    inputs.flywheelCurrentAmps = flywheelSim.getCurrentDrawAmps();
+    inputs.flywheelMotorConnected = true;
+
+    hoodSim.update(0.02);
+    inputs.hoodPositionRadians = hoodSim.getAngleRads();
+    inputs.hoodVelocityRadiansPerSecond = hoodSim.getVelocityRadPerSec();
+    inputs.hoodAppliedVolts = hoodAppliedVolts;
+    inputs.hoodCurrentAmps = hoodSim.getCurrentDrawAmps();
+    inputs.hoodMotorConnected = true;
   }
 
   @Override
-  public void setVoltage(double volts) {
-    appliedVolts = volts;
+  public void setFlyWheelVoltage(double volts) {
+    flywheelAppliedVolts = volts;
     flywheelSim.setInput(volts);
+  }
+
+  @Override
+  public void setHoodVoltage(double volts) {
+    hoodAppliedVolts = volts;
+    hoodSim.setInput(volts);
   }
 }

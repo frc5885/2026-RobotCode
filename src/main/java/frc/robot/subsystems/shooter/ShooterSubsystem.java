@@ -37,14 +37,17 @@ public class ShooterSubsystem extends SubsystemBase {
     return INSTANCE;
   }
 
-  private final Alert motorDisconnectedAlert;
+  private final Alert flywheelMotorDisconnectedAlert;
+  private final Alert hoodMotorDisconnectedAlert;
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   /** Creates a new Shooter. */
   private ShooterSubsystem(ShooterIO io) {
     shooterIO = io;
-    motorDisconnectedAlert = new Alert("Shooter motor disconnected!", AlertType.kError);
+    flywheelMotorDisconnectedAlert =
+        new Alert("Shooter Flywheel motor disconnected!", AlertType.kError);
+    hoodMotorDisconnectedAlert = new Alert("Shooter Hood motor disconnected!", AlertType.kError);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -54,10 +57,15 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     shooterIO.updateInputs(inputs);
     Logger.processInputs("Shooter", inputs);
-    motorDisconnectedAlert.set(!inputs.motorConnected);
+    flywheelMotorDisconnectedAlert.set(!inputs.flywheelMotorConnected);
+    hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
   }
 
-  public void spinShooter(double volts) {
-    shooterIO.setVoltage(volts);
+  public void setFlyWheelVoltage(double volts) {
+    shooterIO.setFlyWheelVoltage(volts);
+  }
+
+  public void setHoodVoltage(double volts) {
+    shooterIO.setHoodVoltage(volts);
   }
 }

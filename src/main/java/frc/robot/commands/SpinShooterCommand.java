@@ -22,7 +22,7 @@ public class SpinShooterCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.spinShooter(12);
+    shooter.setFlyWheelVoltage(12);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -32,7 +32,7 @@ public class SpinShooterCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.spinShooter(0);
+    shooter.setFlyWheelVoltage(0);
   }
 
   // Returns true when the command should end.

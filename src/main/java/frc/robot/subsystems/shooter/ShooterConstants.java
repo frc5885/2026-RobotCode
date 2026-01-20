@@ -8,13 +8,27 @@
 package frc.robot.subsystems.shooter;
 
 public class ShooterConstants {
-  public static final double gearRatio = 10.0 / 1.0;
-  public static final double momentOfInertia = 0.001; // kg*m^2
-  public static final int canId = 33;
-  public static final boolean motorInverted = false;
-  public static final int currentLimit = 30;
+  public static final double flywheelGearRatio = 10.0 / 1.0;
+  public static final double flywheelMomentOfInertia = 0.001; // kg*m^2
+  public static final int flywheelCanId = 33;
+  public static final boolean flywheelMotorInverted = false;
+  public static final int flywheelCurrentLimit = 30;
   // Motor Rotations -> Flywheel Rotations
-  public static final double positionConversionFactor = 1 / gearRatio;
+  public static final double flywheelPositionConversionFactor = 1 / flywheelGearRatio;
   // Motor RPM -> Flywheel RPM
-  public static final double velocityConversionFactor = positionConversionFactor;
+  public static final double flywheelVelocityConversionFactor = flywheelPositionConversionFactor;
+
+  public static final double hoodGearRatio = 10.0 / 1.0;
+  public static final double hoodMinAngleRadians = 0.0;
+  public static final double hoodMaxAngleRadians = 0.5;
+  public static final double hoodStartingAngleRadians = 0.0;
+  public static final double hoodArmLengthMeters = 0.0;
+  public static final double hoodArmMassKG = 0.0;
+  public static final int hoodCanId = 34;
+  public static final boolean hoodMotorInverted = false;
+  public static final int hoodCurrentLimit = 30;
+  // Motor Rotations -> Radians
+  public static final double hoodPositionConversionFactor = 2 * Math.PI / hoodGearRatio;
+  // Motor RPM -> Radians per second
+  public static final double hoodVelocityConversionFactor = hoodPositionConversionFactor * 60;
 }
