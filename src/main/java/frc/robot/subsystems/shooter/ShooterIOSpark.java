@@ -17,33 +17,35 @@ import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
 public class ShooterIOSpark implements ShooterIO {
-  private final SparkMax flywheelMotor;
-  private final RelativeEncoder flywheelEncoder;
+  private final SparkMax flywheelLeftMotor;
+  private final SparkMax flywheelRightMotor;
+  private final RelativeEncoder flywheelLeftEncoder;
   private final SparkMax hoodMotor;
   private final RelativeEncoder hoodEncoder;
   private final Debouncer flywheelMotorConnectedDebounce = new Debouncer(0.5);
   private final Debouncer hoodMotorConnectedDebounce = new Debouncer(0.5);
 
   public ShooterIOSpark() {
-    flywheelMotor = new SparkMax(ShooterConstants.flywheelCanId, MotorType.kBrushless);
-    flywheelEncoder = flywheelMotor.getEncoder();
+    flywheelLeftMotor = new SparkMax(ShooterConstants.flywheelLeftCanId, MotorType.kBrushless);
+    flywheelRightMotor = new SparkMax(ShooterConstants.flywheelRightCanId, MotorType.kBrushless);
+    flywheelLeftEncoder = flywheelLeftMotor.getEncoder();
 
     hoodMotor = new SparkMax(ShooterConstants.hoodCanId, MotorType.kBrushless);
     hoodEncoder = hoodMotor.getEncoder();
 
-    SparkMaxConfig shooterConfig = new SparkMaxConfig();
-    shooterConfig
-        .inverted(ShooterConstants.flywheelMotorInverted)
+    SparkMaxConfig flywheelLeftMotorConfig = new SparkMaxConfig();
+    flywheelLeftMotorConfig
+        .inverted(ShooterConstants.flywheelLeftMotorInverted)
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(ShooterConstants.flywheelCurrentLimit)
         .voltageCompensation(12.0);
-    shooterConfig
+    flywheelLeftMotorConfig
         .encoder
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2)
         .positionConversionFactor(ShooterConstants.flywheelPositionConversionFactor)
         .velocityConversionFactor(ShooterConstants.flywheelVelocityConversionFactor);
-    shooterConfig
+    flywheelLeftMotorConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs(20)
@@ -53,11 +55,24 @@ public class ShooterIOSpark implements ShooterIO {
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
     tryUntilOk(
-        flywheelMotor,
+        flywheelLeftMotor,
         5,
         () ->
-            flywheelMotor.configure(
-                shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+            flywheelLeftMotor.configure(
+                flywheelLeftMotorConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
+    SparkMaxConfig flywheelRightMotorConfig = flywheelLeftMotorConfig;
+    flywheelRightMotorConfig.follow(
+        flywheelLeftMotor, ShooterConstants.flywheelMotorsOppositeDirections);
+    tryUntilOk(
+        flywheelRightMotor,
+        5,
+        () ->
+            flywheelRightMotor.configure(
+                flywheelRightMotorConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
 
     SparkMaxConfig hoodConfig = new SparkMaxConfig();
     hoodConfig
@@ -89,22 +104,36 @@ public class ShooterIOSpark implements ShooterIO {
   }
 
   public void updateInputs(ShooterIOInputs inputs) {
+    double[] flywheelCurrents = {0.0, 0.0};
     sparkStickyFault = false;
     ifOk(
-        flywheelMotor,
-        flywheelEncoder::getPosition,
+        flywheelLeftMotor,
+        flywheelLeftEncoder::getPosition,
         (value) -> inputs.flywheelPositionRotations = value);
     ifOk(
-        flywheelMotor, flywheelEncoder::getVelocity, (value) -> inputs.flywheelVelocityRPM = value);
+        flywheelLeftMotor,
+        flywheelLeftEncoder::getVelocity,
+        (value) -> inputs.flywheelVelocityRPM = value);
     ifOk(
-        flywheelMotor,
-        new DoubleSupplier[] {flywheelMotor::getAppliedOutput, flywheelMotor::getBusVoltage},
+        flywheelLeftMotor,
+        new DoubleSupplier[] {
+          flywheelLeftMotor::getAppliedOutput, flywheelLeftMotor::getBusVoltage
+        },
         (values) -> inputs.flywheelAppliedVolts = values[0] * values[1]);
     ifOk(
-        flywheelMotor,
-        flywheelMotor::getOutputCurrent,
-        (value) -> inputs.flywheelCurrentAmps = value);
-    inputs.flywheelMotorConnected = flywheelMotorConnectedDebounce.calculate(!sparkStickyFault);
+        flywheelLeftMotor,
+        flywheelLeftMotor::getOutputCurrent,
+        (value) -> flywheelCurrents[0] = value);
+    inputs.flywheelLeftMotorConnected = flywheelMotorConnectedDebounce.calculate(!sparkStickyFault);
+
+    sparkStickyFault = false;
+    ifOk(
+        flywheelRightMotor,
+        flywheelRightMotor::getOutputCurrent,
+        (value) -> flywheelCurrents[1] = value);
+    inputs.flywheelRightMotorConnected =
+        flywheelMotorConnectedDebounce.calculate(!sparkStickyFault);
+    inputs.flywheelCurrentAmps = flywheelCurrents;
 
     sparkStickyFault = false;
     ifOk(hoodMotor, hoodEncoder::getPosition, (value) -> inputs.hoodPositionRadians = value);
@@ -123,7 +152,7 @@ public class ShooterIOSpark implements ShooterIO {
   /** Run open loop at the specified voltage. */
   @Override
   public void setFlyWheelVoltage(double volts) {
-    flywheelMotor.setVoltage(volts);
+    flywheelLeftMotor.setVoltage(volts);
   }
 
   @Override

@@ -21,10 +21,10 @@ public class ShooterIOSim implements ShooterIO {
     flywheelSim =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getNEO(1),
+                DCMotor.getNeoVortex(2),
                 ShooterConstants.flywheelMomentOfInertia,
                 ShooterConstants.flywheelGearRatio),
-            DCMotor.getNEO(1));
+            DCMotor.getNeoVortex(2));
 
     hoodSim =
         new SingleJointedArmSim(
@@ -45,8 +45,10 @@ public class ShooterIOSim implements ShooterIO {
     inputs.flywheelPositionRotations = 0.0;
     inputs.flywheelVelocityRPM = flywheelSim.getAngularVelocityRPM();
     inputs.flywheelAppliedVolts = flywheelAppliedVolts;
-    inputs.flywheelCurrentAmps = flywheelSim.getCurrentDrawAmps();
-    inputs.flywheelMotorConnected = true;
+    inputs.flywheelCurrentAmps =
+        new double[] {flywheelSim.getCurrentDrawAmps(), flywheelSim.getCurrentDrawAmps()};
+    inputs.flywheelLeftMotorConnected = true;
+    inputs.flywheelRightMotorConnected = true;
 
     hoodSim.update(0.02);
     inputs.hoodPositionRadians = hoodSim.getAngleRads();

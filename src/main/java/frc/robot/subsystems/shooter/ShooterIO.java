@@ -12,11 +12,12 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ShooterIO {
   @AutoLog
   public static class ShooterIOInputs {
-    public boolean flywheelMotorConnected = false;
+    public boolean flywheelLeftMotorConnected = false;
+    public boolean flywheelRightMotorConnected = false;
     public double flywheelPositionRotations = 0.0;
     public double flywheelVelocityRPM = 0.0;
     public double flywheelAppliedVolts = 0.0;
-    public double flywheelCurrentAmps = 0.0;
+    public double[] flywheelCurrentAmps = {0.0, 0.0};
 
     public boolean hoodMotorConnected = false;
     public double hoodPositionRadians = 0.0;
