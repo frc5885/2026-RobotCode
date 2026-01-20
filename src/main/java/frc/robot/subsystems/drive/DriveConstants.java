@@ -8,6 +8,7 @@
 package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -110,4 +111,7 @@ public class DriveConstants {
               driveMotorCurrentLimit,
               1),
           moduleTranslations);
+
+    public static final PIDConstants drivePID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants turnPID = new PIDConstants(5.0, 0.0, 0.0);
 }
