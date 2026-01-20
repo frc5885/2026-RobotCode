@@ -151,7 +151,7 @@ public class ShooterIOSpark implements ShooterIO {
 
   /** Run open loop at the specified voltage. */
   @Override
-  public void setFlyWheelVoltage(double volts) {
+  public void setFlywheelVoltage(double volts) {
     flywheelLeftMotor.setVoltage(volts);
   }
 

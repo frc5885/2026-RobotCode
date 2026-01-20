@@ -32,5 +32,5 @@ public class ShooterConstants {
   // Motor Rotations -> Radians
   public static final double hoodPositionConversionFactor = 2 * Math.PI / hoodGearRatio;
   // Motor RPM -> Radians per second
-  public static final double hoodVelocityConversionFactor = hoodPositionConversionFactor * 60;
+  public static final double hoodVelocityConversionFactor = hoodPositionConversionFactor / 60;
 }

@@ -66,7 +66,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void setFlyWheelVoltage(double volts) {
-    shooterIO.setFlyWheelVoltage(volts);
+    shooterIO.setFlywheelVoltage(volts);
   }
 
   public void setHoodVoltage(double volts) {

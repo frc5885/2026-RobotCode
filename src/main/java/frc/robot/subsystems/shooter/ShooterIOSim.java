@@ -59,7 +59,7 @@ public class ShooterIOSim implements ShooterIO {
   }
 
   @Override
-  public void setFlyWheelVoltage(double volts) {
+  public void setFlywheelVoltage(double volts) {
     flywheelAppliedVolts = volts;
     flywheelSim.setInput(volts);
   }

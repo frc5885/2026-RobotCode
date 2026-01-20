@@ -30,7 +30,7 @@ public interface ShooterIO {
   public default void updateInputs(ShooterIOInputs inputs) {}
 
   /** Run the motor at the specified voltage. */
-  public default void setFlyWheelVoltage(double volts) {}
+  public default void setFlywheelVoltage(double volts) {}
 
   /** Run the motor at the specified voltage. */
   public default void setHoodVoltage(double volts) {}
