@@ -41,7 +41,6 @@ import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
@@ -71,7 +70,6 @@ public class DriveSubsystem extends SubsystemBase {
           swerveDriveSimulation =
               new SwerveDriveSimulation(
                   DriveConstants.driveTrainSimulationConfig, DriveConstants.simStartingPose);
-          SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
 
           INSTANCE =
               new DriveSubsystem(
