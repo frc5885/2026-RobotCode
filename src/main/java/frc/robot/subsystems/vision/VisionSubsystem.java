@@ -19,19 +19,54 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.Constants;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.LinkedList;
 import java.util.List;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
+  private static VisionSubsystem INSTANCE = null;
+
+  public static VisionSubsystem getInstance() {
+    if (INSTANCE == null) {
+
+      switch (Constants.currentMode) {
+        case REAL:
+          // Real robot, instantiate hardware IO implementations
+          INSTANCE =
+              new VisionSubsystem(
+                  new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                  new VisionIOPhotonVision(camera1Name, robotToCamera1));
+          break;
+
+        case SIM:
+          // Sim robot, instantiate physics sim IO implementations
+          INSTANCE =
+              new VisionSubsystem(
+                  new VisionIOPhotonVisionSim(camera0Name, robotToCamera0),
+                  new VisionIOPhotonVisionSim(camera1Name, robotToCamera1));
+          break;
+
+        default:
+          // Replayed robot, disable IO implementations
+          // (Use same number of dummy implementations as the real robot)
+          INSTANCE = new VisionSubsystem(new VisionIO() {}, new VisionIO() {});
+          break;
+      }
+    }
+
+    return INSTANCE;
+  }
+
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  public VisionSubsystem(VisionConsumer consumer, VisionIO... io) {
-    this.consumer = consumer;
+  private VisionSubsystem(VisionIO... io) {
+    this.consumer = DriveSubsystem.getInstance()::addVisionMeasurement;
     this.io = io;
 
     // Initialize inputs
@@ -47,6 +82,8 @@ public class VisionSubsystem extends SubsystemBase {
           new Alert(
               "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
+
+    AutoLogOutputManager.addObject(this);
   }
 
   /**
@@ -124,10 +161,6 @@ public class VisionSubsystem extends SubsystemBase {
             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
-        }
         if (cameraIndex < cameraStdDevFactors.length) {
           linearStdDev *= cameraStdDevFactors[cameraIndex];
           angularStdDev *= cameraStdDevFactors[cameraIndex];

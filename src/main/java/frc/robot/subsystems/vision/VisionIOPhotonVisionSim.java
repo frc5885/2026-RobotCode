@@ -11,6 +11,7 @@ import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import java.util.function.Supplier;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -29,10 +30,9 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
    * @param name The name of the camera.
    * @param poseSupplier Supplier for the robot pose to use in simulation.
    */
-  public VisionIOPhotonVisionSim(
-      String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
+  public VisionIOPhotonVisionSim(String name, Transform3d robotToCamera) {
     super(name, robotToCamera);
-    this.poseSupplier = poseSupplier;
+    this.poseSupplier = DriveSubsystem.getInstance()::getPose;
 
     // Initialize vision sim
     if (visionSim == null) {
