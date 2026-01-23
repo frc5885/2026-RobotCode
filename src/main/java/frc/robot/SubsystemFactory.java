@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /** Factory for centralized subsystem initialization. */
 public final class SubsystemFactory {
@@ -12,5 +13,6 @@ public final class SubsystemFactory {
 
   public static void initAllSubsystems() {
     DriveSubsystem.getInstance();
+    VisionSubsystem.getInstance();
   }
 }
