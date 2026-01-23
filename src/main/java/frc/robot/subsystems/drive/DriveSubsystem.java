@@ -336,12 +336,12 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    // return poseEstimator.getEstimatedPosition();
-    // TODO: Remove this after vision is implemented, vision keeps poseEstimator synced to
-    // MapleSwerveSimulation drivetrain pose
-    return Constants.currentMode == Mode.SIM
-        ? swerveDriveSimulation.getSimulatedDriveTrainPose()
-        : poseEstimator.getEstimatedPosition();
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  /** Returns the current simulated drive train pose from MapleSwerveSimulation. */
+  public Pose2d getSimulatedDriveTrainPose() {
+    return swerveDriveSimulation.getSimulatedDriveTrainPose();
   }
 
   /** Returns the current odometry rotation. */

@@ -52,11 +52,11 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
   public void updateInputs(VisionIOInputs inputs) {
     super.updateInputs(inputs);
   }
-  /** 
-   * Updates the vision simulation with the current robot pose.
-   * Needs to be called once per iteration of the main loop.
+  /**
+   * Updates the vision simulation with the simulated robot pose. Needs to be called once per
+   * iteration of the main loop.
    */
   public static void updateSim() {
-    visionSim.update(DriveSubsystem.getInstance().getPose());
+    visionSim.update(DriveSubsystem.getInstance().getSimulatedDriveTrainPose());
   }
 }
