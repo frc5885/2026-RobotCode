@@ -9,10 +9,8 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import java.util.function.Supplier;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
@@ -21,18 +19,16 @@ import org.photonvision.simulation.VisionSystemSim;
 public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
   private static VisionSystemSim visionSim;
 
-  private final Supplier<Pose2d> poseSupplier;
   private final PhotonCameraSim cameraSim;
 
   /**
    * Creates a new VisionIOPhotonVisionSim.
    *
    * @param name The name of the camera.
-   * @param poseSupplier Supplier for the robot pose to use in simulation.
+   * @param robotToCamera The 3D position of the camera relative to the robot.
    */
   public VisionIOPhotonVisionSim(String name, Transform3d robotToCamera) {
     super(name, robotToCamera);
-    this.poseSupplier = DriveSubsystem.getInstance()::getPose;
 
     // Initialize vision sim
     if (visionSim == null) {
@@ -44,11 +40,23 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     var cameraProperties = new SimCameraProperties();
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
     visionSim.addCamera(cameraSim, robotToCamera);
+
+    // Enable camera streams in simulation
+    boolean renderSim = false;
+    cameraSim.enableRawStream(renderSim);
+    cameraSim.enableProcessedStream(renderSim);
+    cameraSim.enableDrawWireframe(renderSim);
   }
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    visionSim.update(poseSupplier.get());
     super.updateInputs(inputs);
+  }
+  /** 
+   * Updates the vision simulation with the current robot pose.
+   * Needs to be called once per iteration of the main loop.
+   */
+  public static void updateSim() {
+    visionSim.update(DriveSubsystem.getInstance().getPose());
   }
 }

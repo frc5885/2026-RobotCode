@@ -97,6 +97,11 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Update sim
+    if (io[0] instanceof VisionIOPhotonVisionSim) {
+      VisionIOPhotonVisionSim.updateSim();
+    }
+
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
