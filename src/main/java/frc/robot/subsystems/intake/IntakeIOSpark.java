@@ -115,7 +115,7 @@ public class IntakeIOSpark implements IntakeIO {
         extensionRightMotor,
         5,
         () ->
-            intakeRightMotor.configure(
+            extensionRightMotor.configure(
                 extensionRightMotorConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
