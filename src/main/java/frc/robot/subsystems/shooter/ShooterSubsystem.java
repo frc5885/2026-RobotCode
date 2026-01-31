@@ -40,6 +40,39 @@ public class ShooterSubsystem extends SubsystemBase {
     return INSTANCE;
   }
 
+  private static WriteableState state;
+
+  public static ReadableState getState() {
+    return state;
+  }
+
+  public interface ReadableState {
+    double getFlywheelVelocityRPM();
+
+    double getHoodAngleRadians();
+  }
+
+  private class WriteableState implements ReadableState {
+    private double flywheelVelocityRPM;
+    private double hoodAngleRadians;
+
+    public double getFlywheelVelocityRPM() {
+      return flywheelVelocityRPM;
+    }
+
+    public double getHoodAngleRadians() {
+      return hoodAngleRadians;
+    }
+
+    void emitFlywheelVelocityRPM(double velocity) {
+      flywheelVelocityRPM = velocity;
+    }
+
+    void emitHoodAngleRadians(double angle) {
+      hoodAngleRadians = angle;
+    }
+  }
+
   private final Alert flywheelLeftMotorDisconnectedAlert;
   private final Alert flywheelRightMotorDisconnectedAlert;
   private final Alert hoodMotorDisconnectedAlert;
@@ -51,6 +84,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Creates a new Shooter. */
   private ShooterSubsystem(ShooterIO io) {
+    state = new WriteableState();
     shooterIO = io;
     flywheelLeftMotorDisconnectedAlert =
         new Alert("Shooter Left Flywheel motor disconnected!", AlertType.kError);
@@ -72,6 +106,8 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelLeftMotorDisconnectedAlert.set(!inputs.flywheelLeftMotorConnected);
     flywheelRightMotorDisconnectedAlert.set(!inputs.flywheelRightMotorConnected);
     hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
+    state.emitFlywheelVelocityRPM(inputs.flywheelVelocityRPM);
+    state.emitHoodAngleRadians(inputs.hoodPositionRadians);
 
     setHoodVoltage(hoodPID.calculate(inputs.hoodPositionRadians));
     setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM) * 12.0);

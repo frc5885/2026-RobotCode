@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -27,7 +28,13 @@ public class SpinShooterCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    System.out.println(
+        "Flywheel velocity: " + RobotState.shooterSubsystemState.getFlywheelVelocityRPM());
+
+
+        RobotState.shooterSubsystemState.get
+  }
 
   // Called once the command ends or is interrupted.
   @Override
