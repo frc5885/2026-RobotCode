@@ -29,11 +29,8 @@ public class SpinShooterCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println(
-        "Flywheel velocity: " + RobotState.shooterSubsystemState.getFlywheelVelocityRPM());
-
-
-        RobotState.shooterSubsystemState.get
+    // Only for testing
+    System.out.println("Flywheel velocity: " + RobotState.shooterState.getFlywheelVelocityRPM());
   }
 
   // Called once the command ends or is interrupted.
