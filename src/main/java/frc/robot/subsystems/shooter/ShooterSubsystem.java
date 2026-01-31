@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,6 +44,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private final Alert hoodMotorDisconnectedAlert;
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+  private final PIDController hoodPID =
+      new PIDController(ShooterConstants.hoodKp, ShooterConstants.hoodKi, ShooterConstants.hoodKd);
+  private final BangBangController flywheelBangBangController = new BangBangController();
 
   /** Creates a new Shooter. */
   private ShooterSubsystem(ShooterIO io) {
@@ -51,6 +56,9 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelRightMotorDisconnectedAlert =
         new Alert("Shooter Right Flywheel motor disconnected!", AlertType.kError);
     hoodMotorDisconnectedAlert = new Alert("Shooter Hood motor disconnected!", AlertType.kError);
+
+    hoodPID.setSetpoint(ShooterConstants.hoodStartingAngleRadians);
+    flywheelBangBangController.setSetpoint(0);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -63,13 +71,24 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelLeftMotorDisconnectedAlert.set(!inputs.flywheelLeftMotorConnected);
     flywheelRightMotorDisconnectedAlert.set(!inputs.flywheelRightMotorConnected);
     hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
+
+    setHoodVoltage(hoodPID.calculate(inputs.hoodPositionRadians));
+    setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM));
   }
 
-  public void setFlywheelVoltage(double volts) {
+  private void setFlywheelVoltage(double volts) {
     shooterIO.setFlywheelVoltage(volts);
   }
 
-  public void setHoodVoltage(double volts) {
+  private void setHoodVoltage(double volts) {
     shooterIO.setHoodVoltage(volts);
+  }
+
+  public void setHoodPosition(double positionRadians) {
+    hoodPID.setSetpoint(positionRadians);
+  }
+
+  public void setFlywheelVelocity(double velocityRPM) {
+    flywheelBangBangController.setSetpoint(velocityRPM);
   }
 }
