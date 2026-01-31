@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Alert;
@@ -73,7 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
 
     setHoodVoltage(hoodPID.calculate(inputs.hoodPositionRadians));
-    setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM));
+    setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM) * 12.0);
   }
 
   private void setFlywheelVoltage(double volts) {
@@ -85,7 +86,12 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void setHoodPosition(double positionRadians) {
-    hoodPID.setSetpoint(positionRadians);
+    double hoodSetpoint =
+        MathUtil.clamp(
+            positionRadians,
+            ShooterConstants.hoodMinAngleRadians,
+            ShooterConstants.hoodMaxAngleRadians);
+    hoodPID.setSetpoint(hoodSetpoint);
   }
 
   public void setFlywheelVelocity(double velocityRPM) {

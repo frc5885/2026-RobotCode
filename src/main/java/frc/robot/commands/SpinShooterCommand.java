@@ -32,7 +32,7 @@ public class SpinShooterCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.setFlywheelVelocity(1000);
+    shooter.setFlywheelVelocity(0);
   }
 
   // Returns true when the command should end.
