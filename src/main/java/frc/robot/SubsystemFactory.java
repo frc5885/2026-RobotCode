@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
@@ -16,5 +17,6 @@ public final class SubsystemFactory {
     DriveSubsystem.getInstance();
     VisionSubsystem.getInstance();
     ShooterSubsystem.getInstance();
+    IntakeSubsystem.getInstance();
   }
 }
