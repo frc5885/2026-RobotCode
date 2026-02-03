@@ -74,7 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
 
     setHoodVoltage(hoodPID.calculate(inputs.hoodPositionRadians));
-    setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM) * 12.0);
+    // setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM) * 12.0);
   }
 
   private void setFlywheelVoltage(double volts) {

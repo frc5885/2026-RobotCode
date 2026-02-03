@@ -21,7 +21,7 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = Units.feetToMeters(15.1);
+  public static final double maxSpeedMetersPerSec = 2.8;
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);
@@ -74,7 +74,7 @@ public class DriveConstants {
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.0;
-  public static final double driveSimKv = 0.0789;
+  public static final double driveSimKv = 0.16756;
 
   // Turn motor configuration
   public static final boolean turnInverted = true;
@@ -94,7 +94,7 @@ public class DriveConstants {
       (2 * Math.PI) / 3.3; // V/Sec -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 2.0;
+  public static final double turnKp = 5.5;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;
