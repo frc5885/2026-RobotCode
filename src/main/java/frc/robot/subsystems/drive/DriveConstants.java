@@ -118,8 +118,8 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-    public static final PIDConstants drivePID = new PIDConstants(5.0, 0.0, 0.0);
-    public static final PIDConstants turnPID = new PIDConstants(5.0, 0.0, 0.0);
+  public static final PIDConstants pathplannerDrivePID = new PIDConstants(5.0, 0.0, 0.0);
+  public static final PIDConstants pathplannerTurnPID = new PIDConstants(5.0, 0.0, 0.0);
 
   // Create and configure a drivetrain simulation configuration
   public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
