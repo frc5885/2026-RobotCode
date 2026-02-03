@@ -48,6 +48,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
   private static DriveSubsystem INSTANCE = null;
+  private static SwerveDriveSimulation swerveDriveSimulation = null;
 
   public static DriveSubsystem getInstance() {
     if (INSTANCE == null) {
@@ -65,7 +66,11 @@ public class DriveSubsystem extends SubsystemBase {
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
-          SwerveDriveSimulation swerveDriveSimulation = MapleSwerveSimulation.getInstance();
+          // Maple sim setup
+          swerveDriveSimulation =
+              new SwerveDriveSimulation(
+                  DriveConstants.driveTrainSimulationConfig, DriveConstants.simStartingPose);
+
           INSTANCE =
               new DriveSubsystem(
                   new GyroIOSim(swerveDriveSimulation.getGyroSimulation()),
@@ -331,12 +336,12 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    // return poseEstimator.getEstimatedPosition();
-    // TODO: Remove this after vision is implemented, vision keeps poseEstimator synced to
-    // MapleSwerveSimulation drivetrain pose
-    return Constants.currentMode == Mode.SIM
-        ? MapleSwerveSimulation.getInstance().getSimulatedDriveTrainPose()
-        : poseEstimator.getEstimatedPosition();
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  /** Returns the current simulated drive train pose from MapleSwerveSimulation. */
+  public Pose2d getSimulatedDriveTrainPose() {
+    return swerveDriveSimulation.getSimulatedDriveTrainPose();
   }
 
   /** Returns the current odometry rotation. */
@@ -348,7 +353,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     if (Constants.currentMode == Mode.SIM) {
-      MapleSwerveSimulation.getInstance().setSimulationWorldPose(pose);
+      swerveDriveSimulation.setSimulationWorldPose(pose);
     }
   }
 
@@ -369,5 +374,10 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  /** Returns the maple sim drivetrain. */
+  public SwerveDriveSimulation getSwerveDriveSimulation() {
+    return swerveDriveSimulation;
   }
 }

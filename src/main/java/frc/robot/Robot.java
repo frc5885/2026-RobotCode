@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.MapleSwerveSimulation;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -111,6 +111,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    resetSimulationField();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -152,6 +153,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    setupSimulationField();
     resetSimulationField();
   }
 
@@ -159,6 +161,23 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     updateSimulation();
+  }
+
+  // === Maple Sim ===
+
+  public void setupSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
+    // Setup the arena with custom settings
+    boolean addRampCollider = false; // Disable drive over ramp
+    boolean efficiencyMode = true; // Spawn reduced number of balls
+    Arena2026Rebuilt arena = new Arena2026Rebuilt(addRampCollider);
+    arena.setEfficiencyMode(efficiencyMode);
+    SimulatedArena.overrideInstance(arena);
+
+    // Register the drivetrain simulation to the default simulation world
+    SimulatedArena.getInstance()
+        .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
   }
 
   public void resetSimulationField() {
@@ -174,7 +193,7 @@ public class Robot extends LoggedRobot {
     SimulatedArena.getInstance().simulationPeriodic();
     Logger.recordOutput(
         "FieldSimulation/RobotPosition",
-        MapleSwerveSimulation.getInstance().getSimulatedDriveTrainPose());
+        DriveSubsystem.getInstance().getSwerveDriveSimulation().getSimulatedDriveTrainPose());
     Logger.recordOutput(
         "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
   }

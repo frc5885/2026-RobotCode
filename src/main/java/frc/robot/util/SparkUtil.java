@@ -12,7 +12,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -68,7 +67,7 @@ public class SparkUtil {
     final double[] odometryTimeStamps = new double[SimulatedArena.getSimulationSubTicksIn1Period()];
     final double simDtSeconds = SimulatedArena.getSimulationDt().in(Seconds);
     for (int i = 0; i < odometryTimeStamps.length; i++) {
-      odometryTimeStamps[i] = Timer.getFPGATimestamp() - Constants.dtSeconds + i * simDtSeconds;
+      odometryTimeStamps[i] = Timer.getFPGATimestamp() - 0.02 + i * simDtSeconds;
     }
     return odometryTimeStamps;
   }
