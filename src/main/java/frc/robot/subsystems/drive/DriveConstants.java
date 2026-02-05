@@ -102,8 +102,8 @@ public class DriveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = 74.088;
-  public static final double robotMOI = 6.883;
+  public static final double robotMassKg = Units.lbsToKilograms(150.0);
+  public static final double robotMOI = 6.8;
   public static final double wheelCOF = COTS.WHEELS.COLSONS.cof;
   public static final RobotConfig ppConfig =
       new RobotConfig(
@@ -118,8 +118,8 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-  public static final PIDConstants pathplannerDrivePID = new PIDConstants(5.0, 0.0, 0.0);
-  public static final PIDConstants pathplannerTurnPID = new PIDConstants(5.0, 0.0, 0.0);
+  public static final PIDConstants pathplannerDrivePID = new PIDConstants(9.0, 0.0, 1.0);
+  public static final PIDConstants pathplannerTurnPID = new PIDConstants(8.0, 0.0, 1.0);
 
   // Create and configure a drivetrain simulation configuration
   public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
