@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.config.ModuleConfig;
@@ -26,7 +27,6 @@ public class DriveConstants {
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
-  public static final double bumperWidth = Units.inchesToMeters(3.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
         new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
@@ -34,6 +34,10 @@ public class DriveConstants {
         new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
         new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
       };
+  // Used for maple sim
+  public static final double robotLength = Units.inchesToMeters(27.5);
+  public static final double robotWidth = Units.inchesToMeters(27.5);
+  public static final double bumperWidth = Units.inchesToMeters(3.0);
 
   // Zeroed rotation values for each module, see setup instructions
   public static final Rotation2d frontLeftZeroRotation = new Rotation2d(2.11);
@@ -73,8 +77,8 @@ public class DriveConstants {
   public static final double driveKv = 0.13084; // Tuned on poseidon
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
-  public static final double driveSimKs = 0.0;
-  public static final double driveSimKv = 0.16756;
+  public static final double driveSimKs = 0.10819; // Tuned with maple sim
+  public static final double driveSimKv = 0.15890; // Tuned with maple sim
 
   // Turn motor configuration
   public static final boolean turnInverted = true;
@@ -103,7 +107,7 @@ public class DriveConstants {
   public static final double turnPIDToleranceRad = Units.degreesToRadians(1.0);
 
   // PathPlanner configuration
-  public static final double robotMassKg = Units.lbsToKilograms(150.0);
+  public static final double robotMassKg = Units.lbsToKilograms(130.0);
   public static final double robotMOI = 6.8;
   public static final double wheelCOF = COTS.WHEELS.COLSONS.cof;
   public static final RobotConfig ppConfig =
@@ -137,7 +141,10 @@ public class DriveConstants {
           // Configures the track length and track width (spacing between swerve modules)
           .withTrackLengthTrackWidth(Meters.of(wheelBase), Meters.of(trackWidth))
           // Configures the bumper size (dimensions of the robot bumper)
-          .withBumperSize(Meters.of(trackWidth + bumperWidth), Meters.of(wheelBase + bumperWidth));
+          .withBumperSize(Meters.of(robotLength + bumperWidth), Meters.of(robotWidth + bumperWidth))
+          // Configures the robot mass (for realistic dynamics)
+          .withRobotMass(
+              Kilograms.of(robotMassKg * 0.5)); // Multiplied by 0.5 to match real robot speed
 
   public static final Pose2d simStartingPose = new Pose2d(3, 3, new Rotation2d());
 }

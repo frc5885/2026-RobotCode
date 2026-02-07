@@ -317,7 +317,7 @@ public class DriveSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Odometry/VelocityMagnitude")
   private double getRobotVelocity() {
     ChassisSpeeds speeds = getChassisSpeeds();
-    return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
+    return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
 
   /** Returns the position of each module in radians. */
