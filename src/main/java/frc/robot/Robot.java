@@ -174,7 +174,7 @@ public class Robot extends LoggedRobot {
 
   // === Maple Sim ===
 
-  public void setupSimulationField() {
+  private void setupSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
     // Setup the arena with custom settings
@@ -189,14 +189,14 @@ public class Robot extends LoggedRobot {
         .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
   }
 
-  public void resetSimulationField() {
+  private void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
     DriveSubsystem.getInstance().setPose(DriveConstants.simStartingPose);
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
-  public void updateSimulation() {
+  private void updateSimulation() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
     SimulatedArena.getInstance().simulationPeriodic();

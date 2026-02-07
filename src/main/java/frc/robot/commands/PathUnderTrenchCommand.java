@@ -10,16 +10,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FieldConstants;
-import java.util.function.DoubleSupplier;
+import java.util.function.BooleanSupplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class PathUnderTrenchCommand extends Command {
   private Command cmd;
   private DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
-  private DoubleSupplier leftJoystickSupplier;
+  private BooleanSupplier leftJoystickSupplier;
   /** Creates a new PathUnderTrenchCommand. */
-  public PathUnderTrenchCommand(DoubleSupplier leftJoystickSupplier) {
-    this.leftJoystickSupplier = leftJoystickSupplier;
+  public PathUnderTrenchCommand(BooleanSupplier leftJoystickMovedSupplier) {
+    this.leftJoystickSupplier = leftJoystickMovedSupplier;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(driveSubsystem);
   }
@@ -41,12 +41,12 @@ public class PathUnderTrenchCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    cmd.end(interrupted);
+    cmd.end(interrupted || !cmd.isFinished());
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return cmd.isFinished() || leftJoystickSupplier.getAsDouble() > 0.1;
+    return cmd.isFinished() || leftJoystickSupplier.getAsBoolean();
   }
 }

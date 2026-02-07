@@ -16,6 +16,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.SpinIntakeCommand;
 import frc.robot.commands.SpinShooterCommand;
+import frc.robot.util.ControllerUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -65,9 +66,7 @@ public class RobotContainer {
     controller.b().whileTrue(new SpinIntakeCommand());
     controller
         .povLeft()
-        .onTrue(
-            new PathUnderTrenchCommand(
-                () -> Math.abs(controller.getLeftY()) + Math.abs(controller.getLeftX())));
+        .onTrue(new PathUnderTrenchCommand(() -> ControllerUtil.isLeftJoystickMoved(controller)));
   }
 
   /**

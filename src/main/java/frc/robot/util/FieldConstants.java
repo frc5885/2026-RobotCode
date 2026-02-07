@@ -306,7 +306,8 @@ public class FieldConstants {
     double xOffset = Units.inchesToMeters(54);
     Pose2d flippedRobotPose = AllianceFlipUtil.apply(robotPose);
     Rotation2d targetAngle = GeometryUtil.getNearest90Rotation(flippedRobotPose.getRotation());
-    // define target positions
+
+    // Define target positions
     Pose2d rightClose =
         new Pose2d(RightTrench.center.getX() - xOffset, RightTrench.center.getY(), targetAngle);
 
@@ -319,9 +320,8 @@ public class FieldConstants {
     Pose2d leftFar =
         new Pose2d(LeftTrench.center.getX() + xOffset, LeftTrench.center.getY(), targetAngle);
 
-    Pose2d returnPose = new Pose2d();
-
     // Find closest path under the trench
+    Pose2d returnPose;
     if (flippedRobotPose.getX() < LinesVertical.hubCenter
         && flippedRobotPose.getY() < LinesHorizontal.center) {
       returnPose = rightFar;

@@ -144,7 +144,8 @@ public class DriveConstants {
           // Configures the track length and track width (spacing between swerve modules)
           .withTrackLengthTrackWidth(Meters.of(wheelBase), Meters.of(trackWidth))
           // Configures the bumper size (dimensions of the robot bumper)
-          .withBumperSize(Meters.of(robotLength + bumperWidth), Meters.of(robotWidth + bumperWidth))
+          .withBumperSize(
+              Meters.of(robotLength + 2 * bumperWidth), Meters.of(robotWidth + 2 * bumperWidth))
           // Configures the robot mass (for realistic dynamics)
           .withRobotMass(
               Kilograms.of(robotMassKg * 0.5)); // Multiplied by 0.5 to match real robot speed
