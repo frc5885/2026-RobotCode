@@ -98,7 +98,7 @@ public class DriveConstants {
       (2 * Math.PI) / 3.3; // V/Sec -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 3.0;
+  public static final double turnKp = 1.0;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;
@@ -123,8 +123,8 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-  public static final PIDConstants pathplannerDrivePID = new PIDConstants(9.0, 0.0, 1.0);
-  public static final PIDConstants pathplannerTurnPID = new PIDConstants(8.0, 0.0, 1.0);
+  public static final PIDConstants pathplannerDrivePID = new PIDConstants(6.0, 0.0, 0.6);
+  public static final PIDConstants pathplannerTurnPID = new PIDConstants(6.0, 0.0, 1.0);
 
   // Create and configure a drivetrain simulation configuration
   public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
