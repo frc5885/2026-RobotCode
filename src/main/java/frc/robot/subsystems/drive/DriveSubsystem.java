@@ -314,6 +314,12 @@ public class DriveSubsystem extends SubsystemBase {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
+  @AutoLogOutput(key = "Odometry/VelocityMagnitude")
+  private double getRobotVelocity() {
+    ChassisSpeeds speeds = getChassisSpeeds();
+    return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
+  }
+
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];

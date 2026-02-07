@@ -21,7 +21,7 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = 2.8;
+  public static final double maxSpeedMetersPerSec = 4.1; // Tuned on poseidon
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);
@@ -67,10 +67,10 @@ public class DriveConstants {
   // Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.0;
+  public static final double driveKp = 0.0; // Don't use kP or kD
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.0;
-  public static final double driveKv = 0.1;
+  public static final double driveKs = 0.16493; // Tuned on poseidon
+  public static final double driveKv = 0.13084; // Tuned on poseidon
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.0;
@@ -94,12 +94,13 @@ public class DriveConstants {
       (2 * Math.PI) / 3.3; // V/Sec -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 5.5;
+  public static final double turnKp = 3.0;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
+  public static final double turnPIDToleranceRad = Units.degreesToRadians(1.0);
 
   // PathPlanner configuration
   public static final double robotMassKg = Units.lbsToKilograms(150.0);
