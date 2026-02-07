@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Meters;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -125,6 +126,8 @@ public class DriveConstants {
 
   public static final PIDConstants pathplannerDrivePID = new PIDConstants(6.0, 0.0, 0.6);
   public static final PIDConstants pathplannerTurnPID = new PIDConstants(6.0, 0.0, 1.0);
+
+  public static final PathConstraints pathConstraints = new PathConstraints(4.1, 8.0, 8.8, 16.0);
 
   // Create and configure a drivetrain simulation configuration
   public static final DriveTrainSimulationConfig driveTrainSimulationConfig =

@@ -8,14 +8,12 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.SpinIntakeCommand;
 import frc.robot.commands.SpinShooterCommand;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -66,12 +64,10 @@ public class RobotContainer {
     controller.a().whileTrue(new SpinShooterCommand());
     controller.b().whileTrue(new SpinIntakeCommand());
     controller
-        .x()
+        .povLeft()
         .onTrue(
-            AutoBuilder.pathfindToPose(
-                new Pose2d(5.95, 0.62, new Rotation2d(0.0)),
-                new PathConstraints(2.87, 8.0, 7.1, 26.0),
-                0.0));
+            new PathUnderTrenchCommand(
+                () -> Math.abs(controller.getLeftY()) + Math.abs(controller.getLeftX())));
   }
 
   /**

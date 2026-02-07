@@ -10,6 +10,7 @@ package frc.robot.util;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -191,6 +192,9 @@ public class FieldConstants {
         new Translation3d(LinesVertical.oppHubCenter, fieldWidth, openingHeight);
     public static final Translation3d oppOpeningTopRight =
         new Translation3d(LinesVertical.oppHubCenter, fieldWidth - openingWidth, openingHeight);
+
+    public static final Translation3d center =
+        new Translation3d(LinesVertical.hubCenter, fieldWidth - openingWidth / 2.0, openingHeight);
   }
 
   public static class RightTrench {
@@ -213,6 +217,9 @@ public class FieldConstants {
         new Translation3d(LinesVertical.oppHubCenter, openingWidth, openingHeight);
     public static final Translation3d oppOpeningTopRight =
         new Translation3d(LinesVertical.oppHubCenter, 0, openingHeight);
+
+    public static final Translation3d center =
+        new Translation3d(LinesVertical.hubCenter, openingWidth / 2.0, openingHeight);
   }
 
   /** Tower related constants */
@@ -290,5 +297,43 @@ public class FieldConstants {
     // Relevant reference points on alliance side
     public static final Translation2d centerPoint =
         new Translation2d(0, aprilTagFieldLayout.getTagPose(29).get().getY());
+  }
+
+  /*
+   * Get the point to pathfind to under trench
+   */
+  public static Pose2d getUnderTrenchTargetPose(Pose2d robotPose) {
+    double xOffset = Units.inchesToMeters(54);
+    Pose2d flippedRobotPose = AllianceFlipUtil.apply(robotPose);
+    Rotation2d targetAngle = GeometryUtil.getNearest90Rotation(flippedRobotPose.getRotation());
+    // define target positions
+    Pose2d rightClose =
+        new Pose2d(RightTrench.center.getX() - xOffset, RightTrench.center.getY(), targetAngle);
+
+    Pose2d rightFar =
+        new Pose2d(RightTrench.center.getX() + xOffset, RightTrench.center.getY(), targetAngle);
+
+    Pose2d leftClose =
+        new Pose2d(LeftTrench.center.getX() - xOffset, LeftTrench.center.getY(), targetAngle);
+
+    Pose2d leftFar =
+        new Pose2d(LeftTrench.center.getX() + xOffset, LeftTrench.center.getY(), targetAngle);
+
+    Pose2d returnPose = new Pose2d();
+
+    // Find closest path under the trench
+    if (flippedRobotPose.getX() < LinesVertical.hubCenter
+        && flippedRobotPose.getY() < LinesHorizontal.center) {
+      returnPose = rightFar;
+    } else if (flippedRobotPose.getX() < LinesVertical.hubCenter
+        && flippedRobotPose.getY() >= LinesHorizontal.center) {
+      returnPose = leftFar;
+    } else if (flippedRobotPose.getX() >= LinesVertical.hubCenter
+        && flippedRobotPose.getY() < LinesHorizontal.center) {
+      returnPose = rightClose;
+    } else {
+      returnPose = leftClose;
+    }
+    return AllianceFlipUtil.apply(returnPose);
   }
 }
