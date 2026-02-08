@@ -9,6 +9,7 @@ package frc.robot.util;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -302,7 +303,9 @@ public class FieldConstants {
   /*
    * Get the point to pathfind to under trench
    */
-  public static Pose2d getUnderTrenchTargetPose(Pose2d robotPose) {
+
+  public static Pair<Pose2d, Pose2d> getUnderTrenchTargetPoses(Pose2d robotPose) {
+
     double xOffset = Units.inchesToMeters(54);
     Pose2d flippedRobotPose = AllianceFlipUtil.apply(robotPose);
     Rotation2d targetAngle = GeometryUtil.getNearest90Rotation(flippedRobotPose.getRotation());
@@ -321,19 +324,24 @@ public class FieldConstants {
         new Pose2d(LeftTrench.center.getX() + xOffset, LeftTrench.center.getY(), targetAngle);
 
     // Find closest path under the trench
-    Pose2d returnPose;
+
+    Pose2d approachPose, endPose;
     if (flippedRobotPose.getX() < LinesVertical.hubCenter
         && flippedRobotPose.getY() < LinesHorizontal.center) {
-      returnPose = rightFar;
+      approachPose = rightClose;
+      endPose = rightFar;
     } else if (flippedRobotPose.getX() < LinesVertical.hubCenter
         && flippedRobotPose.getY() >= LinesHorizontal.center) {
-      returnPose = leftFar;
+      approachPose = leftClose;
+      endPose = leftFar;
     } else if (flippedRobotPose.getX() >= LinesVertical.hubCenter
         && flippedRobotPose.getY() < LinesHorizontal.center) {
-      returnPose = rightClose;
+      approachPose = rightFar;
+      endPose = rightClose;
     } else {
-      returnPose = leftClose;
+      approachPose = leftFar;
+      endPose = leftClose;
     }
-    return AllianceFlipUtil.apply(returnPose);
+    return Pair.of(AllianceFlipUtil.apply(approachPose), AllianceFlipUtil.apply(endPose));
   }
 }

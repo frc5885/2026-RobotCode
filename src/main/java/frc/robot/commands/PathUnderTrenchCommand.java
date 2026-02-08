@@ -5,11 +5,15 @@
 package frc.robot.commands;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FieldConstants;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -27,8 +31,21 @@ public class PathUnderTrenchCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Pose2d targetPose = FieldConstants.getUnderTrenchTargetPose(driveSubsystem.getPose());
-    cmd = AutoBuilder.pathfindToPose(targetPose, DriveConstants.pathConstraints, 0.0);
+    Pair<Pose2d, Pose2d> targetPoses =
+        FieldConstants.getUnderTrenchTargetPoses(driveSubsystem.getPose());
+    cmd =
+        // AutoBuilder.pathfindToPose(targetPoses.getFirst(), DriveConstants.pathConstraints, 1.0)
+        //     .andThen(
+        //         AutoBuilder.pathfindToPose(
+        //             targetPoses.getSecond(), DriveConstants.pathConstraints, 0.0));
+        AutoBuilder.pathfindThenFollowPath(
+            new PathPlannerPath(
+                PathPlannerPath.waypointsFromPoses(
+                    List.of(targetPoses.getFirst(), targetPoses.getSecond())),
+                DriveConstants.pathConstraints,
+                null,
+                new GoalEndState(0, targetPoses.getSecond().getRotation())),
+            DriveConstants.pathConstraints);
     cmd.initialize();
   }
 
