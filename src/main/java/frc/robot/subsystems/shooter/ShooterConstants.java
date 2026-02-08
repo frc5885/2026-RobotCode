@@ -10,8 +10,8 @@ package frc.robot.subsystems.shooter;
 public class ShooterConstants {
   public static final double flywheelGearRatio = 10.0 / 1.0;
   public static final double flywheelMomentOfInertia = 0.1; // kg*m^2
-  public static final int flywheelLeftCanId = 33;
-  public static final int flywheelRightCanId = 34;
+  public static final int flywheelLeftCanId = 43;
+  public static final int flywheelRightCanId = 44;
   public static final boolean flywheelLeftMotorInverted = false;
   public static final boolean flywheelMotorsOppositeDirections = false;
   public static final int flywheelCurrentLimit = 30;
@@ -26,7 +26,7 @@ public class ShooterConstants {
   public static final double hoodStartingAngleRadians = 0.0;
   public static final double hoodArmLengthMeters = 1.0;
   public static final double hoodArmMassKG = 1.0;
-  public static final int hoodCanId = 35;
+  public static final int hoodCanId = 45;
   public static final boolean hoodMotorInverted = false;
   public static final int hoodCurrentLimit = 30;
   // Motor Rotations -> Radians

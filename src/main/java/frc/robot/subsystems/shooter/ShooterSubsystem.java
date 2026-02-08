@@ -74,7 +74,9 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotorDisconnectedAlert.set(!inputs.hoodMotorConnected);
 
     setHoodVoltage(hoodPID.calculate(inputs.hoodPositionRadians));
-    setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM) * 12.0);
+    if (flywheelBangBangController.getSetpoint() != 0) {
+      setFlywheelVoltage(flywheelBangBangController.calculate(inputs.flywheelVelocityRPM) * 12.0);
+    }
   }
 
   private void setFlywheelVoltage(double volts) {
@@ -96,5 +98,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void setFlywheelVelocity(double velocityRPM) {
     flywheelBangBangController.setSetpoint(velocityRPM);
+    // If the setpoint is 0, set the voltage to 0 because the bang bang controller will not
+    // calculate a voltage in periodic if the setpoint is 0
+    if (velocityRPM == 0) {
+      setFlywheelVoltage(0);
+    }
   }
 }

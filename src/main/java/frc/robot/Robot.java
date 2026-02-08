@@ -7,9 +7,14 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.revrobotics.util.StatusLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -54,6 +59,8 @@ public class Robot extends LoggedRobot {
       case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
+        // Uncomment below if running sysID tests in sim
+        // Logger.addDataReceiver(new WPILOGWriter());
         break;
 
       case REPLAY:
@@ -75,6 +82,12 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+  }
+
+  @Override
+  public void robotInit() {
+    // For pathplanner
+    FollowPathCommand.warmupCommand().schedule();
   }
 
   /** This function is called periodically during all modes. */
@@ -107,6 +120,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    resetSimulationField();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -147,9 +161,49 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    setupSimulationField();
+    resetSimulationField();
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    updateSimulation();
+  }
+
+  // === Maple Sim ===
+
+  private void setupSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
+    // Setup the arena with custom settings
+    boolean addRampCollider = false; // Disable drive over ramp
+    boolean efficiencyMode = true; // Spawn reduced number of balls
+    Arena2026Rebuilt arena = new Arena2026Rebuilt(addRampCollider);
+    arena.setEfficiencyMode(efficiencyMode);
+    SimulatedArena.overrideInstance(arena);
+
+    // Register the drivetrain simulation to the default simulation world
+    SimulatedArena.getInstance()
+        .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
+  }
+
+  private void resetSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
+    DriveSubsystem.getInstance().setPose(DriveConstants.simStartingPose);
+    SimulatedArena.getInstance().resetFieldForAuto();
+  }
+
+  private void updateSimulation() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
+    SimulatedArena.getInstance().simulationPeriodic();
+    Logger.recordOutput(
+        "FieldSimulation/RobotPosition",
+        DriveSubsystem.getInstance().getSwerveDriveSimulation().getSimulatedDriveTrainPose());
+    Logger.recordOutput(
+        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+  }
 }

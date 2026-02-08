@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -41,12 +40,14 @@ import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
   private static DriveSubsystem INSTANCE = null;
+  private static SwerveDriveSimulation swerveDriveSimulation = null;
 
   public static DriveSubsystem getInstance() {
     if (INSTANCE == null) {
@@ -64,13 +65,19 @@ public class DriveSubsystem extends SubsystemBase {
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
+          // Maple sim setup
+          swerveDriveSimulation =
+              new SwerveDriveSimulation(
+                  DriveConstants.driveTrainSimulationConfig, DriveConstants.simStartingPose);
+
           INSTANCE =
               new DriveSubsystem(
-                  new GyroIO() {},
-                  new ModuleIOSim(),
-                  new ModuleIOSim(),
-                  new ModuleIOSim(),
-                  new ModuleIOSim());
+                  new GyroIOSim(swerveDriveSimulation.getGyroSimulation()),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[0]),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[1]),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[2]),
+                  new ModuleIOSim(swerveDriveSimulation.getModules()[3]));
+          INSTANCE.setPose(DriveConstants.simStartingPose);
           break;
 
         default:
@@ -134,11 +141,10 @@ public class DriveSubsystem extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            DriveConstants.drivePID,
-            DriveConstants.turnPID),
-            ppConfig,
-            () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-            this);
+            DriveConstants.pathplannerDrivePID, DriveConstants.pathplannerTurnPID),
+        ppConfig,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
@@ -229,7 +235,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, Constants.dtSeconds);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
 
@@ -308,6 +314,12 @@ public class DriveSubsystem extends SubsystemBase {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
+  @AutoLogOutput(key = "Odometry/VelocityMagnitude")
+  private double getRobotVelocity() {
+    ChassisSpeeds speeds = getChassisSpeeds();
+    return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+  }
+
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
@@ -332,6 +344,11 @@ public class DriveSubsystem extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
+  /** Returns the current simulated drive train pose from MapleSwerveSimulation. */
+  public Pose2d getSimulatedDriveTrainPose() {
+    return swerveDriveSimulation.getSimulatedDriveTrainPose();
+  }
+
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -340,6 +357,9 @@ public class DriveSubsystem extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    if (Constants.currentMode == Mode.SIM) {
+      swerveDriveSimulation.setSimulationWorldPose(pose);
+    }
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -359,5 +379,10 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  /** Returns the maple sim drivetrain. */
+  public SwerveDriveSimulation getSwerveDriveSimulation() {
+    return swerveDriveSimulation;
   }
 }
