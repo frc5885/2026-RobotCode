@@ -16,6 +16,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.SpinIntakeCommand;
 import frc.robot.commands.SpinShooterCommand;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.ControllerUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -67,6 +68,8 @@ public class RobotContainer {
     controller
         .povLeft()
         .onTrue(new PathUnderTrenchCommand(() -> ControllerUtil.isLeftJoystickMoved(controller)));
+
+    controller.rightTrigger(0.1).onTrue(ShotCalculator.launchSimulatedFuel());
   }
 
   /**
