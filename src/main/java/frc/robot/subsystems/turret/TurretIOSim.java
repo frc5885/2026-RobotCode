@@ -12,7 +12,7 @@ import frc.robot.Constants;
 /** Sim turret implementation */
 public class TurretIOSim implements TurretIO {
 
-  private double turretAppliedVolts;
+  private double appliedVolts;
 
   private DCMotorSim turretSim;
 
