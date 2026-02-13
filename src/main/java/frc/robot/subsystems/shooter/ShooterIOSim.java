@@ -8,6 +8,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.Constants;
 
 /** Sim shooter implementation */
 public class ShooterIOSim implements ShooterIO {
@@ -41,7 +42,7 @@ public class ShooterIOSim implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    flywheelSim.update(0.02);
+    flywheelSim.update(Constants.dtSeconds);
     inputs.flywheelPositionRotations = 0.0;
     inputs.flywheelVelocityRPM = flywheelSim.getAngularVelocityRPM();
     inputs.flywheelAppliedVolts = flywheelAppliedVolts;
@@ -50,7 +51,7 @@ public class ShooterIOSim implements ShooterIO {
     inputs.flywheelLeftMotorConnected = true;
     inputs.flywheelRightMotorConnected = true;
 
-    hoodSim.update(0.02);
+    hoodSim.update(Constants.dtSeconds);
     inputs.hoodPositionRadians = hoodSim.getAngleRads();
     inputs.hoodVelocityRadiansPerSecond = hoodSim.getVelocityRadPerSec();
     inputs.hoodAppliedVolts = hoodAppliedVolts;
