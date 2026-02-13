@@ -25,21 +25,21 @@ public class TurretIOSpark implements TurretIO {
 
   public TurretIOSpark() {
 
-    turretMotor = new SparkMax(TurretConstants.turretCanId, MotorType.kBrushless);
+    turretMotor = new SparkMax(TurretConstants.canId, MotorType.kBrushless);
     turretEncoder = turretMotor.getEncoder();
 
     SparkMaxConfig turretConfig = new SparkMaxConfig();
     turretConfig
-        .inverted(TurretConstants.turretMotorInverted)
+        .inverted(TurretConstants.motorInverted)
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(TurretConstants.turretCurrentLimit)
+        .smartCurrentLimit(TurretConstants.currentLimit)
         .voltageCompensation(12.0);
     turretConfig
         .encoder
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2)
-        .positionConversionFactor(TurretConstants.turretPositionConversionFactor)
-        .velocityConversionFactor(TurretConstants.turretVelocityConversionFactor);
+        .positionConversionFactor(TurretConstants.positionConversionFactor)
+        .velocityConversionFactor(TurretConstants.velocityConversionFactor);
     turretConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
@@ -61,21 +61,21 @@ public class TurretIOSpark implements TurretIO {
   public void updateInputs(TurretIOInputs inputs) {
 
     sparkStickyFault = false;
-    ifOk(turretMotor, turretEncoder::getPosition, (value) -> inputs.turretPositionRadians = value);
+    ifOk(turretMotor, turretEncoder::getPosition, (value) -> inputs.positionRadians = value);
     ifOk(
         turretMotor,
         turretEncoder::getVelocity,
-        (value) -> inputs.turretVelocityRadiansPerSecond = value);
+        (value) -> inputs.velocityRadiansPerSecond = value);
     ifOk(
         turretMotor,
         new DoubleSupplier[] {turretMotor::getAppliedOutput, turretMotor::getBusVoltage},
-        (values) -> inputs.turretAppliedVolts = values[0] * values[1]);
-    ifOk(turretMotor, turretMotor::getOutputCurrent, (value) -> inputs.turretCurrentAmps = value);
-    inputs.turretMotorConnected = turretMotorConnectedDebounce.calculate(!sparkStickyFault);
+        (values) -> inputs.appliedVolts = values[0] * values[1]);
+    ifOk(turretMotor, turretMotor::getOutputCurrent, (value) -> inputs.currentAmps = value);
+    inputs.motorConnected = turretMotorConnectedDebounce.calculate(!sparkStickyFault);
   }
 
   @Override
-  public void setTurretVoltage(double volts) {
+  public void setVoltage(double volts) {
     turretMotor.setVoltage(volts);
   }
 }

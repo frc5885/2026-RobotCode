@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.turret;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -43,15 +42,17 @@ public class TurretSubsystem extends SubsystemBase {
       new Alert("Turret motor disconnected!", AlertType.kWarning);
   private final TurretIO turretIO;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
-  private final PIDController turretPID =
+  private final PIDController pidController =
       new PIDController(
-          TurretConstants.turretKp, TurretConstants.turretKi, TurretConstants.turretKd);
+          TurretConstants.kp, TurretConstants.ki, TurretConstants.kd);
+  private boolean runClosedLoop = false;
 
   /** Creates a new Turret. */
   private TurretSubsystem(TurretIO io) {
     turretIO = io;
 
-    turretPID.setSetpoint(TurretConstants.turretStartingAngleRadians);
+    pidController.setSetpoint(TurretConstants.startingAngleRadians);
+    runClosedLoop = true;
 
     AutoLogOutputManager.addObject(this);
   }
@@ -62,21 +63,20 @@ public class TurretSubsystem extends SubsystemBase {
     turretIO.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
 
-    turretMotorDisconnectedAlert.set(!inputs.turretMotorConnected);
+    turretMotorDisconnectedAlert.set(!inputs.motorConnected);
 
-    setTurretVoltage(turretPID.calculate(inputs.turretPositionRadians));
+    if (runClosedLoop) {
+      turretIO.setVoltage(pidController.calculate(inputs.positionRadians));
+    }
   }
 
-  private void setTurretVoltage(double volts) {
-    turretIO.setTurretVoltage(volts);
+  public void runOpenLoop(double volts) {
+    runClosedLoop = false;
+    turretIO.setVoltage(volts);
   }
 
-  public void setTurretPosition(double positionRadians) {
-    double turretSetpoint =
-        MathUtil.clamp(
-            positionRadians,
-            TurretConstants.turretMinAngleRadians,
-            TurretConstants.turretMaxAngleRadians);
-    turretPID.setSetpoint(turretSetpoint);
+  public void runClosedLoop(double positionRadians) {
+    runClosedLoop = true;
+    pidController.setSetpoint(positionRadians);
   }
 }

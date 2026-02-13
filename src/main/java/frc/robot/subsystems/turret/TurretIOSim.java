@@ -12,7 +12,7 @@ import frc.robot.Constants;
 /** Sim turret implementation */
 public class TurretIOSim implements TurretIO {
 
-  private double turretAppliedVolts;
+  private double appliedVolts;
 
   private DCMotorSim turretSim;
 
@@ -21,24 +21,24 @@ public class TurretIOSim implements TurretIO {
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
                 DCMotor.getNEO(1),
-                TurretConstants.turretMomentOfInertia,
-                TurretConstants.turretGearRatio),
+                TurretConstants.momentOfInertia,
+                TurretConstants.gearRatio),
             DCMotor.getNEO(1));
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     turretSim.update(Constants.dtSeconds);
-    inputs.turretPositionRadians = turretSim.getAngularPositionRad();
-    inputs.turretVelocityRadiansPerSecond = turretSim.getAngularVelocityRadPerSec();
-    inputs.turretAppliedVolts = turretAppliedVolts;
-    inputs.turretCurrentAmps = turretSim.getCurrentDrawAmps();
-    inputs.turretMotorConnected = true;
+    inputs.positionRadians = turretSim.getAngularPositionRad();
+    inputs.velocityRadiansPerSecond = turretSim.getAngularVelocityRadPerSec();
+    inputs.appliedVolts = appliedVolts;
+    inputs.currentAmps = turretSim.getCurrentDrawAmps();
+    inputs.motorConnected = true;
   }
 
   @Override
-  public void setTurretVoltage(double volts) {
-    turretAppliedVolts = volts;
+  public void setVoltage(double volts) {
+    appliedVolts = volts;
     turretSim.setInput(volts);
   }
 }
