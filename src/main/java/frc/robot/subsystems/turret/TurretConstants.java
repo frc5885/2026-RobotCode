@@ -10,6 +10,9 @@ package frc.robot.subsystems.turret;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+
 public class TurretConstants {
 
   public static final double gearRatio = 10.0 / 1.0;
@@ -26,8 +29,19 @@ public class TurretConstants {
   public static final double velocityConversionFactor = positionConversionFactor / 60;
   public static final double kp = 5.0;
   public static final double ki = 0.0;
-  public static final double kd = 3.0;
+  public static final double kd = 0.0;
+  public static final double kS = 0.0;
+  public static final double kV = 0.0;
+  public static final double kA = 0.0;
+  public static final double maxVelocityRadiansPerSecond = 5.0;
+  public static final double maxAccelerationRadiansPerSecondSquared = 10.0;
 
-  public static final Transform3d robotToTurret =
-      new Transform3d(-0.16, 0.16, 0.38, Rotation3d.kZero);
+  public static final double minAngle = Math.toRadians(-210.0);
+  public static final double maxAngle = Math.toRadians(210.0);
+  public static final double trackOverlapMargin = Math.toRadians(10);
+  public static final double trackCenterRads = (minAngle + maxAngle) / 2;
+  public static final double trackMinAngle = trackCenterRads - Math.PI - trackOverlapMargin;
+  public static final double trackMaxAngle = trackCenterRads + Math.PI + trackOverlapMargin;
+
+  public static Transform3d robotToTurret = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
 }

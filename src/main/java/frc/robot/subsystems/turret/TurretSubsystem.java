@@ -4,14 +4,22 @@
 
 package frc.robot.subsystems.turret;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.util.EqualsUtil;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -45,14 +53,32 @@ public class TurretSubsystem extends SubsystemBase {
       new Alert("Turret motor disconnected!", AlertType.kWarning);
   private final TurretIO turretIO;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
-  private final PIDController turretPID =
+  private final PIDController pidController =
       new PIDController(TurretConstants.kp, TurretConstants.ki, TurretConstants.kd);
+  private final SimpleMotorFeedforward feedforward =
+      new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
+  private boolean runClosedLoop = true;
+
+  // Stuff for tracking
+  @AutoLogOutput private LaunchState launchState = LaunchState.TRACKING;
+  private Rotation2d goalAngle = Rotation2d.kZero;
+  private double goalVelocity = 0.0;
+  private double lastGoalAngle = 0.0;
+  private TrapezoidProfile profile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              TurretConstants.maxVelocityRadiansPerSecond,
+              TurretConstants.maxAccelerationRadiansPerSecondSquared));
+  private State setpoint = new State();
+  private double turretOffset;
+  @AutoLogOutput private boolean atGoal = false;
 
   /** Creates a new Turret. */
   private TurretSubsystem(TurretIO io) {
     turretIO = io;
 
-    turretPID.setSetpoint(TurretConstants.startingAngleRadians);
+    setpoint = new State(TurretConstants.startingAngleRadians, 0.0);
+    runClosedLoop = true;
 
     AutoLogOutputManager.addObject(this);
   }
@@ -65,32 +91,113 @@ public class TurretSubsystem extends SubsystemBase {
 
     turretMotorDisconnectedAlert.set(!inputs.motorConnected);
 
-    setTurretVoltage(turretPID.calculate(inputs.positionRadians));
+    // Stuff for tracking
+    Rotation2d robotAngle = DriveSubsystem.getInstance().getRotation();
+    double robotAngularVelocity =
+        DriveSubsystem.getInstance().getFieldRelativeChassisSpeeds().omegaRadiansPerSecond;
 
-    visualizationUpdate();
+    Rotation2d robotRelativeGoalAngle = goalAngle.minus(robotAngle);
+    double robotRelativeGoalVelocity = goalVelocity - robotAngularVelocity;
+
+    boolean hasBestAngle = false;
+    double bestAngle = 0;
+    double minLegalAngle =
+        switch (launchState) {
+          case ACTIVE_LAUNCHING -> TurretConstants.minAngle;
+          case TRACKING -> TurretConstants.trackMinAngle;
+        };
+    double maxLegalAngle =
+        switch (launchState) {
+          case ACTIVE_LAUNCHING -> TurretConstants.maxAngle;
+          case TRACKING -> TurretConstants.trackMaxAngle;
+        };
+
+    for (int i = -2; i < 3; i++) {
+      double potentialSetpoint = robotRelativeGoalAngle.getRadians() + Math.PI * 2.0 * i;
+      if (potentialSetpoint < minLegalAngle || potentialSetpoint > maxLegalAngle) {
+        continue;
+      } else {
+        if (!hasBestAngle) {
+          bestAngle = potentialSetpoint;
+          hasBestAngle = true;
+        }
+        if (Math.abs(lastGoalAngle - potentialSetpoint) < Math.abs(lastGoalAngle - bestAngle)) {
+          bestAngle = potentialSetpoint;
+        }
+      }
+    }
+    lastGoalAngle = bestAngle;
+
+    State goalState =
+        new State(
+            MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle), robotRelativeGoalVelocity);
+
+    setpoint = profile.calculate(Constants.dtSeconds, setpoint, goalState);
+    atGoal =
+        EqualsUtil.epsilonEquals(bestAngle, setpoint.position)
+            && EqualsUtil.epsilonEquals(robotRelativeGoalVelocity, setpoint.velocity);
+    Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
+    Logger.recordOutput("Turret/GoalVelocityRadPerSec", robotRelativeGoalVelocity);
+    Logger.recordOutput("Turret/SetpointPositionRad", setpoint.position);
+    Logger.recordOutput("Turret/SetpointVelocityRadPerSec", setpoint.velocity);
+
+    if (runClosedLoop) {
+      turretIO.setVoltage(
+          pidController.calculate(inputs.positionRadians, setpoint.position - turretOffset)
+              + feedforward.calculate(setpoint.velocity));
+    }
+  }
+
+  private void setFieldRelativeTarget(Rotation2d angle, double velocity) {
+    this.goalAngle = angle;
+    this.goalVelocity = velocity;
+  }
+
+  @AutoLogOutput(key = "Turret/MeasuredPositionRad")
+  public double getPosition() {
+    return inputs.positionRadians + turretOffset;
+  }
+
+  @AutoLogOutput(key = "Turret/MeasuredVelocityRadPerSec")
+  public double getVelocity() {
+    return inputs.velocityRadiansPerSecond;
+  }
+
+  public Command runTrackTargetCommand() {
+    return run(
+        () -> {
+          var params = LaunchCalculator.getInstance().getParameters();
+          setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
+          launchState = LaunchState.TRACKING;
+          runClosedLoop = true;
+        });
+  }
+
+  public Command runTrackTargetActiveLaunchingCommand() {
+    return run(
+        () -> {
+          var params = LaunchCalculator.getInstance().getParameters();
+          setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
+          launchState = LaunchState.ACTIVE_LAUNCHING;
+          runClosedLoop = true;
+        });
+  }
+
+  public Command runFixedCommand(Supplier<Rotation2d> angle, DoubleSupplier velocity) {
+    return run(
+        () -> {
+          setFieldRelativeTarget(angle.get(), velocity.getAsDouble());
+          launchState = LaunchState.TRACKING;
+          runClosedLoop = true;
+        });
   }
 
   private void setTurretVoltage(double volts) {
     turretIO.setMotorVoltage(volts);
   }
 
-  public void setTurretPosition(double positionRadians) {
-    double turretSetpoint =
-        MathUtil.clamp(
-            positionRadians, TurretConstants.minAngleRadians, TurretConstants.maxAngleRadians);
-    turretPID.setSetpoint(turretSetpoint);
-  }
-
-  private void visualizationUpdate() {
-    // Log Pose3d
-    Logger.recordOutput(
-        "Mechanism3d/2-Turret",
-        new Pose3d(
-            TurretConstants.robotToTurret.getTranslation(),
-            new Rotation3d(0.0, 0.0, inputs.positionRadians)));
-  }
-
-  public Rotation2d getTurretPosition() {
-    return new Rotation2d(inputs.positionRadians);
+  public enum LaunchState {
+    ACTIVE_LAUNCHING,
+    TRACKING
   }
 }
