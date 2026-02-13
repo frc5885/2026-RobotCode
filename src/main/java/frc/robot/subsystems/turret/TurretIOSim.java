@@ -7,6 +7,7 @@ package frc.robot.subsystems.turret;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.Constants;
 
 /** Sim turret implementation */
 public class TurretIOSim implements TurretIO {
@@ -27,7 +28,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
-    turretSim.update(0.02);
+    turretSim.update(Constants.dtSeconds);
     inputs.turretPositionRadians = turretSim.getAngularPositionRad();
     inputs.turretVelocityRadiansPerSecond = turretSim.getAngularVelocityRadPerSec();
     inputs.turretAppliedVolts = turretAppliedVolts;
