@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -192,34 +193,21 @@ public class TurretSubsystem extends SubsystemBase {
     return inputs.velocityRadiansPerSecond;
   }
 
-  /** Run the turret in tracking mode Tracks the result of the launch calculator */
+  /** Run the turret in tracking mode. Tracks the result of the launch calculator */
   public Command runTrackTargetCommand() {
     return run(
         () -> {
           var params = LaunchCalculator.getInstance().getParameters();
           setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
-          launchState = LaunchState.TRACKING;
           runClosedLoop = true;
         });
   }
 
-  /** Run the turret in active launching mode Tracks the result of the launch calculator */
-  public Command runTrackTargetActiveLaunchingCommand() {
-    return run(
-        () -> {
-          var params = LaunchCalculator.getInstance().getParameters();
-          setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
-          launchState = LaunchState.ACTIVE_LAUNCHING;
-          runClosedLoop = true;
-        });
-  }
-
-  /** Track a supplied field-relative angle and velocity */
+  /** Lock to a supplied field-relative angle and velocity */
   public Command runFieldRelativeFixedCommand(Supplier<Rotation2d> angle, DoubleSupplier velocity) {
     return run(
         () -> {
           setFieldRelativeTarget(angle.get(), velocity.getAsDouble());
-          launchState = LaunchState.TRACKING;
           runClosedLoop = true;
         });
   }
@@ -232,11 +220,20 @@ public class TurretSubsystem extends SubsystemBase {
     return run(
         () -> {
           setRobotRelativeTarget(angle.get());
-          launchState = LaunchState.TRACKING;
           runClosedLoop = true;
         });
   }
 
+  /**
+   * Set the turret to active launching mode for the duration of the command, reverting back to
+   * tracking mode when done
+   */
+  public Command setActiveLaunchingModeCommand() {
+    return new StartEndCommand(
+        () -> launchState = LaunchState.ACTIVE_LAUNCHING, () -> launchState = LaunchState.TRACKING);
+  }
+
+  /** Run the turret in open loop mode at a specified voltage */
   public void runOpenLoop(double volts) {
     runClosedLoop = false;
     turretIO.setVoltage(volts);
