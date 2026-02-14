@@ -43,5 +43,6 @@ public class TurretConstants {
   public static final double trackMinAngle = trackCenterRads - Math.PI - trackOverlapMargin;
   public static final double trackMaxAngle = trackCenterRads + Math.PI + trackOverlapMargin;
 
-  public static Transform3d robotToTurret = new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
+  public static final Transform3d robotToTurret =
+      new Transform3d(-0.19685, 0.0, 0.44, Rotation3d.kZero);
 }
