@@ -7,8 +7,7 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -19,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.*;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
@@ -151,4 +151,17 @@ public class DriveConstants {
               Kilograms.of(robotMassKg * 0.5)); // Multiplied by 0.5 to match real robot speed
 
   public static final Pose2d simStartingPose = new Pose2d(3, 3, new Rotation2d());
+
+  // Teleop Drive Constants
+  public static final LinearVelocity defaultDriveSpeed = MetersPerSecond.of(2.0);
+  public static final LinearVelocity fastDriveSpeed = MetersPerSecond.of(maxSpeedMetersPerSec);
+  public static final AngularVelocity defaultRotationSpeed = RadiansPerSecond.of(4.0);
+  public static final AngularVelocity fastRotationSpeed = RadiansPerSecond.of(8.0);
+  public static final LinearAcceleration maxLinearAcceleration = MetersPerSecondPerSecond.of(8.0);
+
+  public static final double trenchTranslationConstants = 1.0;
+  public static final double rotationConstants = 5.0; // Matching DriveCommands.ANGLE_KP
+
+  public static final LinearAcceleration maxTeleopAcceleration =
+      MetersPerSecondPerSecond.of(1.0); // TBD Please change later -Thanks, Chuck ;)
 }

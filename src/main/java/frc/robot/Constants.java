@@ -30,4 +30,8 @@ public final class Constants {
   }
 
   public static final double dtSeconds = 0.02; // Robot loop time (20ms)
+
+  public static final class ControllerConstants {
+    public static final double CONTROLLER_DEADBAND = 0.1;
+  }
 }

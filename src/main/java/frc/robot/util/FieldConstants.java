@@ -7,6 +7,8 @@
 
 package frc.robot.util;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * Contains information for location of field element and other useful reference points.
@@ -32,6 +35,25 @@ public class FieldConstants {
   // Field dimensions
   public static final double fieldLength = aprilTagFieldLayout.getFieldLength();
   public static final double fieldWidth = aprilTagFieldLayout.getFieldWidth();
+
+  // public static final Distance fieldWidth = Meters.of(fieldWidth);
+  public static final Distance trenchCenter = Meters.of(Units.inchesToMeters(24.0)); // Approximated
+
+  public static final Translation2d[][] trenchZones =
+      new Translation2d[][] {
+        {new Translation2d(0, 0), new Translation2d(1, 1)}, // Placeholder 1
+        {new Translation2d(0, 0), new Translation2d(1, 1)}, // Placeholder 2
+        {new Translation2d(0, 0), new Translation2d(1, 1)}, // Placeholder 3
+        {new Translation2d(0, 0), new Translation2d(1, 1)} // Placeholder 4
+      };
+
+  public static final Translation2d[][] bumpZones =
+      new Translation2d[][] {
+        {new Translation2d(0, 0), new Translation2d(1, 1)}, // Placeholder 1
+        {new Translation2d(0, 0), new Translation2d(1, 1)}, // Placeholder 2
+        {new Translation2d(0, 0), new Translation2d(1, 1)}, // Placeholder 3
+        {new Translation2d(0, 0), new Translation2d(1, 1)} // Placeholder 4
+      };
 
   /**
    * Officially defined and relevant vertical lines found on the field (defined by X-axis offset)

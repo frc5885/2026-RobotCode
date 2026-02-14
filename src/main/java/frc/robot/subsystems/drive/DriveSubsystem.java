@@ -28,6 +28,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -250,6 +252,23 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  }
+
+  /**
+   * Runs the drive at the desired field-centric velocity.
+   *
+   * @param xVelocity The x velocity (forward/backward)
+   * @param yVelocity The y velocity (left/right)
+   * @param omega The angular velocity (rotation)
+   */
+  public void driveFieldCentric(
+      LinearVelocity xVelocity, LinearVelocity yVelocity, AngularVelocity omega) {
+    runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xVelocity.in(MetersPerSecond),
+            yVelocity.in(MetersPerSecond),
+            omega.in(RadiansPerSecond),
+            getRotation()));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
