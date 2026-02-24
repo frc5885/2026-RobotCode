@@ -4,13 +4,15 @@
 
 package frc.robot.subsystems.shooter.hood;
 
+import edu.wpi.first.math.util.Units;
+
 public class HoodConstants {
   public static final double gearRatio = 10.0 / 1.0;
-  public static final double minAngleRadians = 0.0;
-  public static final double maxAngleRadians = 0.5;
-  public static final double startingAngleRadians = 0.0;
-  public static final double armLengthMeters = 1.0;
-  public static final double armMassKG = 1.0;
+  public static final double minAngleRadians = Units.degreesToRadians(0);
+  public static final double maxAngleRadians = Units.degreesToRadians(90);
+  public static final double startingAngleRadians = Units.degreesToRadians(80);
+  public static final double armLengthMeters = 0.1;
+  public static final double armMassKG = 0.05;
   public static final int canId = 45;
   public static final boolean motorInverted = false;
   public static final int currentLimit = 30;

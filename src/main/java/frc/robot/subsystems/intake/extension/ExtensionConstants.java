@@ -9,8 +9,8 @@ public class ExtensionConstants {
   public static final double minAngleRadians = 0.0;
   public static final double maxAngleRadians = 0.5;
   public static final double startingAngleRadians = 0.0;
-  public static final double armLengthMeters = 1.0;
-  public static final double armMassKG = 1.0;
+  public static final double armLengthMeters = 0.2;
+  public static final double armMassKG = 0.1;
   public static final int leftCanId = 35;
   public static final int rightCanId = 36;
   public static final boolean leftMotorInverted = false;

@@ -7,6 +7,8 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +22,7 @@ import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOSpark;
+import frc.robot.subsystems.turret.TurretSubsystem;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -91,6 +94,8 @@ public class ShooterSubsystem extends SubsystemBase {
     if (flywheelBangBangController.getSetpoint() != 0) {
       setFlywheelVoltage(flywheelBangBangController.calculate(flywheelInputs.velocityRPM) * 12.0);
     }
+
+    visualizationUpdate();
   }
 
   private void setFlywheelVoltage(double volts) {
@@ -115,5 +120,19 @@ public class ShooterSubsystem extends SubsystemBase {
     if (velocityRPM == 0) {
       setFlywheelVoltage(0);
     }
+  }
+
+  private void visualizationUpdate() {
+    // Log Pose3d
+    Logger.recordOutput(
+        "Mechanism3d/3-Hood",
+        new Pose3d(
+            -0.04,
+            0.16,
+            0.445,
+            new Rotation3d(
+                0.0,
+                -hoodInputs.positionRadians,
+                TurretSubsystem.getInstance().getTurretPosition().getRadians())));
   }
 }

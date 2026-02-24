@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.hopper;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -72,6 +75,8 @@ public class HopperSubsystem extends SubsystemBase {
 
     kickerDisconnectedAlert.set(!kickerInputs.motorConnected);
     spindexerDisconnectedAlert.set(!spindexerInputs.motorConnected);
+
+    visualizationUpdate();
   }
 
   public void setKickerVoltage(double volts) {
@@ -80,5 +85,16 @@ public class HopperSubsystem extends SubsystemBase {
 
   public void setSpindexerVoltage(double volts) {
     spindexerIO.setMotorVoltage(volts);
+  }
+
+  private void visualizationUpdate() {
+    // Log Pose3d
+    Logger.recordOutput(
+        "Mechanism3d/0-Spindexer",
+        new Pose3d(
+            0.12,
+            -0.045,
+            0.15,
+            new Rotation3d(0.0, 0.0, Units.rotationsToRadians(spindexerInputs.positionRotations))));
   }
 }
