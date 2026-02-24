@@ -44,14 +44,13 @@ public class TurretSubsystem extends SubsystemBase {
   private final TurretIO turretIO;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
   private final PIDController turretPID =
-      new PIDController(
-          TurretConstants.turretKp, TurretConstants.turretKi, TurretConstants.turretKd);
+      new PIDController(TurretConstants.kp, TurretConstants.ki, TurretConstants.kd);
 
   /** Creates a new Turret. */
   private TurretSubsystem(TurretIO io) {
     turretIO = io;
 
-    turretPID.setSetpoint(TurretConstants.turretStartingAngleRadians);
+    turretPID.setSetpoint(TurretConstants.startingAngleRadians);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -62,21 +61,19 @@ public class TurretSubsystem extends SubsystemBase {
     turretIO.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
 
-    turretMotorDisconnectedAlert.set(!inputs.turretMotorConnected);
+    turretMotorDisconnectedAlert.set(!inputs.motorConnected);
 
-    setTurretVoltage(turretPID.calculate(inputs.turretPositionRadians));
+    setTurretVoltage(turretPID.calculate(inputs.positionRadians));
   }
 
   private void setTurretVoltage(double volts) {
-    turretIO.setTurretVoltage(volts);
+    turretIO.setMotorVoltage(volts);
   }
 
   public void setTurretPosition(double positionRadians) {
     double turretSetpoint =
         MathUtil.clamp(
-            positionRadians,
-            TurretConstants.turretMinAngleRadians,
-            TurretConstants.turretMaxAngleRadians);
+            positionRadians, TurretConstants.minAngleRadians, TurretConstants.maxAngleRadians);
     turretPID.setSetpoint(turretSetpoint);
   }
 }

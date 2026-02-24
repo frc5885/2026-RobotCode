@@ -5,23 +5,23 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.turret;
+package frc.robot.subsystems.intake.extension;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface TurretIO {
+public interface ExtensionIO {
   @AutoLog
-  public static class TurretIOInputs {
-    public boolean motorConnected = false;
-
+  public static class ExtensionIOInputs {
+    public boolean leftMotorConnected = false;
+    public boolean rightMotorConnected = false;
     public double positionRadians = 0.0;
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
-    public double currentAmps = 0.0;
+    public double[] currentAmps = {0.0, 0.0};
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(TurretIOInputs inputs) {}
+  public default void updateInputs(ExtensionIOInputs inputs) {}
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}

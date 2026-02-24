@@ -20,24 +20,22 @@ public class TurretIOSim implements TurretIO {
     turretSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                DCMotor.getNEO(1),
-                TurretConstants.turretMomentOfInertia,
-                TurretConstants.turretGearRatio),
+                DCMotor.getNEO(1), TurretConstants.momentOfInertia, TurretConstants.gearRatio),
             DCMotor.getNEO(1));
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
     turretSim.update(Constants.dtSeconds);
-    inputs.turretPositionRadians = turretSim.getAngularPositionRad();
-    inputs.turretVelocityRadiansPerSecond = turretSim.getAngularVelocityRadPerSec();
-    inputs.turretAppliedVolts = turretAppliedVolts;
-    inputs.turretCurrentAmps = turretSim.getCurrentDrawAmps();
-    inputs.turretMotorConnected = true;
+    inputs.positionRadians = turretSim.getAngularPositionRad();
+    inputs.velocityRadiansPerSecond = turretSim.getAngularVelocityRadPerSec();
+    inputs.appliedVolts = turretAppliedVolts;
+    inputs.currentAmps = turretSim.getCurrentDrawAmps();
+    inputs.motorConnected = true;
   }
 
   @Override
-  public void setTurretVoltage(double volts) {
+  public void setMotorVoltage(double volts) {
     turretAppliedVolts = volts;
     turretSim.setInput(volts);
   }

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.turret;
+package frc.robot.subsystems.shooter.hood;
 
 import static frc.robot.util.SparkUtil.*;
 
@@ -16,31 +16,28 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
 
-public class TurretIOSpark implements TurretIO {
-
+public class HoodIOSpark implements HoodIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
-
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
-  public TurretIOSpark() {
-
-    motor = new SparkMax(TurretConstants.canId, MotorType.kBrushless);
+  public HoodIOSpark() {
+    motor = new SparkMax(HoodConstants.canId, MotorType.kBrushless);
     encoder = motor.getEncoder();
 
-    SparkMaxConfig turretConfig = new SparkMaxConfig();
-    turretConfig
-        .inverted(TurretConstants.motorInverted)
+    SparkMaxConfig hoodConfig = new SparkMaxConfig();
+    hoodConfig
+        .inverted(HoodConstants.motorInverted)
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(TurretConstants.currentLimit)
+        .smartCurrentLimit(HoodConstants.currentLimit)
         .voltageCompensation(12.0);
-    turretConfig
+    hoodConfig
         .encoder
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2)
-        .positionConversionFactor(TurretConstants.positionConversionFactor)
-        .velocityConversionFactor(TurretConstants.velocityConversionFactor);
-    turretConfig
+        .positionConversionFactor(HoodConstants.positionConversionFactor)
+        .velocityConversionFactor(HoodConstants.velocityConversionFactor);
+    hoodConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs(20)
@@ -54,12 +51,11 @@ public class TurretIOSpark implements TurretIO {
         5,
         () ->
             motor.configure(
-                turretConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+                hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
-  public void updateInputs(TurretIOInputs inputs) {
-
+  public void updateInputs(HoodIOInputs inputs) {
     sparkStickyFault = false;
     ifOk(motor, encoder::getPosition, (value) -> inputs.positionRadians = value);
     ifOk(motor, encoder::getVelocity, (value) -> inputs.velocityRadiansPerSecond = value);
@@ -71,6 +67,7 @@ public class TurretIOSpark implements TurretIO {
     inputs.motorConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
   }
 
+  /** Run open loop at the specified voltage. */
   @Override
   public void setMotorVoltage(double volts) {
     motor.setVoltage(volts);
