@@ -10,6 +10,15 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.intake.extension.ExtensionConstants;
+import frc.robot.subsystems.intake.extension.ExtensionIO;
+import frc.robot.subsystems.intake.extension.ExtensionIOInputsAutoLogged;
+import frc.robot.subsystems.intake.extension.ExtensionIOSim;
+import frc.robot.subsystems.intake.extension.ExtensionIOSpark;
+import frc.robot.subsystems.intake.roller.RollerIO;
+import frc.robot.subsystems.intake.roller.RollerIOInputsAutoLogged;
+import frc.robot.subsystems.intake.roller.RollerIOSim;
+import frc.robot.subsystems.intake.roller.RollerIOSpark;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,17 +30,17 @@ public class IntakeSubsystem extends SubsystemBase {
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
-          INSTANCE = new IntakeSubsystem(new IntakeIOSpark());
+          INSTANCE = new IntakeSubsystem(new ExtensionIOSpark(), new RollerIOSpark());
           break;
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
-          INSTANCE = new IntakeSubsystem(new IntakeIOSim());
+          INSTANCE = new IntakeSubsystem(new ExtensionIOSim(), new RollerIOSim());
           break;
 
         default:
           // Replayed robot, disable IO implementations
-          INSTANCE = new IntakeSubsystem(new IntakeIO() {});
+          INSTANCE = new IntakeSubsystem(new ExtensionIO() {}, new RollerIO() {});
           break;
       }
     }
@@ -39,29 +48,30 @@ public class IntakeSubsystem extends SubsystemBase {
     return INSTANCE;
   }
 
-  private final Alert intakeLeftMotorDisconnectedAlert;
-  private final Alert intakeRightMotorDisconnectedAlert;
   private final Alert extensionLeftMotorDisconnectedAlert;
   private final Alert extensionRightMotorDisconnectedAlert;
-  private final IntakeIO intakeIO;
-  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private final Alert rollerLeftMotorDisconnectedAlert;
+  private final Alert rollerRightMotorDisconnectedAlert;
+  private final ExtensionIO extensionIO;
+  private final RollerIO rollerIO;
+  private final ExtensionIOInputsAutoLogged extensionInputs = new ExtensionIOInputsAutoLogged();
+  private final RollerIOInputsAutoLogged rollerInputs = new RollerIOInputsAutoLogged();
   private final PIDController extensionPID =
-      new PIDController(
-          IntakeConstants.extensionKp, IntakeConstants.extensionKi, IntakeConstants.extensionKd);
+      new PIDController(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
 
   /** Creates a new Intake. */
-  private IntakeSubsystem(IntakeIO io) {
-    intakeIO = io;
-    intakeLeftMotorDisconnectedAlert =
-        new Alert("Intake Left motor disconnected!", AlertType.kError);
-    intakeRightMotorDisconnectedAlert =
-        new Alert("Intake Right motor disconnected!", AlertType.kError);
+  private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
+    this.extensionIO = extensionIO;
+    this.rollerIO = rollerIO;
     extensionLeftMotorDisconnectedAlert =
-        new Alert("Intake Extension Left motor disconnected!", AlertType.kError);
+        new Alert("Intake extension left motor disconnected!", AlertType.kError);
     extensionRightMotorDisconnectedAlert =
-        new Alert("Intake Extension Right motor disconnected!", AlertType.kError);
-
-    extensionPID.setSetpoint(IntakeConstants.extensionStartingAngleRadians);
+        new Alert("Intake extension right motor disconnected!", AlertType.kError);
+    rollerLeftMotorDisconnectedAlert =
+        new Alert("Intake roller left motor disconnected!", AlertType.kError);
+    rollerRightMotorDisconnectedAlert =
+        new Alert("Intake roller right motor disconnected!", AlertType.kError);
+    extensionPID.setSetpoint(ExtensionConstants.startingAngleRadians);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -69,30 +79,33 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    intakeIO.updateInputs(inputs);
-    Logger.processInputs("Intake", inputs);
-    intakeLeftMotorDisconnectedAlert.set(!inputs.intakeLeftMotorConnected);
-    intakeRightMotorDisconnectedAlert.set(!inputs.intakeRightMotorConnected);
-    extensionLeftMotorDisconnectedAlert.set(!inputs.extensionLeftMotorConnected);
-    extensionRightMotorDisconnectedAlert.set(!inputs.extensionRightMotorConnected);
+    extensionIO.updateInputs(extensionInputs);
+    rollerIO.updateInputs(rollerInputs);
+    Logger.processInputs("Intake/Extension", extensionInputs);
+    Logger.processInputs("Intake/Roller", rollerInputs);
 
-    setExtensionVoltage(extensionPID.calculate(inputs.extensionPositionRadians));
+    extensionLeftMotorDisconnectedAlert.set(!extensionInputs.leftMotorConnected);
+    extensionRightMotorDisconnectedAlert.set(!extensionInputs.rightMotorConnected);
+    rollerLeftMotorDisconnectedAlert.set(!rollerInputs.leftMotorConnected);
+    rollerRightMotorDisconnectedAlert.set(!rollerInputs.rightMotorConnected);
+
+    setExtensionVoltage(extensionPID.calculate(extensionInputs.positionRadians));
   }
 
   private void setExtensionVoltage(double volts) {
-    intakeIO.setExtensionVoltage(volts);
+    extensionIO.setMotorVoltage(volts);
   }
 
   public void setIntakeVoltage(double volts) {
-    intakeIO.setIntakeVoltage(volts);
+    rollerIO.setMotorVoltage(volts);
   }
 
   public void setExtensionPosition(double positionRadians) {
     double extensionSetpoint =
         MathUtil.clamp(
             positionRadians,
-            IntakeConstants.extensionMinAngleRadians,
-            IntakeConstants.extensionMaxAngleRadians);
+            ExtensionConstants.minAngleRadians,
+            ExtensionConstants.maxAngleRadians);
     extensionPID.setSetpoint(extensionSetpoint);
   }
 }

@@ -5,15 +5,14 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.turret;
+package frc.robot.subsystems.shooter.hood;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface TurretIO {
+public interface HoodIO {
   @AutoLog
-  public static class TurretIOInputs {
+  public static class HoodIOInputs {
     public boolean motorConnected = false;
-
     public double positionRadians = 0.0;
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
@@ -21,7 +20,7 @@ public interface TurretIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(TurretIOInputs inputs) {}
+  public default void updateInputs(HoodIOInputs inputs) {}
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
