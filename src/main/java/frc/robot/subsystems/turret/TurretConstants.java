@@ -7,6 +7,9 @@
 
 package frc.robot.subsystems.turret;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+
 public class TurretConstants {
 
   public static final double gearRatio = 10.0 / 1.0;
@@ -24,4 +27,7 @@ public class TurretConstants {
   public static final double kp = 5.0;
   public static final double ki = 0.0;
   public static final double kd = 3.0;
+
+  public static final Transform3d robotToTurret =
+      new Transform3d(-0.16, 0.16, 0.38, Rotation3d.kZero);
 }

@@ -86,7 +86,9 @@ public class TurretSubsystem extends SubsystemBase {
     // Log Pose3d
     Logger.recordOutput(
         "Mechanism3d/2-Turret",
-        new Pose3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, inputs.positionRadians)));
+        new Pose3d(
+            TurretConstants.robotToTurret.getTranslation(),
+            new Rotation3d(0.0, 0.0, inputs.positionRadians)));
   }
 
   public Rotation2d getTurretPosition() {
