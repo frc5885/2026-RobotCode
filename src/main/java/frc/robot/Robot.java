@@ -87,7 +87,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     // For pathplanner
-    FollowPathCommand.warmupCommand().schedule();
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
   }
 
   /** This function is called periodically during all modes. */
