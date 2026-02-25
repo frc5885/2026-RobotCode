@@ -131,8 +131,7 @@ public class ShooterSubsystem extends SubsystemBase {
         "Mechanism3d/3-Hood",
         new Pose3d(
                 TurretConstants.robotToTurret.getTranslation(),
-                new Rotation3d(
-                    0, 0, TurretSubsystem.getInstance().getTurretPosition().getRadians()))
+                new Rotation3d(0, 0, TurretSubsystem.getInstance().getPosition()))
             .plus(
                 new Transform3d(
                     new Translation3d(0.12, 0, 0.065),
