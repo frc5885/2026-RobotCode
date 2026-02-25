@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.turret;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -36,7 +37,7 @@ public class TurretIOSim implements TurretIO {
 
   @Override
   public void setMotorVoltage(double volts) {
-    appliedVolts = volts;
-    turretSim.setInput(volts);
+    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    turretSim.setInput(appliedVolts);
   }
 }

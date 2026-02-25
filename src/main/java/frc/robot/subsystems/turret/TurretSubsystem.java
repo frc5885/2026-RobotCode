@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class TurretSubsystem extends SubsystemBase {
   private static TurretSubsystem INSTANCE = null;
@@ -68,8 +69,12 @@ public class TurretSubsystem extends SubsystemBase {
   private boolean runClosedLoop = true;
 
   // Stuff for tracking
-  @AutoLogOutput private LaunchState launchState = LaunchState.TRACKING;
-  @AutoLogOutput private TargetType targetType = TargetType.FIELD_RELATIVE;
+  @AutoLogOutput(key = "Turret/LaunchState")
+  private LaunchState launchState = LaunchState.TRACKING;
+
+  @AutoLogOutput(key = "Turret/TargetType")
+  private TargetType targetType = TargetType.FIELD_RELATIVE;
+
   private Rotation2d goalAngle = Rotation2d.kZero;
   private double goalVelocity = 0.0;
   private double lastGoalAngle = 0.0;
@@ -79,7 +84,9 @@ public class TurretSubsystem extends SubsystemBase {
               TurretConstants.maxVelocityRadiansPerSecond,
               TurretConstants.maxAccelerationRadiansPerSecondSquared));
   private State setpoint = new State();
-  @AutoLogOutput private boolean atGoal = false;
+
+  @AutoLogOutput(key = "Turret/AtGoal")
+  private boolean atGoal = false;
 
   /** Creates a new Turret. */
   private TurretSubsystem(TurretIO io) {
@@ -87,6 +94,7 @@ public class TurretSubsystem extends SubsystemBase {
     sysId = sysIdSetup();
 
     setpoint = new State(TurretConstants.startingAngleRadians, 0.0);
+    this.goalAngle = Rotation2d.fromRadians(TurretConstants.startingAngleRadians);
     runClosedLoop = true;
 
     AutoLogOutputManager.addObject(this);
@@ -204,7 +212,6 @@ public class TurretSubsystem extends SubsystemBase {
           var params = LaunchCalculator.getInstance().getParameters();
           setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
           runClosedLoop = true;
-          LaunchCalculator.getInstance().clearLaunchingParameters();
         });
   }
 
@@ -258,8 +265,8 @@ public class TurretSubsystem extends SubsystemBase {
   private SysIdRoutine sysIdSetup() {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
-            Volts.of(1.0).per(Second),
-            Volts.of(7.0),
+            Volts.of(0.5).per(Second),
+            Volts.of(3.0),
             null,
             (state) -> Logger.recordOutput("Turret/SysIDState", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> runOpenLoop(voltage.in(Volts)), null, this));
@@ -273,6 +280,20 @@ public class TurretSubsystem extends SubsystemBase {
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return run(() -> runOpenLoop(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
+  }
+
+  /*
+   * Add all turret SysID commands to autochooser
+   */
+  public void addTurretSysIdToAutoChooser(LoggedDashboardChooser<Command> autoChooser) {
+    autoChooser.addOption(
+        "Turret SysId (Quasistatic Forward)", sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Turret SysId (Quasistatic Reverse)", sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Turret SysId (Dynamic Forward)", sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Turret SysId (Dynamic Reverse)", sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   private void visualizationUpdate() {

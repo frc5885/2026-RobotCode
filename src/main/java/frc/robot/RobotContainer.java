@@ -44,6 +44,7 @@ public class RobotContainer {
 
     // Set up SysId routines
     DriveCommands.addDriveSysIdToAutoChooser(autoChooser);
+    TurretSubsystem.getInstance().addTurretSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();

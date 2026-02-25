@@ -99,9 +99,10 @@ public class LaunchCalculator {
   }
 
   public LaunchingParameters getParameters() {
-    if (latestParameters != null) {
-      return latestParameters;
-    }
+    // TODO: figure out a way to cache the parameters and clear them once per period
+    // if (latestParameters != null) {
+    //   return latestParameters;
+    // }
 
     // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose = DriveSubsystem.getInstance().getPose();
