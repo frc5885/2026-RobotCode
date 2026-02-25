@@ -66,7 +66,7 @@ public class TurretSubsystem extends SubsystemBase {
       new PIDController(TurretConstants.kp, TurretConstants.ki, TurretConstants.kd);
   private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
-  private boolean runClosedLoop = true;
+  private boolean runClosedLoop = false;
 
   // Stuff for tracking
   @AutoLogOutput(key = "Turret/LaunchState")
@@ -92,10 +92,6 @@ public class TurretSubsystem extends SubsystemBase {
   private TurretSubsystem(TurretIO io) {
     turretIO = io;
     sysId = sysIdSetup();
-
-    setpoint = new State(TurretConstants.startingAngleRadians, 0.0);
-    this.goalAngle = Rotation2d.fromRadians(TurretConstants.startingAngleRadians);
-    runClosedLoop = true;
 
     AutoLogOutputManager.addObject(this);
   }
