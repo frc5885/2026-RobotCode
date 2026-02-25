@@ -29,14 +29,14 @@ public class TurretIOSim implements TurretIO {
     turretSim.update(Constants.dtSeconds);
     inputs.positionRadians = turretSim.getAngularPositionRad();
     inputs.velocityRadiansPerSecond = turretSim.getAngularVelocityRadPerSec();
-    inputs.appliedVolts = turretAppliedVolts;
+    inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = turretSim.getCurrentDrawAmps();
     inputs.motorConnected = true;
   }
 
   @Override
   public void setMotorVoltage(double volts) {
-    turretAppliedVolts = volts;
+    appliedVolts = volts;
     turretSim.setInput(volts);
   }
 }

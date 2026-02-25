@@ -10,7 +10,9 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Alert;
@@ -77,7 +79,6 @@ public class TurretSubsystem extends SubsystemBase {
               TurretConstants.maxVelocityRadiansPerSecond,
               TurretConstants.maxAccelerationRadiansPerSecondSquared));
   private State setpoint = new State();
-  private double turretOffset;
   @AutoLogOutput private boolean atGoal = false;
 
   /** Creates a new Turret. */
@@ -158,17 +159,20 @@ public class TurretSubsystem extends SubsystemBase {
 
       switch (targetType) {
         case FIELD_RELATIVE -> {
-          turretIO.setVoltage(
-              pidController.calculate(inputs.positionRadians, setpoint.position - turretOffset)
+          turretIO.setMotorVoltage(
+              pidController.calculate(
+                      inputs.positionRadians, setpoint.position - TurretConstants.turretOffset)
                   + feedforward.calculate(setpoint.velocity));
         }
         case ROBOT_RELATIVE -> {
-          turretIO.setVoltage(
+          turretIO.setMotorVoltage(
               pidController.calculate(
-                  inputs.positionRadians, goalAngle.getRadians() - turretOffset));
+                  inputs.positionRadians, goalAngle.getRadians() - TurretConstants.turretOffset));
         }
       }
     }
+
+    visualizationUpdate();
   }
 
   private void setFieldRelativeTarget(Rotation2d angle, double velocity) {
@@ -185,7 +189,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   @AutoLogOutput(key = "Turret/MeasuredPositionRad")
   public double getPosition() {
-    return inputs.positionRadians + turretOffset;
+    return inputs.positionRadians + TurretConstants.turretOffset;
   }
 
   @AutoLogOutput(key = "Turret/MeasuredVelocityRadPerSec")
@@ -200,6 +204,7 @@ public class TurretSubsystem extends SubsystemBase {
           var params = LaunchCalculator.getInstance().getParameters();
           setFieldRelativeTarget(params.turretAngle(), params.turretVelocity());
           runClosedLoop = true;
+          LaunchCalculator.getInstance().clearLaunchingParameters();
         });
   }
 
@@ -236,7 +241,7 @@ public class TurretSubsystem extends SubsystemBase {
   /** Run the turret in open loop mode at a specified voltage */
   public void runOpenLoop(double volts) {
     runClosedLoop = false;
-    turretIO.setVoltage(volts);
+    turretIO.setMotorVoltage(volts);
   }
 
   public enum LaunchState {
@@ -268,5 +273,12 @@ public class TurretSubsystem extends SubsystemBase {
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return run(() -> runOpenLoop(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
+  }
+
+  private void visualizationUpdate() {
+    // Log Pose3d
+    Logger.recordOutput(
+        "Mechanism3d/2-Turret",
+        new Pose3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, getPosition())));
   }
 }
