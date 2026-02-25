@@ -24,7 +24,7 @@ import frc.robot.util.FieldConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class LaunchCalculator {
-  private static LaunchCalculator instance;
+  private static volatile LaunchCalculator instance;
 
   private final LinearFilter turretAngleFilter =
       LinearFilter.movingAverage((int) (0.1 / Constants.dtSeconds));
@@ -54,9 +54,9 @@ public class LaunchCalculator {
   // Cache parameters
   private LaunchingParameters latestParameters = null;
 
-  private static double minDistance;
-  private static double maxDistance;
-  private static double phaseDelay;
+  private static final double minDistance;
+  private static final double maxDistance;
+  private static final double phaseDelay;
   private static final InterpolatingTreeMap<Double, Rotation2d> launchHoodAngleMap =
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
   private static final InterpolatingDoubleTreeMap launchFlywheelSpeedMap =
@@ -99,10 +99,11 @@ public class LaunchCalculator {
   }
 
   public LaunchingParameters getParameters() {
-    // TODO: figure out a way to cache the parameters and clear them once per period
-    // if (latestParameters != null) {
-    //   return latestParameters;
-    // }
+    // Parameters get cleared once per period in robotPeriodic
+    // Subsystems use cached parameters to avoid redundant calculations
+    if (latestParameters != null) {
+      return latestParameters;
+    }
 
     // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose = DriveSubsystem.getInstance().getPose();
