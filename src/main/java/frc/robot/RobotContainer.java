@@ -12,10 +12,12 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.SpinIntakeCommand;
 import frc.robot.commands.SpinShooterCommand;
+import frc.robot.commands.SysIDCommands;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.ControllerUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -43,8 +45,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    DriveCommands.addDriveSysIdToAutoChooser(autoChooser);
-    TurretSubsystem.getInstance().addTurretSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -58,14 +60,13 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    DriveCommands.setDefaultDriveCommand(
+    DefaultCommands.setDefaultDriveCommand(
         DriveCommands.joystickDrive(
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    TurretSubsystem.getInstance()
-        .setDefaultCommand(TurretSubsystem.getInstance().runTrackTargetCommand());
+    DefaultCommands.setDefaultTurretCommand(TurretSubsystem.getInstance().runTrackTargetCommand());
 
     controller.a().whileTrue(new SpinShooterCommand());
     controller.b().whileTrue(new SpinIntakeCommand());

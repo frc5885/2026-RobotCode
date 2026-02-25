@@ -29,7 +29,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class TurretSubsystem extends SubsystemBase {
   private static TurretSubsystem INSTANCE = null;
@@ -276,20 +275,6 @@ public class TurretSubsystem extends SubsystemBase {
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return run(() -> runOpenLoop(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
-  }
-
-  /*
-   * Add all turret SysID commands to autochooser
-   */
-  public void addTurretSysIdToAutoChooser(LoggedDashboardChooser<Command> autoChooser) {
-    autoChooser.addOption(
-        "Turret SysId (Quasistatic Forward)", sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Turret SysId (Quasistatic Reverse)", sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Turret SysId (Dynamic Forward)", sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Turret SysId (Dynamic Reverse)", sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   private void visualizationUpdate() {
