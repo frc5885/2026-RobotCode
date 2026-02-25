@@ -32,7 +32,7 @@ public class LaunchCalculator {
       LinearFilter.movingAverage((int) (0.1 / Constants.dtSeconds));
 
   private Rotation2d lastTurretAngle;
-  private double lastHoodAngle;
+  private double lastHoodAngle = Double.NaN;
   private Rotation2d turretAngle;
   private double hoodAngle = Double.NaN;
   private double turretVelocity;
@@ -130,8 +130,8 @@ public class LaunchCalculator {
     double turretVelocityX =
         robotVelocity.vxMetersPerSecond
             + robotVelocity.omegaRadiansPerSecond
-                * (TurretConstants.robotToTurret.getY() * Math.cos(robotAngle)
-                    - TurretConstants.robotToTurret.getX() * Math.sin(robotAngle));
+                * (-TurretConstants.robotToTurret.getX() * Math.sin(robotAngle)
+                    - TurretConstants.robotToTurret.getY() * Math.cos(robotAngle));
     double turretVelocityY =
         robotVelocity.vyMetersPerSecond
             + robotVelocity.omegaRadiansPerSecond

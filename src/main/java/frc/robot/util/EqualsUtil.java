@@ -11,7 +11,10 @@ import edu.wpi.first.math.geometry.Twist2d;
 
 public class EqualsUtil {
   public static boolean epsilonEquals(double a, double b, double epsilon) {
-    return (a - epsilon <= b) && (a + epsilon >= b);
+    if (epsilon < 0.0) {
+      throw new IllegalArgumentException("epsilon must be non-negative");
+    }
+    return Math.abs(a - b) <= epsilon;
   }
 
   public static boolean epsilonEquals(double a, double b) {
