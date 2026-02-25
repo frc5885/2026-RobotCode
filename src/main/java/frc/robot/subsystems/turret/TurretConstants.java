@@ -17,7 +17,7 @@ public class TurretConstants {
   public static final double maxAngleRadians = 2 * Math.PI;
   public static final double startingAngleRadians = 0.0;
   public static final double momentOfInertia = 0.5; // kg*m^2
-  public static final int canId = 45;
+  public static final int canId = 27;
   public static final boolean motorInverted = false;
   public static final int currentLimit = 30;
   // Motor Rotations -> Radians
