@@ -6,6 +6,9 @@ package frc.robot.subsystems.turret;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,6 +67,8 @@ public class TurretSubsystem extends SubsystemBase {
     turretMotorDisconnectedAlert.set(!inputs.motorConnected);
 
     setTurretVoltage(turretPID.calculate(inputs.positionRadians));
+
+    visualizationUpdate();
   }
 
   private void setTurretVoltage(double volts) {
@@ -75,5 +80,18 @@ public class TurretSubsystem extends SubsystemBase {
         MathUtil.clamp(
             positionRadians, TurretConstants.minAngleRadians, TurretConstants.maxAngleRadians);
     turretPID.setSetpoint(turretSetpoint);
+  }
+
+  private void visualizationUpdate() {
+    // Log Pose3d
+    Logger.recordOutput(
+        "Mechanism3d/2-Turret",
+        new Pose3d(
+            TurretConstants.robotToTurret.getTranslation(),
+            new Rotation3d(0.0, 0.0, inputs.positionRadians)));
+  }
+
+  public Rotation2d getTurretPosition() {
+    return new Rotation2d(inputs.positionRadians);
   }
 }
