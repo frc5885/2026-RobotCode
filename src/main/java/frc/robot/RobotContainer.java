@@ -14,8 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.PathUnderTrenchCommand;
-import frc.robot.commands.SpinIntakeCommand;
+import frc.robot.commands.RetractIntakeCommand;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.commands.SysIDCommands;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -69,10 +70,11 @@ public class RobotContainer {
     DefaultCommands.setDefaultTurretCommand(TurretSubsystem.getInstance().runTrackTargetCommand());
 
     controller.a().whileTrue(new SpinShooterCommand());
-    controller.b().whileTrue(new SpinIntakeCommand());
     controller
         .povLeft()
         .onTrue(new PathUnderTrenchCommand(() -> ControllerUtil.isLeftJoystickMoved(controller)));
+    controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
+    controller.leftBumper().onTrue(new RetractIntakeCommand());
   }
 
   /**

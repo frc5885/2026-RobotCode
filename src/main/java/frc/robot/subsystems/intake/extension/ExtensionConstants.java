@@ -4,11 +4,13 @@
 
 package frc.robot.subsystems.intake.extension;
 
+import edu.wpi.first.math.util.Units;
+
 public class ExtensionConstants {
   public static final double gearRatio = 10.0 / 1.0;
-  public static final double minAngleRadians = 0.0;
-  public static final double maxAngleRadians = 0.5;
-  public static final double startingAngleRadians = 0.0;
+  public static final double minAngleRadians = Units.degreesToRadians(0.0);
+  public static final double maxAngleRadians = Units.degreesToRadians(90.0);
+  public static final double startingAngleRadians = Units.degreesToRadians(90.0);
   public static final double armLengthMeters = 0.2;
   public static final double armMassKG = 0.1;
   public static final int leftCanId = 35;
@@ -23,4 +25,7 @@ public class ExtensionConstants {
   public static final double kp = 1.0;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
+
+  public static final double intakeStowedAngle = Units.degreesToRadians(90.0);
+  public static final double intakeExtendedAngle = Units.degreesToRadians(0.0);
 }

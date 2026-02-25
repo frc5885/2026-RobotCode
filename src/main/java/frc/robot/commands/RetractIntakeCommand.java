@@ -6,23 +6,21 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.extension.ExtensionConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SpinIntakeCommand extends Command {
-
-  private final IntakeSubsystem intake;
-
-  /** Creates a new SpinIntakeCommand. */
-  public SpinIntakeCommand() {
-    intake = IntakeSubsystem.getInstance();
+public class RetractIntakeCommand extends Command {
+  private IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
+  /** Creates a new IntakeCommand. */
+  public RetractIntakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
+    addRequirements(intakeSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.setIntakeVoltage(6);
+    intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,9 +29,7 @@ public class SpinIntakeCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    intake.setIntakeVoltage(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
