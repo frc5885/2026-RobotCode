@@ -80,6 +80,9 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
 
+    // Override Simulation Field
+    overrideSimulationField();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
@@ -181,16 +184,20 @@ public class Robot extends LoggedRobot {
   private void setupSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
-    // Setup the arena with custom settings
+    // Register the drivetrain simulation to the default simulation world
+    SimulatedArena.getInstance()
+        .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
+  }
+
+  /** Setup the arena with custom settings. Must be called before RobotContainer */
+  private void overrideSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
     boolean addRampCollider = false; // Disable drive over ramp
     boolean efficiencyMode = true; // Spawn reduced number of balls
     Arena2026Rebuilt arena = new Arena2026Rebuilt(addRampCollider);
     arena.setEfficiencyMode(efficiencyMode);
     SimulatedArena.overrideInstance(arena);
-
-    // Register the drivetrain simulation to the default simulation world
-    SimulatedArena.getInstance()
-        .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
   }
 
   private void resetSimulationField() {

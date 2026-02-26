@@ -4,15 +4,23 @@
 
 package frc.robot.subsystems.intake.extension;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.hopper.HopperConstants;
+import org.ironmaple.simulation.IntakeSimulation;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Sim extension implementation */
 public class ExtensionIOSim implements ExtensionIO {
 
   private double appliedVolts;
-  private SingleJointedArmSim extensionSim;
+  private final SingleJointedArmSim extensionSim;
+  private final IntakeSimulation intakeSimulation;
 
   public ExtensionIOSim() {
     extensionSim =
@@ -26,6 +34,21 @@ public class ExtensionIOSim implements ExtensionIO {
             ExtensionConstants.maxAngleRadians,
             true,
             ExtensionConstants.startingAngleRadians);
+
+    this.intakeSimulation =
+        IntakeSimulation.OverTheBumperIntake(
+            // Specify the type of game pieces that the intake can collect
+            "Fuel",
+            // Specify the drivetrain to which this intake is attached
+            DriveSubsystem.getInstance().getSwerveDriveSimulation(),
+            // Width of the intake
+            Meters.of(DriveConstants.robotWidth),
+            // The extension length of the intake beyond the robot's frame (when activated)
+            Meters.of(ExtensionConstants.intakeExtensionLengthMeters),
+            // The intake is mounted on the back side of the chassis
+            IntakeSimulation.IntakeSide.FRONT,
+            // The intake can hold up to 30 Fuel
+            HopperConstants.hopperCapacity);
   }
 
   @Override
@@ -44,5 +67,14 @@ public class ExtensionIOSim implements ExtensionIO {
   public void setMotorVoltage(double volts) {
     appliedVolts = volts;
     extensionSim.setInput(volts);
+  }
+
+  public IntakeSimulation getIntakeSimulation() {
+    return intakeSimulation;
+  }
+
+  @AutoLogOutput(key = "FieldSimulation/HopperFuelCount")
+  public int getSimHopperFuelCount() {
+    return intakeSimulation.getGamePiecesAmount();
   }
 }

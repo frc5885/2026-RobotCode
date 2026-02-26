@@ -21,6 +21,7 @@ import frc.robot.subsystems.intake.roller.RollerIO;
 import frc.robot.subsystems.intake.roller.RollerIOInputsAutoLogged;
 import frc.robot.subsystems.intake.roller.RollerIOSim;
 import frc.robot.subsystems.intake.roller.RollerIOSpark;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -100,8 +101,22 @@ public class IntakeSubsystem extends SubsystemBase {
     extensionIO.setMotorVoltage(volts);
   }
 
-  public void setIntakeVoltage(double volts) {
+  public void setIntakeRollerVoltage(double volts) {
     rollerIO.setMotorVoltage(volts);
+  }
+
+  /**
+   * Returns maple sim intake simulation. MUST only be called from simulation mode or will throw an
+   * error.
+   */
+  public IntakeSimulation getIntakeSimulation() {
+    if (extensionIO instanceof ExtensionIOSim) {
+      ExtensionIOSim extensionIOSim = (ExtensionIOSim) extensionIO;
+      return extensionIOSim.getIntakeSimulation();
+    } else {
+      throw new UnsupportedOperationException(
+          "Can't call getIntakeSimulation if not in simulation mode");
+    }
   }
 
   public void setExtensionPosition(double positionRadians) {
@@ -113,10 +128,14 @@ public class IntakeSubsystem extends SubsystemBase {
     extensionPID.setSetpoint(extensionSetpoint);
   }
 
+  public boolean isExtensionAtSetPoint() {
+    return extensionPID.atSetpoint();
+  }
+
   private void visualizationUpdate() {
     // Log Pose3d
     Logger.recordOutput(
         "Mechanism3d/1-Intake",
-        new Pose3d(0.32, 0.0, 0.18, new Rotation3d(0.0, extensionInputs.positionRadians, 0.0)));
+        new Pose3d(0.32, 0.0, 0.18, new Rotation3d(0.0, -extensionInputs.positionRadians, 0.0)));
   }
 }
