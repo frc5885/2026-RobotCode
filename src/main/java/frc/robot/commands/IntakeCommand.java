@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
 
@@ -23,7 +24,9 @@ public class IntakeCommand extends Command {
   @Override
   public void initialize() {
     intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
-    intakeSubsystem.startIntakeSim();
+    if (Constants.isSim()) {
+      intakeSubsystem.getIntakeSimulation().startIntake();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,7 +39,9 @@ public class IntakeCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     intakeSubsystem.setIntakeRollerVoltage(0);
-    intakeSubsystem.stopIntakeSim();
+    if (Constants.isSim()) {
+      intakeSubsystem.getIntakeSimulation().stopIntake();
+    }
   }
 
   // Returns true when the command should end.

@@ -21,6 +21,7 @@ import frc.robot.subsystems.intake.roller.RollerIO;
 import frc.robot.subsystems.intake.roller.RollerIOInputsAutoLogged;
 import frc.robot.subsystems.intake.roller.RollerIOSim;
 import frc.robot.subsystems.intake.roller.RollerIOSpark;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -104,19 +105,17 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerIO.setMotorVoltage(volts);
   }
 
-  /** Checks if intake is simulated, and starts maple sim intake if it is */
-  public void startIntakeSim() {
+  /**
+   * Returns maple sim intake simulation. MUST only be called from simulation mode or will throw an
+   * error.
+   */
+  public IntakeSimulation getIntakeSimulation() {
     if (extensionIO instanceof ExtensionIOSim) {
       ExtensionIOSim extensionIOSim = (ExtensionIOSim) extensionIO;
-      extensionIOSim.startIntakeSim();
-    }
-  }
-
-  /** Checks if intake is simulated, and stops maple sim intake if it is */
-  public void stopIntakeSim() {
-    if (extensionIO instanceof ExtensionIOSim) {
-      ExtensionIOSim extensionIOSim = (ExtensionIOSim) extensionIO;
-      extensionIOSim.stopIntakeSim();
+      return extensionIOSim.getIntakeSimulation();
+    } else {
+      throw new UnsupportedOperationException(
+          "Can't call getIntakeSimulation if not in simulation mode");
     }
   }
 

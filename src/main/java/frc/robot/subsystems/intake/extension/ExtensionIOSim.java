@@ -69,12 +69,8 @@ public class ExtensionIOSim implements ExtensionIO {
     extensionSim.setInput(volts);
   }
 
-  public void startIntakeSim() {
-    intakeSimulation.startIntake();
-  }
-
-  public void stopIntakeSim() {
-    intakeSimulation.stopIntake();
+  public IntakeSimulation getIntakeSimulation() {
+    return intakeSimulation;
   }
 
   @AutoLogOutput(key = "FieldSimulation/HopperFuelCount")
