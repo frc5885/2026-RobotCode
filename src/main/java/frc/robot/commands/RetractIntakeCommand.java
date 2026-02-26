@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
 
@@ -21,6 +22,9 @@ public class RetractIntakeCommand extends Command {
   @Override
   public void initialize() {
     intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
+    if (Constants.isSim()) {
+      intakeSubsystem.getIntakeSimulation().stopIntake();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

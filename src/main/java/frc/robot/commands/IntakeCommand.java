@@ -39,9 +39,6 @@ public class IntakeCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     intakeSubsystem.setIntakeRollerVoltage(0);
-    if (Constants.isSim()) {
-      intakeSubsystem.getIntakeSimulation().stopIntake();
-    }
   }
 
   // Returns true when the command should end.
