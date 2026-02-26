@@ -9,6 +9,8 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.revrobotics.util.StatusLogger;
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -169,6 +171,10 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    // set default sim alliance station to blue 1
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.notifyNewData();
+
     setupSimulationField();
     resetSimulationField();
   }
