@@ -30,4 +30,12 @@ public class TurretCommands {
   public static Command runRobotRelativeFixedCommand(Supplier<Rotation2d> angle) {
     return TurretSubsystem.getInstance().runRobotRelativeFixedCommand(angle);
   }
+
+  /**
+   * Set the turret to active launching mode for the duration of the command, reverting back to
+   * tracking mode when done
+   */
+  public static Command setActiveLaunchingModeCommand() {
+    return TurretSubsystem.getInstance().setActiveLaunchingModeCommand();
+  }
 }
