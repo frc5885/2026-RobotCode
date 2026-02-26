@@ -28,4 +28,6 @@ public class ExtensionConstants {
 
   public static final double intakeStowedAngle = Units.degreesToRadians(90.0);
   public static final double intakeExtendedAngle = Units.degreesToRadians(0.0);
+
+  public static final double intakeExtensionLengthMeters = Units.inchesToMeters(12.0);
 }

@@ -21,6 +21,7 @@ public class IntakeCommand extends Command {
   @Override
   public void initialize() {
     intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
+    intakeSubsystem.startIntakeSim();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -33,6 +34,7 @@ public class IntakeCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     intakeSubsystem.setIntakeRollerVoltage(0);
+    intakeSubsystem.stopIntakeSim();
   }
 
   // Returns true when the command should end.

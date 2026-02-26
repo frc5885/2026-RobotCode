@@ -104,6 +104,22 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerIO.setMotorVoltage(volts);
   }
 
+  /** Checks if intake is simulated, and starts maple sim intake if it is */
+  public void startIntakeSim() {
+    if (extensionIO instanceof ExtensionIOSim) {
+      ExtensionIOSim extensionIOSim = (ExtensionIOSim) extensionIO;
+      extensionIOSim.startIntakeSim();
+    }
+  }
+
+  /** Checks if intake is simulated, and stops maple sim intake if it is */
+  public void stopIntakeSim() {
+    if (extensionIO instanceof ExtensionIOSim) {
+      ExtensionIOSim extensionIOSim = (ExtensionIOSim) extensionIO;
+      extensionIOSim.stopIntakeSim();
+    }
+  }
+
   public void setExtensionPosition(double positionRadians) {
     double extensionSetpoint =
         MathUtil.clamp(
