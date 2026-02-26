@@ -19,7 +19,7 @@ import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.RetractIntakeCommand;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.commands.SysIDCommands;
-import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.commands.TurretCommands;
 import frc.robot.util.ControllerUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -67,7 +67,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    DefaultCommands.setDefaultTurretCommand(TurretSubsystem.getInstance().runTrackTargetCommand());
+    DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
 
     controller.a().whileTrue(new SpinShooterCommand());
     controller
