@@ -11,7 +11,7 @@ import frc.robot.subsystems.intake.extension.ExtensionConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeCommand extends Command {
-  private IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
+  private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
   private static final double intakeRollerVoltage = 6.0;
   /** Creates a new IntakeCommand. */

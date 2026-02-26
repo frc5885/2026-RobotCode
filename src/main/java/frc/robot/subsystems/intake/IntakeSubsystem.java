@@ -128,6 +128,10 @@ public class IntakeSubsystem extends SubsystemBase {
     extensionPID.setSetpoint(extensionSetpoint);
   }
 
+  public boolean isExtensionAtSetPoint() {
+    return extensionPID.atSetpoint();
+  }
+
   private void visualizationUpdate() {
     // Log Pose3d
     Logger.recordOutput(
