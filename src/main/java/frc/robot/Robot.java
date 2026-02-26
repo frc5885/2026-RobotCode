@@ -191,6 +191,8 @@ public class Robot extends LoggedRobot {
 
   /** Setup the arena with custom settings. Must be called before RobotContainer */
   private void overrideSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
     boolean addRampCollider = false; // Disable drive over ramp
     boolean efficiencyMode = true; // Spawn reduced number of balls
     Arena2026Rebuilt arena = new Arena2026Rebuilt(addRampCollider);

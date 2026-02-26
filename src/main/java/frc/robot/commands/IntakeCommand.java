@@ -11,6 +11,8 @@ import frc.robot.subsystems.intake.extension.ExtensionConstants;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeCommand extends Command {
   private IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
+
+  private static final double intakeRollerVoltage = 6.0;
   /** Creates a new IntakeCommand. */
   public IntakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,7 +29,7 @@ public class IntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeRollerVoltage(6);
+    intakeSubsystem.setIntakeRollerVoltage(intakeRollerVoltage);
   }
 
   // Called once the command ends or is interrupted.

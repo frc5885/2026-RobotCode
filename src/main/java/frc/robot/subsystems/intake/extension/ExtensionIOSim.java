@@ -47,7 +47,7 @@ public class ExtensionIOSim implements ExtensionIO {
             Meters.of(ExtensionConstants.intakeExtensionLengthMeters),
             // The intake is mounted on the back side of the chassis
             IntakeSimulation.IntakeSide.FRONT,
-            // The intake can hold up to 1 note
+            // The intake can hold up to 30 Fuel
             HopperConstants.hopperCapacity);
   }
 

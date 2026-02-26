@@ -11,7 +11,7 @@ import frc.robot.subsystems.intake.extension.ExtensionConstants;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RetractIntakeCommand extends Command {
   private IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
-  /** Creates a new IntakeCommand. */
+  /** Creates a new RetractIntakeCommand. */
   public RetractIntakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intakeSubsystem);
