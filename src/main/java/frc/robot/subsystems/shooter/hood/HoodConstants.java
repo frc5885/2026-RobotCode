@@ -11,6 +11,7 @@ public class HoodConstants {
   public static final double minAngleRadians = Units.degreesToRadians(0);
   public static final double maxAngleRadians = Units.degreesToRadians(90);
   public static final double startingAngleRadians = Units.degreesToRadians(80);
+  public static final double idleAngleRadians = Units.degreesToRadians(85.0);
   public static final double armLengthMeters = 0.1;
   public static final double armMassKG = 0.05;
   public static final int canId = 45;
@@ -23,4 +24,5 @@ public class HoodConstants {
   public static final double kp = 1.0;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
+  public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
 }

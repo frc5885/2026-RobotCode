@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -66,6 +67,7 @@ public class TurretSubsystem extends SubsystemBase {
   private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
   private boolean runClosedLoop = false;
+  private final Debouncer atGoalDebouncer = new Debouncer(0.1);
 
   // Stuff for tracking
   @AutoLogOutput(key = "Turret/LaunchState")
@@ -153,8 +155,12 @@ public class TurretSubsystem extends SubsystemBase {
 
       setpoint = profile.calculate(Constants.dtSeconds, setpoint, goalState);
       atGoal =
-          EqualsUtil.epsilonEquals(bestAngle, setpoint.position)
-              && EqualsUtil.epsilonEquals(robotRelativeGoalVelocity, setpoint.velocity);
+          EqualsUtil.epsilonEquals(
+                  bestAngle, setpoint.position, TurretConstants.turretPositionTolerance)
+              && EqualsUtil.epsilonEquals(
+                  robotRelativeGoalVelocity,
+                  setpoint.velocity,
+                  TurretConstants.turretVelocityTolerance);
       Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
       Logger.recordOutput("Turret/GoalVelocityRadPerSec", robotRelativeGoalVelocity);
       Logger.recordOutput("Turret/SetpointPositionRad", setpoint.position);
@@ -254,6 +260,11 @@ public class TurretSubsystem extends SubsystemBase {
   public enum TargetType {
     FIELD_RELATIVE,
     ROBOT_RELATIVE
+  }
+
+  /** Returns debounced atGoal (position and velocity setpoints) */
+  public boolean isAtGoal() {
+    return atGoalDebouncer.calculate(atGoal);
   }
 
   // Configure SysId

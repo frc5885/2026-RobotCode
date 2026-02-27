@@ -2,27 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.shooter.ShooterSubsystem;
+import frc.robot.Constants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.extension.ExtensionConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SpinShooterCommand extends Command {
-
-  private final ShooterSubsystem shooter;
-
-  /** Creates a new SpinShooterCommand. */
-  public SpinShooterCommand() {
-    shooter = ShooterSubsystem.getInstance();
+public class RetractIntakeCommand extends Command {
+  private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
+  /** Creates a new RetractIntakeCommand. */
+  public RetractIntakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(shooter);
+    addRequirements(intakeSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.setFlywheelVelocity(1000);
+    intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
+    if (Constants.isSim()) {
+      intakeSubsystem.getIntakeSimulation().stopIntake();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,13 +33,11 @@ public class SpinShooterCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    shooter.setFlywheelVelocity(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return intakeSubsystem.isExtensionAtSetPoint();
   }
 }
