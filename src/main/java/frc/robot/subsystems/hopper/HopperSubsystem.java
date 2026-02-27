@@ -133,17 +133,16 @@ public class HopperSubsystem extends SubsystemBase {
 
     // Visualize balls held inside the hopper in sim only
     if (Constants.currentMode == Constants.Mode.SIM) {
-      int ballCount = IntakeSubsystem.getInstance().getSimHopperFuelCount();
+      int rawBallCount = IntakeSubsystem.getInstance().getSimHopperFuelCount();
+      int ballCount = Math.max(0, Math.min(rawBallCount, BALL_SLOT_POSITIONS.length));
 
       Pose3d robotPose = new Pose3d(DriveSubsystem.getInstance().getSimulatedDriveTrainPose());
       Pose3d[] ballPoses = new Pose3d[ballCount];
-      Pose3d[] ballPosesRobotRelative = new Pose3d[ballCount];
 
       // Each ball occupies a fixed pre-computed slot (ring position + layer height).
       // Robot-relative positions never change, so balls stay anchored to the hopper.
       for (int i = 0; i < ballCount; i++) {
-        Translation3d slotPosition = BALL_SLOT_POSITIONS[i % BALL_SLOT_POSITIONS.length];
-        ballPosesRobotRelative[i] = new Pose3d(slotPosition, new Rotation3d());
+        Translation3d slotPosition = BALL_SLOT_POSITIONS[i];
         ballPoses[i] = robotPose.transformBy(new Transform3d(slotPosition, new Rotation3d()));
       }
 
