@@ -29,35 +29,11 @@ import org.littletonrobotics.junction.Logger;
 public class HopperSubsystem extends SubsystemBase {
   private static HopperSubsystem INSTANCE = null;
 
-  // Hopper bowl center position (robot-relative, meters)
-  private static final double HOPPER_CENTER_X = 0.12;
-  private static final double HOPPER_CENTER_Y = -0.045;
-  private static final double HOPPER_FLOOR_Z = 0.15;
-
-  // Ball ring layout — 6 balls per layer, 5 layers = 30 ball capacity
-  private static final int BALLS_PER_RING = 6;
-  private static final int MAX_RING_LAYERS = 5;
-  private static final double BALL_DIAMETER = 0.075; // meters (~3 inches)
-  private static final double BALL_RING_RADIUS = 0.12; // ring radius around hopper center
-
   // Pre-compute the fixed robot-relative position for every ball slot (slot index
   // = layer * 6 + i)
-  private static final Translation3d[] BALL_SLOT_POSITIONS =
-      computeBallSlotPositions(BALLS_PER_RING, MAX_RING_LAYERS);
-
-  private static Translation3d[] computeBallSlotPositions(int ballsPerRing, int layers) {
-    Translation3d[] positions = new Translation3d[ballsPerRing * layers];
-    for (int layer = 0; layer < layers; layer++) {
-      for (int i = 0; i < ballsPerRing; i++) {
-        double angle = (2 * Math.PI / ballsPerRing) * i;
-        double rx = HOPPER_CENTER_X + BALL_RING_RADIUS * Math.cos(angle);
-        double ry = HOPPER_CENTER_Y + BALL_RING_RADIUS * Math.sin(angle);
-        double rz = HOPPER_FLOOR_Z + layer * BALL_DIAMETER;
-        positions[layer * ballsPerRing + i] = new Translation3d(rx, ry, rz);
-      }
-    }
-    return positions;
-  }
+  private static final Translation3d[] simBallSlotPositions =
+      computeSimBallSlotPositions(
+          HopperConstants.Sim.ballsPerRing, HopperConstants.Sim.maxRingLayers);
 
   public static HopperSubsystem getInstance() {
     if (INSTANCE == null) {
@@ -126,15 +102,13 @@ public class HopperSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Mechanism3d/0-Spindexer",
         new Pose3d(
-            HOPPER_CENTER_X,
-            HOPPER_CENTER_Y,
-            HOPPER_FLOOR_Z,
+            HopperConstants.robotRelativeHopperCenter,
             new Rotation3d(0.0, 0.0, Units.rotationsToRadians(spindexerInputs.positionRotations))));
 
     // Visualize balls held inside the hopper in sim only
-    if (Constants.currentMode == Constants.Mode.SIM) {
+    if (Constants.isSim()) {
       int rawBallCount = IntakeSubsystem.getInstance().getSimHopperFuelCount();
-      int ballCount = Math.max(0, Math.min(rawBallCount, BALL_SLOT_POSITIONS.length));
+      int ballCount = Math.max(0, Math.min(rawBallCount, simBallSlotPositions.length));
 
       Pose3d robotPose = new Pose3d(DriveSubsystem.getInstance().getSimulatedDriveTrainPose());
       Pose3d[] ballPoses = new Pose3d[ballCount];
@@ -142,11 +116,26 @@ public class HopperSubsystem extends SubsystemBase {
       // Each ball occupies a fixed pre-computed slot (ring position + layer height).
       // Robot-relative positions never change, so balls stay anchored to the hopper.
       for (int i = 0; i < ballCount; i++) {
-        Translation3d slotPosition = BALL_SLOT_POSITIONS[i];
+        Translation3d slotPosition = simBallSlotPositions[i];
         ballPoses[i] = robotPose.transformBy(new Transform3d(slotPosition, new Rotation3d()));
       }
 
       Logger.recordOutput("FieldSimulation/HopperFuel", ballPoses);
     }
+  }
+
+  private static Translation3d[] computeSimBallSlotPositions(int ballsPerRing, int layers) {
+    Translation3d[] positions = new Translation3d[ballsPerRing * layers];
+    Translation3d hopperCenter = HopperConstants.robotRelativeHopperCenter;
+    for (int layer = 0; layer < layers; layer++) {
+      for (int i = 0; i < ballsPerRing; i++) {
+        double angle = (2 * Math.PI / ballsPerRing) * i;
+        double rx = hopperCenter.getX() + HopperConstants.Sim.ballRingRadius * Math.cos(angle);
+        double ry = hopperCenter.getY() + HopperConstants.Sim.ballRingRadius * Math.sin(angle);
+        double rz = hopperCenter.getZ() + layer * HopperConstants.Sim.ballDiameter;
+        positions[layer * ballsPerRing + i] = new Translation3d(rx, ry, rz);
+      }
+    }
+    return positions;
   }
 }
