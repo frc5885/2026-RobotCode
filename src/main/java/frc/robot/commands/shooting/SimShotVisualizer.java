@@ -31,6 +31,9 @@ public class SimShotVisualizer {
   // Balls per second
   private static final double bps = 6.0;
   private static double lastShotTime = 0.0;
+
+  private static int score = 0;
+
   private static final double rpmToMetersPerSecond = 0.0034; // Multiplier from John's Excel sheet
 
   public static void launchFuelWithRateLimit() {
@@ -75,7 +78,7 @@ public class SimShotVisualizer {
           // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of hub opening)
           .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3))
           // Set a callback to run when the fuel hits the target
-          .withHitTargetCallBack(() -> System.out.println("Hit hub, +1 point!"));
+          .withHitTargetCallBack(() -> Logger.recordOutput("FieldSimulation/Score", ++score));
 
       fuelOnFly
           // Configure callbacks to visualize the flight trajectory of the projectile

@@ -70,8 +70,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private final BangBangController flywheelBangBangController = new BangBangController();
   private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.1);
   private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
-  private boolean flywheelAtSetpoint = false;
-  private boolean hoodAtSetpoint = false;
 
   /** Creates a new Shooter. */
   private ShooterSubsystem(FlywheelIO flywheelIO, HoodIO hoodIO) {
@@ -101,10 +99,6 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelLeftMotorDisconnectedAlert.set(!flywheelInputs.leftMotorConnected);
     flywheelRightMotorDisconnectedAlert.set(!flywheelInputs.rightMotorConnected);
     hoodMotorDisconnectedAlert.set(!hoodInputs.motorConnected);
-
-    flywheelAtSetpoint =
-        flywheelAtSetpointDebouncer.calculate(flywheelBangBangController.atSetpoint());
-    hoodAtSetpoint = hoodAtSetpointDebouncer.calculate(hoodPID.atSetpoint());
 
     setHoodVoltage(hoodPID.calculate(hoodInputs.positionRadians));
     if (flywheelBangBangController.getSetpoint() != 0) {
@@ -143,13 +137,13 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Returns debounced flywheel at setpoint */
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
-    return flywheelAtSetpoint;
+    return flywheelAtSetpointDebouncer.calculate(flywheelBangBangController.atSetpoint());
   }
 
   /** Returns debounced hood at setpoint */
   @AutoLogOutput(key = "Shooter/HoodAtSetpoint")
   public boolean isHoodAtSetpoint() {
-    return hoodAtSetpoint;
+    return hoodAtSetpointDebouncer.calculate(hoodPID.atSetpoint());
   }
 
   public double getHoodAngle() {

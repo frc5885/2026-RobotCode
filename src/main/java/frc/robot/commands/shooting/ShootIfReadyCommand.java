@@ -32,13 +32,16 @@ public class ShootIfReadyCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (TurretSubsystem.getInstance().isAtGoal()
-        && ShooterSubsystem.getInstance().isFlywheelAtSetpoint()
-        && ShooterSubsystem.getInstance().isHoodAtSetpoint()
-        && LaunchCalculator.getInstance().getParameters().isValid()) {
+    boolean isReadyToShoot =
+        TurretSubsystem.getInstance().isAtGoal()
+            && ShooterSubsystem.getInstance().isFlywheelAtSetpoint()
+            && ShooterSubsystem.getInstance().isHoodAtSetpoint()
+            && LaunchCalculator.getInstance().getParameters().isValid();
+    Logger.recordOutput("ShootIfReadyCommand/IsReadyToShoot", isReadyToShoot);
+
+    if (isReadyToShoot) {
       hopperSubsystem.setKickerVoltage(kickerVoltage);
       hopperSubsystem.setSpindexerVoltage(spindexerVoltage);
-      Logger.recordOutput("ShootIfReadyCommand/isReady", true);
 
       if (Constants.isSim()) {
         SimShotVisualizer.launchFuelWithRateLimit();
@@ -46,7 +49,6 @@ public class ShootIfReadyCommand extends Command {
     } else {
       hopperSubsystem.setKickerVoltage(0.0);
       hopperSubsystem.setSpindexerVoltage(0.0);
-      Logger.recordOutput("ShootIfReadyCommand/isReady", false);
     }
   }
 

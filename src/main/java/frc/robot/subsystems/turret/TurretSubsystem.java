@@ -68,7 +68,6 @@ public class TurretSubsystem extends SubsystemBase {
       new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
   private boolean runClosedLoop = false;
   private final Debouncer atGoalDebouncer = new Debouncer(0.1);
-  private boolean debouncedAtGoal = false;
 
   // Stuff for tracking
   @AutoLogOutput(key = "Turret/LaunchState")
@@ -87,6 +86,7 @@ public class TurretSubsystem extends SubsystemBase {
               TurretConstants.maxAccelerationRadiansPerSecondSquared));
   private State setpoint = new State();
 
+  @AutoLogOutput(key = "Turret/AtGoal")
   private boolean atGoal = false;
 
   /** Creates a new Turret. */
@@ -156,12 +156,11 @@ public class TurretSubsystem extends SubsystemBase {
       setpoint = profile.calculate(Constants.dtSeconds, setpoint, goalState);
       atGoal =
           EqualsUtil.epsilonEquals(
-                  bestAngle, setpoint.position, TurretConstants.turretPositionToleranceRadians)
+                  getPosition(), bestAngle, TurretConstants.turretPositionToleranceRadians)
               && EqualsUtil.epsilonEquals(
+                  getVelocity(),
                   robotRelativeGoalVelocity,
-                  setpoint.velocity,
                   TurretConstants.turretVelocityToleranceRadiansPerSecond);
-      debouncedAtGoal = atGoalDebouncer.calculate(atGoal);
 
       Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
       Logger.recordOutput("Turret/GoalVelocityRadPerSec", robotRelativeGoalVelocity);
@@ -269,7 +268,7 @@ public class TurretSubsystem extends SubsystemBase {
     if (!runClosedLoop) {
       return false;
     }
-    return debouncedAtGoal;
+    return atGoalDebouncer.calculate(atGoal);
   }
 
   // Configure SysId
