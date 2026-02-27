@@ -176,7 +176,7 @@ public class LaunchCalculator {
     // Log calculated values
     Logger.recordOutput("LaunchCalculator/LookaheadPose", lookaheadPose);
     Logger.recordOutput("LaunchCalculator/TurretToTargetDistance", lookaheadTurretToTargetDistance);
-    Logger.recordOutput("LaunchCalculator/isValid", isValid);
+    Logger.recordOutput("LaunchCalculator/IsValid", isValid);
     Logger.recordOutput("LaunchCalculator/TurretAngle", turretAngle);
     Logger.recordOutput("LaunchCalculator/HoodAngle", hoodAngle);
     Logger.recordOutput("LaunchCalculator/TurretVelocity", turretVelocity);

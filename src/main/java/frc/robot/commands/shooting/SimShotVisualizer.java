@@ -31,8 +31,9 @@ public class SimShotVisualizer {
   // Balls per second
   private static final double bps = 6.0;
   private static double lastShotTime = 0.0;
+  private static final double rpmToMetersPerSecond = 0.0034; // Multiplier from John's Excel sheet
 
-  public static void launchFuel() {
+  public static void launchFuelWithRateLimit() {
     if (Constants.isSim()
         && Timer.getFPGATimestamp() - lastShotTime > 1.0 / bps
         && IntakeSubsystem.getInstance().getIntakeSimulation().obtainGamePieceFromIntake()) {
@@ -63,15 +64,15 @@ public class SimShotVisualizer {
               // Initial height of the fuel
               Meters.of(TurretConstants.robotToTurret.getTranslation().getZ()),
               // Multiplier from John's Excel sheet
-              Meters.per(Second).of(ShooterSubsystem.getInstance().getFlywheelRPM() * 0.0034),
+              Meters.per(Second)
+                  .of(ShooterSubsystem.getInstance().getFlywheelRPM() * rpmToMetersPerSecond),
               // The angle at which the fuel is launched
               Radians.of(ShooterSubsystem.getInstance().getHoodAngle()));
 
       fuelOnFly
-          // Set the target center to the Rebbuilt Hub of the current alliance
+          // Set the target center to the Rebuilt Hub of the current alliance
           .withTargetPosition(() -> AllianceFlipUtil.apply(FieldConstants.Hub.innerCenterPoint))
-          // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of the speaker's
-          // "mouth")
+          // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of hub opening)
           .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3))
           // Set a callback to run when the fuel hits the target
           .withHitTargetCallBack(() -> System.out.println("Hit hub, +1 point!"));

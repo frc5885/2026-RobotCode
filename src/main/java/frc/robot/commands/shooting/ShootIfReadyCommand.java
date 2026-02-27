@@ -15,6 +15,10 @@ import org.littletonrobotics.junction.Logger;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootIfReadyCommand extends Command {
   private final HopperSubsystem hopperSubsystem = HopperSubsystem.getInstance();
+
+  private final double kickerVoltage = 12.0;
+  private final double spindexerVoltage = 12.0;
+
   /** Creates a new ShootIfReadyCommand. */
   public ShootIfReadyCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -32,12 +36,12 @@ public class ShootIfReadyCommand extends Command {
         && ShooterSubsystem.getInstance().isFlywheelAtSetpoint()
         && ShooterSubsystem.getInstance().isHoodAtSetpoint()
         && LaunchCalculator.getInstance().getParameters().isValid()) {
-      hopperSubsystem.setKickerVoltage(12.0);
-      hopperSubsystem.setSpindexerVoltage(12.0);
+      hopperSubsystem.setKickerVoltage(kickerVoltage);
+      hopperSubsystem.setSpindexerVoltage(spindexerVoltage);
       Logger.recordOutput("ShootIfReadyCommand/isReady", true);
 
       if (Constants.isSim()) {
-        SimShotVisualizer.launchFuel();
+        SimShotVisualizer.launchFuelWithRateLimit();
       }
     } else {
       hopperSubsystem.setKickerVoltage(0.0);

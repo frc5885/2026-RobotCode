@@ -68,6 +68,7 @@ public class TurretSubsystem extends SubsystemBase {
       new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
   private boolean runClosedLoop = false;
   private final Debouncer atGoalDebouncer = new Debouncer(0.1);
+  private boolean debouncedAtGoal = false;
 
   // Stuff for tracking
   @AutoLogOutput(key = "Turret/LaunchState")
@@ -86,7 +87,6 @@ public class TurretSubsystem extends SubsystemBase {
               TurretConstants.maxAccelerationRadiansPerSecondSquared));
   private State setpoint = new State();
 
-  @AutoLogOutput(key = "Turret/AtGoal")
   private boolean atGoal = false;
 
   /** Creates a new Turret. */
@@ -161,6 +161,8 @@ public class TurretSubsystem extends SubsystemBase {
                   robotRelativeGoalVelocity,
                   setpoint.velocity,
                   TurretConstants.turretVelocityToleranceRadiansPerSecond);
+      debouncedAtGoal = atGoalDebouncer.calculate(atGoal);
+
       Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
       Logger.recordOutput("Turret/GoalVelocityRadPerSec", robotRelativeGoalVelocity);
       Logger.recordOutput("Turret/SetpointPositionRad", setpoint.position);
@@ -264,7 +266,10 @@ public class TurretSubsystem extends SubsystemBase {
 
   /** Returns debounced atGoal (position and velocity setpoints) */
   public boolean isAtGoal() {
-    return atGoalDebouncer.calculate(atGoal);
+    if (!runClosedLoop) {
+      return false;
+    }
+    return debouncedAtGoal;
   }
 
   // Configure SysId

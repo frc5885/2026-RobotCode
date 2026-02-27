@@ -14,7 +14,7 @@ import frc.robot.subsystems.turret.LaunchCalculator.LaunchingParameters;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AimHoodAndSpinFlywheelCommand extends Command {
   private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
-  /** Creates a new AimHoodCommand. */
+  /** Creates a new AimHoodAndSpinFlywheelCommand. */
   public AimHoodAndSpinFlywheelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(shooterSubsystem);
