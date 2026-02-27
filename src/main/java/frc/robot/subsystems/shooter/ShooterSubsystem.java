@@ -144,6 +144,14 @@ public class ShooterSubsystem extends SubsystemBase {
     return hoodAtSetpointDebouncer.calculate(hoodPID.atSetpoint());
   }
 
+  public double getHoodAngle() {
+    return hoodInputs.positionRadians;
+  }
+
+  public double getFlywheelRPM() {
+    return flywheelInputs.velocityRPM;
+  }
+
   private void visualizationUpdate() {
     // Log Pose3d
     Logger.recordOutput(

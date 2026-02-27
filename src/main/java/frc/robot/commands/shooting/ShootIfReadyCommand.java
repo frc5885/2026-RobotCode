@@ -5,6 +5,7 @@
 package frc.robot.commands.shooting;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.hopper.HopperSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.LaunchCalculator;
@@ -32,7 +33,10 @@ public class ShootIfReadyCommand extends Command {
         && LaunchCalculator.getInstance().getParameters().isValid()) {
       hopperSubsystem.setKickerVoltage(12.0);
       hopperSubsystem.setSpindexerVoltage(12.0);
-      System.out.println("Shoot");
+
+      if (Constants.isSim()) {
+        SimShotVisualizer.launchFuel();
+      }
     } else {
       hopperSubsystem.setKickerVoltage(0.0);
       hopperSubsystem.setSpindexerVoltage(0.0);
@@ -41,7 +45,10 @@ public class ShootIfReadyCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    hopperSubsystem.setKickerVoltage(0.0);
+    hopperSubsystem.setSpindexerVoltage(0.0);
+  }
 
   // Returns true when the command should end.
   @Override
