@@ -28,15 +28,19 @@ import org.littletonrobotics.junction.Logger;
 public class SimShotVisualizer {
   private SimShotVisualizer() {}
 
-  private static final double shotDelaySeconds = 0.2;
+  // Balls per second
+  private static final double bps = 6.0;
   private static double lastShotTime = 0.0;
 
   public static void launchFuel() {
     if (Constants.isSim()
-        && Timer.getFPGATimestamp() - lastShotTime > shotDelaySeconds
+        && Timer.getFPGATimestamp() - lastShotTime > 1.0 / bps
         && IntakeSubsystem.getInstance().getIntakeSimulation().obtainGamePieceFromIntake()) {
       lastShotTime = Timer.getFPGATimestamp();
+
       Pose2d drivePose = DriveSubsystem.getInstance().getSimulatedDriveTrainPose();
+      Rotation2d turretRotation = new Rotation2d(TurretSubsystem.getInstance().getPosition());
+
       RebuiltFuelOnFly fuelOnFly =
           new RebuiltFuelOnFly(
               // Specify the position of the chassis when the note is launched
@@ -46,7 +50,7 @@ public class SimShotVisualizer {
               TurretConstants.robotToTurret
                   .getTranslation()
                   .toTranslation2d()
-                  .rotateBy(drivePose.getRotation()),
+                  .rotateBy(turretRotation.unaryMinus()),
               // Specify the field-relative speed of the chassis, adding it to the initial
               // velocity
               // of the projectile
@@ -55,12 +59,10 @@ public class SimShotVisualizer {
               drivePose
                   .getRotation()
                   // Add the shooter’s rotation
-                  .plus(new Rotation2d(TurretSubsystem.getInstance().getPosition())),
+                  .plus(turretRotation),
               // Initial height of the fuel
               Meters.of(TurretConstants.robotToTurret.getTranslation().getZ()),
-              // The launch speed is proportional to the RPM; assumed to be 16 meters/second at
-              // 6000
-              // RPM
+              // Multiplier from John's Excel sheet
               Meters.per(Second).of(ShooterSubsystem.getInstance().getFlywheelRPM() * 0.0034),
               // The angle at which the fuel is launched
               Radians.of(ShooterSubsystem.getInstance().getHoodAngle()));

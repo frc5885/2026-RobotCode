@@ -134,11 +134,13 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.recordOutput("Shooter/FlywheelSetpoint", velocityRPM);
   }
 
+  /** Returns debounced flywheel at setpoint */
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
     return flywheelAtSetpointDebouncer.calculate(flywheelBangBangController.atSetpoint());
   }
 
+  /** Returns debounced hood at setpoint */
   @AutoLogOutput(key = "Shooter/HoodAtSetpoint")
   public boolean isHoodAtSetpoint() {
     return hoodAtSetpointDebouncer.calculate(hoodPID.atSetpoint());

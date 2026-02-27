@@ -156,11 +156,11 @@ public class TurretSubsystem extends SubsystemBase {
       setpoint = profile.calculate(Constants.dtSeconds, setpoint, goalState);
       atGoal =
           EqualsUtil.epsilonEquals(
-                  bestAngle, setpoint.position, TurretConstants.turretPositionTolerance)
+                  bestAngle, setpoint.position, TurretConstants.turretPositionToleranceRadians)
               && EqualsUtil.epsilonEquals(
                   robotRelativeGoalVelocity,
                   setpoint.velocity,
-                  TurretConstants.turretVelocityTolerance);
+                  TurretConstants.turretVelocityToleranceRadiansPerSecond);
       Logger.recordOutput("Turret/GoalPositionRad", bestAngle);
       Logger.recordOutput("Turret/GoalVelocityRadPerSec", robotRelativeGoalVelocity);
       Logger.recordOutput("Turret/SetpointPositionRad", setpoint.position);

@@ -10,6 +10,7 @@ import frc.robot.subsystems.hopper.HopperSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.LaunchCalculator;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootIfReadyCommand extends Command {
@@ -33,6 +34,7 @@ public class ShootIfReadyCommand extends Command {
         && LaunchCalculator.getInstance().getParameters().isValid()) {
       hopperSubsystem.setKickerVoltage(12.0);
       hopperSubsystem.setSpindexerVoltage(12.0);
+      Logger.recordOutput("ShootIfReadyCommand/isReady", true);
 
       if (Constants.isSim()) {
         SimShotVisualizer.launchFuel();
@@ -40,6 +42,7 @@ public class ShootIfReadyCommand extends Command {
     } else {
       hopperSubsystem.setKickerVoltage(0.0);
       hopperSubsystem.setSpindexerVoltage(0.0);
+      Logger.recordOutput("ShootIfReadyCommand/isReady", false);
     }
   }
 
