@@ -7,6 +7,7 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.shooter.flywheel.FlywheelConstants;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
@@ -26,6 +28,7 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOSpark;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -65,6 +68,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private final PIDController hoodPID =
       new PIDController(HoodConstants.kp, HoodConstants.ki, HoodConstants.kd);
   private final BangBangController flywheelBangBangController = new BangBangController();
+  private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.1);
+  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
 
   /** Creates a new Shooter. */
   private ShooterSubsystem(FlywheelIO flywheelIO, HoodIO hoodIO) {
@@ -76,7 +81,9 @@ public class ShooterSubsystem extends SubsystemBase {
         new Alert("Shooter flywheel right motor disconnected!", AlertType.kError);
     hoodMotorDisconnectedAlert = new Alert("Shooter hood motor disconnected!", AlertType.kError);
 
+    hoodPID.setTolerance(HoodConstants.positionToleranceRadians);
     hoodPID.setSetpoint(HoodConstants.startingAngleRadians);
+    flywheelBangBangController.setTolerance(FlywheelConstants.velocityToleranceRPM);
     flywheelBangBangController.setSetpoint(0);
 
     AutoLogOutputManager.addObject(this);
@@ -114,6 +121,7 @@ public class ShooterSubsystem extends SubsystemBase {
         MathUtil.clamp(
             positionRadians, HoodConstants.minAngleRadians, HoodConstants.maxAngleRadians);
     hoodPID.setSetpoint(hoodSetpoint);
+    Logger.recordOutput("Shooter/HoodSetpoint", hoodSetpoint);
   }
 
   public void setFlywheelVelocity(double velocityRPM) {
@@ -123,6 +131,27 @@ public class ShooterSubsystem extends SubsystemBase {
     if (velocityRPM == 0) {
       setFlywheelVoltage(0);
     }
+    Logger.recordOutput("Shooter/FlywheelSetpoint", velocityRPM);
+  }
+
+  /** Returns debounced flywheel at setpoint */
+  @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
+  public boolean isFlywheelAtSetpoint() {
+    return flywheelAtSetpointDebouncer.calculate(flywheelBangBangController.atSetpoint());
+  }
+
+  /** Returns debounced hood at setpoint */
+  @AutoLogOutput(key = "Shooter/HoodAtSetpoint")
+  public boolean isHoodAtSetpoint() {
+    return hoodAtSetpointDebouncer.calculate(hoodPID.atSetpoint());
+  }
+
+  public double getHoodAngle() {
+    return hoodInputs.positionRadians;
+  }
+
+  public double getFlywheelRPM() {
+    return flywheelInputs.velocityRPM;
   }
 
   private void visualizationUpdate() {

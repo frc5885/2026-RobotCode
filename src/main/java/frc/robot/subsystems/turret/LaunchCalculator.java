@@ -165,19 +165,23 @@ public class LaunchCalculator {
     hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.dtSeconds);
     lastTurretAngle = turretAngle;
     lastHoodAngle = hoodAngle;
+    boolean isValid =
+        lookaheadTurretToTargetDistance >= minDistance
+            && lookaheadTurretToTargetDistance <= maxDistance;
+    double flywheelSpeed = launchFlywheelSpeedMap.get(lookaheadTurretToTargetDistance);
     latestParameters =
         new LaunchingParameters(
-            lookaheadTurretToTargetDistance >= minDistance
-                && lookaheadTurretToTargetDistance <= maxDistance,
-            turretAngle,
-            turretVelocity,
-            hoodAngle,
-            hoodVelocity,
-            launchFlywheelSpeedMap.get(lookaheadTurretToTargetDistance));
+            isValid, turretAngle, turretVelocity, hoodAngle, hoodVelocity, flywheelSpeed);
 
     // Log calculated values
     Logger.recordOutput("LaunchCalculator/LookaheadPose", lookaheadPose);
     Logger.recordOutput("LaunchCalculator/TurretToTargetDistance", lookaheadTurretToTargetDistance);
+    Logger.recordOutput("LaunchCalculator/IsValid", isValid);
+    Logger.recordOutput("LaunchCalculator/TurretAngle", turretAngle);
+    Logger.recordOutput("LaunchCalculator/HoodAngle", hoodAngle);
+    Logger.recordOutput("LaunchCalculator/TurretVelocity", turretVelocity);
+    Logger.recordOutput("LaunchCalculator/HoodVelocity", hoodVelocity);
+    Logger.recordOutput("LaunchCalculator/FlywheelSpeed", flywheelSpeed);
 
     return latestParameters;
   }

@@ -14,12 +14,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.PathUnderTrenchCommand;
-import frc.robot.commands.RetractIntakeCommand;
-import frc.robot.commands.SpinShooterCommand;
 import frc.robot.commands.SysIDCommands;
-import frc.robot.commands.TurretCommands;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.RetractIntakeCommand;
+import frc.robot.commands.shooting.ShootCommandGroup;
+import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.util.ControllerUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -69,7 +69,8 @@ public class RobotContainer {
 
     DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
 
-    controller.a().whileTrue(new SpinShooterCommand());
+    controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
+
     controller
         .povLeft()
         .onTrue(new PathUnderTrenchCommand(() -> ControllerUtil.isLeftJoystickMoved(controller)));
