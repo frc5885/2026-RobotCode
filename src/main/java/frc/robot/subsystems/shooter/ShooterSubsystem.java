@@ -213,11 +213,19 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean isHoodAtGoal() {
     return hoodAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(
-            getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians));
+                getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians)
+            && EqualsUtil.epsilonEquals(
+                getHoodVelocity(),
+                hoodGoalState.velocity,
+                HoodConstants.velocityToleranceRadiansPerSecond));
   }
 
   public double getHoodAngle() {
     return hoodInputs.positionRadians;
+  }
+
+  public double getHoodVelocity() {
+    return hoodInputs.velocityRadiansPerSecond;
   }
 
   public double getFlywheelRPM() {

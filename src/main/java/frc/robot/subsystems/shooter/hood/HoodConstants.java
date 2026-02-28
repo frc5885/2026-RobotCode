@@ -33,4 +33,5 @@ public class HoodConstants {
   public static final double kv = 0.10265;
   public static final double ka = 5.2044e-05;
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
+  public static final double velocityToleranceRadiansPerSecond = Units.degreesToRadians(6.0);
 }

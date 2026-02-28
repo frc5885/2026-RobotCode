@@ -14,6 +14,8 @@ public class SlowDriveSpeedCommand extends Command {
   /** Creates a new SlowDriveSpeedCommand. */
   public SlowDriveSpeedCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
+    // We don't need drive subsystem as a requirement because this command doesn't actively
+    // control it
   }
 
   // Called when the command is initially scheduled.
