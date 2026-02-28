@@ -13,9 +13,22 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "deadline",
                       "data": {
-                        "pathName": "orbit.0"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "orbit.0"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "PreSpinFlywheel"
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -23,21 +36,21 @@
                       "data": {
                         "commands": [
                           {
-                            "type": "wait",
+                            "type": "named",
                             "data": {
-                              "waitTime": 8.0
+                              "name": "WaitUntilHopperIsEmpty"
                             }
                           },
                           {
                             "type": "named",
                             "data": {
-                              "name": "shoot"
+                              "name": "Shoot"
                             }
                           },
                           {
                             "type": "named",
                             "data": {
-                              "name": "stop"
+                              "name": "Stop"
                             }
                           }
                         ]
@@ -55,7 +68,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "intake"
+                  "name": "Intake"
                 }
               }
             ]
@@ -64,19 +77,32 @@
         {
           "type": "named",
           "data": {
-            "name": "retractIntake"
+            "name": "RetractIntake"
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "orbit.2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "orbit.2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PreSpinFlywheel"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "Shoot"
           }
         }
       ]
