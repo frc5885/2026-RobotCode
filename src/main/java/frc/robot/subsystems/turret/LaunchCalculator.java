@@ -19,7 +19,6 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -66,7 +65,7 @@ public class LaunchCalculator {
 
   static {
     minDistance = 1.34;
-    maxDistance = 5.60;
+    maxDistance = FieldConstants.fieldLength / 2;
     phaseDelay = 0.03;
 
     launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(71.0));
@@ -116,8 +115,8 @@ public class LaunchCalculator {
                 robotRelativeVelocity.omegaRadiansPerSecond * phaseDelay));
 
     // Calculate distance from turret to target
-    Translation2d target =
-        AllianceFlipUtil.apply(FieldConstants.Hub.topCenterPoint.toTranslation2d());
+    Translation2d target = FieldConstants.getTurretTarget(estimatedPose);
+    Logger.recordOutput("LaunchCalculator/Target", target);
     Pose2d turretPosition =
         estimatedPose.transformBy(
             new Transform2d(
