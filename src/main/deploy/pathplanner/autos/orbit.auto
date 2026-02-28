@@ -38,12 +38,6 @@
                           {
                             "type": "named",
                             "data": {
-                              "name": "WaitUntilHopperIsEmpty"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
                               "name": "Shoot"
                             }
                           },

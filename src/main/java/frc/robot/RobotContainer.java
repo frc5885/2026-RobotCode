@@ -17,8 +17,8 @@ import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
+import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
-import frc.robot.commands.autonomous.WaitUntilHopperIsEmptyCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
@@ -48,10 +48,9 @@ public class RobotContainer {
     // Init all named commands
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
-    NamedCommands.registerCommand("Shoot", new ShootCommandGroup());
+    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
     NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
-    NamedCommands.registerCommand("WaitUntilHopperIsEmpty", new WaitUntilHopperIsEmptyCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
 
     // Set up auto routines
