@@ -16,9 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -42,11 +40,6 @@ public class AssistedDriveCommand extends Command {
   private final DoubleSupplier omegaSupplier;
   private final SlewRateLimiter2d driveLimiter;
   private int flipFactor = 1; // 1 for normal, -1 for flipped
-
-  private LinearVelocity maxDriveSpeed =
-      MetersPerSecond.of(driveSubsystem.getMaxLinearSpeedMetersPerSec());
-  private AngularVelocity maxRotSpeed =
-      RadiansPerSecond.of(driveSubsystem.getMaxAngularSpeedRadPerSec());
 
   @AutoLogOutput private final Trigger inTrenchZoneTrigger;
 
@@ -151,7 +144,7 @@ public class AssistedDriveCommand extends Command {
   public void execute() {
     Translation2d linearVelocity =
         getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-    linearVelocity = linearVelocity.times(maxDriveSpeed.in(MetersPerSecond));
+    linearVelocity = linearVelocity.times(driveSubsystem.getMaxLinearSpeedMetersPerSec());
     linearVelocity = driveLimiter.calculate(linearVelocity);
 
     double omega =
@@ -164,7 +157,7 @@ public class AssistedDriveCommand extends Command {
             ChassisSpeeds.fromFieldRelativeSpeeds(
                 MetersPerSecond.of(linearVelocity.getX()),
                 MetersPerSecond.of(linearVelocity.getY()),
-                maxRotSpeed.times(omega),
+                RadiansPerSecond.of(driveSubsystem.getMaxAngularSpeedRadPerSec()).times(omega),
                 driveSubsystem.getRotation()));
         break;
       case TRENCH_LOCK:
@@ -201,14 +194,6 @@ public class AssistedDriveCommand extends Command {
                 driveSubsystem.getRotation()));
         break;
     }
-  }
-
-  private void setDriveSpeed(LinearVelocity speed) {
-    maxDriveSpeed = speed;
-  }
-
-  private void setRotSpeed(AngularVelocity speed) {
-    maxRotSpeed = speed;
   }
 
   // Called once the command ends or is interrupted.
