@@ -4,7 +4,11 @@
 
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
@@ -12,9 +16,13 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.shooter.flywheel.FlywheelConstants;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
@@ -28,6 +36,7 @@ import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOSpark;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.util.EqualsUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
@@ -65,11 +74,25 @@ public class ShooterSubsystem extends SubsystemBase {
   private final HoodIO hoodIO;
   private final FlywheelIOInputsAutoLogged flywheelInputs = new FlywheelIOInputsAutoLogged();
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
+  private final SysIdRoutine hoodSysId;
   private final PIDController hoodPID =
       new PIDController(HoodConstants.kp, HoodConstants.ki, HoodConstants.kd);
+  private final ArmFeedforward hoodFF =
+      new ArmFeedforward(HoodConstants.ks, HoodConstants.kg, HoodConstants.kv, HoodConstants.ka);
   private final BangBangController flywheelBangBangController = new BangBangController();
   private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.1);
   private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
+
+  private TrapezoidProfile hoodProfile =
+      new TrapezoidProfile(
+          new Constraints(
+              HoodConstants.maxVelocityRadiansPerSecond,
+              HoodConstants.maxAccelerationRadiansPerSecondSquared));
+  private TrapezoidProfile.State hoodGoalState =
+      new TrapezoidProfile.State(HoodConstants.startingAngleRadians, 0.0);
+  private TrapezoidProfile.State hoodPrevSetpoint = hoodGoalState;
+  private boolean runHoodClosedLoop = true;
+  private boolean runFlywheelClosedLoop = false;
 
   /** Creates a new Shooter. */
   private ShooterSubsystem(FlywheelIO flywheelIO, HoodIO hoodIO) {
@@ -81,8 +104,9 @@ public class ShooterSubsystem extends SubsystemBase {
         new Alert("Shooter flywheel right motor disconnected!", AlertType.kError);
     hoodMotorDisconnectedAlert = new Alert("Shooter hood motor disconnected!", AlertType.kError);
 
+    hoodSysId = hoodSysIdSetup();
+
     hoodPID.setTolerance(HoodConstants.positionToleranceRadians);
-    hoodPID.setSetpoint(HoodConstants.startingAngleRadians);
     flywheelBangBangController.setTolerance(FlywheelConstants.velocityToleranceRPM);
     flywheelBangBangController.setSetpoint(0);
 
@@ -100,8 +124,21 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelRightMotorDisconnectedAlert.set(!flywheelInputs.rightMotorConnected);
     hoodMotorDisconnectedAlert.set(!hoodInputs.motorConnected);
 
-    setHoodVoltage(hoodPID.calculate(hoodInputs.positionRadians));
-    if (flywheelBangBangController.getSetpoint() != 0) {
+    if (runHoodClosedLoop) {
+      TrapezoidProfile.State current = getHoodCurrentState();
+      TrapezoidProfile.State setpoint =
+          hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
+      hoodPrevSetpoint = setpoint;
+      Logger.recordOutput("Shooter/Hood/SetpointPosition", setpoint.position);
+      Logger.recordOutput("Shooter/Hood/SetpointVelocity", setpoint.velocity);
+
+      setHoodVoltage(
+          hoodFF.calculate(
+                  setpoint.position + HoodConstants.armOffsetToHorizontalRadians, setpoint.velocity)
+              + hoodPID.calculate(current.position, setpoint.position));
+    }
+
+    if (runFlywheelClosedLoop) {
       setFlywheelVoltage(flywheelBangBangController.calculate(flywheelInputs.velocityRPM) * 12.0);
     }
 
@@ -116,19 +153,50 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodIO.setMotorVoltage(volts);
   }
 
-  public void setHoodPosition(double positionRadians) {
-    double hoodSetpoint =
+  public void runHoodOpenLoop(double volts) {
+    runHoodClosedLoop = false;
+    setHoodVoltage(volts);
+  }
+
+  /**
+   * Sets the hood goal state, consisting of a position and a velocity
+   *
+   * @param positionRadians
+   * @param velocityRadiansPerSecond
+   */
+  public void setHoodGoal(double positionRadians, double velocityRadiansPerSecond) {
+    double positionSetpoint =
         MathUtil.clamp(
             positionRadians, HoodConstants.minAngleRadians, HoodConstants.maxAngleRadians);
-    hoodPID.setSetpoint(hoodSetpoint);
-    Logger.recordOutput("Shooter/HoodSetpoint", hoodSetpoint);
+    double velocitySetpoint =
+        MathUtil.clamp(
+            velocityRadiansPerSecond,
+            -HoodConstants.maxVelocityRadiansPerSecond,
+            HoodConstants.maxVelocityRadiansPerSecond);
+    hoodGoalState = new TrapezoidProfile.State(positionSetpoint, velocitySetpoint);
+    if (!runHoodClosedLoop) {
+      // Reset setpoint to current state when transitioning from open-loop
+      hoodPrevSetpoint = getHoodCurrentState();
+    }
+    runHoodClosedLoop = true;
+  }
+
+  /**
+   * Sets the hood goal to the given position with a velocity of 0
+   *
+   * @param positionRadians
+   */
+  public void setHoodGoalPosition(double positionRadians) {
+    setHoodGoal(positionRadians, 0.0);
   }
 
   public void setFlywheelVelocity(double velocityRPM) {
     flywheelBangBangController.setSetpoint(velocityRPM);
+    runFlywheelClosedLoop = true;
     // If the setpoint is 0, set the voltage to 0 because the bang bang controller will not
     // calculate a voltage in periodic if the setpoint is 0
     if (velocityRPM == 0) {
+      runFlywheelClosedLoop = false;
       setFlywheelVoltage(0);
     }
     Logger.recordOutput("Shooter/FlywheelSetpoint", velocityRPM);
@@ -140,10 +208,12 @@ public class ShooterSubsystem extends SubsystemBase {
     return flywheelAtSetpointDebouncer.calculate(flywheelBangBangController.atSetpoint());
   }
 
-  /** Returns debounced hood at setpoint */
-  @AutoLogOutput(key = "Shooter/HoodAtSetpoint")
-  public boolean isHoodAtSetpoint() {
-    return hoodAtSetpointDebouncer.calculate(hoodPID.atSetpoint());
+  /** Returns debounced hood at goal */
+  @AutoLogOutput(key = "Shooter/HoodAtGoal")
+  public boolean isHoodAtGoal() {
+    return hoodAtSetpointDebouncer.calculate(
+        EqualsUtil.epsilonEquals(
+            getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians));
   }
 
   public double getHoodAngle() {
@@ -152,6 +222,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public double getFlywheelRPM() {
     return flywheelInputs.velocityRPM;
+  }
+
+  public TrapezoidProfile.State getHoodCurrentState() {
+    return new TrapezoidProfile.State(
+        hoodInputs.positionRadians, hoodInputs.velocityRadiansPerSecond);
   }
 
   private void visualizationUpdate() {
@@ -165,5 +240,28 @@ public class ShooterSubsystem extends SubsystemBase {
                 new Transform3d(
                     new Translation3d(0.12, 0, 0.065),
                     new Rotation3d(0, -hoodInputs.positionRadians, 0))));
+  }
+
+  // Configure SysId
+  private SysIdRoutine hoodSysIdSetup() {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(0.1).per(Second),
+            Volts.of(0.2),
+            null,
+            (state) -> Logger.recordOutput("Shooter/Hood/SysIDState", state.toString())),
+        new SysIdRoutine.Mechanism((voltage) -> runHoodOpenLoop(voltage.in(Volts)), null, this));
+  }
+
+  /** Returns a command to run a quasistatic test in the specified direction. */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return run(() -> runHoodOpenLoop(0.0))
+        .withTimeout(1.0)
+        .andThen(hoodSysId.quasistatic(direction));
+  }
+
+  /** Returns a command to run a dynamic test in the specified direction. */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return run(() -> runHoodOpenLoop(0.0)).withTimeout(1.0).andThen(hoodSysId.dynamic(direction));
   }
 }

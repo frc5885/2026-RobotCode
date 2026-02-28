@@ -10,6 +10,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -57,5 +58,24 @@ public class SysIDCommands {
     autoChooser.addOption(
         "Turret SysId (Dynamic Reverse)",
         turretSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  /*
+   * Add all hood SysID commands to autochooser
+   */
+  public static void addHoodSysIdToAutoChooser(LoggedDashboardChooser<Command> autoChooser) {
+    ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
+    autoChooser.addOption(
+        "Hood SysId (Quasistatic Forward)",
+        shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Hood SysId (Quasistatic Reverse)",
+        shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Hood SysId (Dynamic Forward)",
+        shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Hood SysId (Dynamic Reverse)",
+        shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 }
