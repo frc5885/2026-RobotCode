@@ -24,6 +24,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.1; // Tuned on poseidon
+  public static final double maxAccelerationMetersPerSec2 = 10.0;
   public static final double shootOnTheMoveSpeedMultiplier = 0.15;
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
@@ -130,6 +131,20 @@ public class DriveConstants {
 
   public static final PathConstraints pathConstraints = new PathConstraints(4.1, 8.0, 8.8, 16.0);
 
+  public static final double driveAssistTranslationKp = 6.0;
+  public static final double driveAssistTranslationKi = 0.0;
+  public static final double driveAssistTranslationKd = 0.0;
+
+  public static final double driveAssistRotationKp = 6.0;
+  public static final double driveAssistRotationKi = 0.0;
+  public static final double driveAssistRotationKd = 0.0;
+
+  public static final double trenchAlignTimeSeconds = 0.5;
+  public static final double bumpAlignTimeSeconds = 0.3;
+
+  public static final double fullRobotLength = robotLength + 2 * bumperWidth;
+  public static final double fullRobotWidth = robotWidth + 2 * bumperWidth;
+
   // Create and configure a drivetrain simulation configuration
   public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
       DriveTrainSimulationConfig.Default()
@@ -145,8 +160,7 @@ public class DriveConstants {
           // Configures the track length and track width (spacing between swerve modules)
           .withTrackLengthTrackWidth(Meters.of(wheelBase), Meters.of(trackWidth))
           // Configures the bumper size (dimensions of the robot bumper)
-          .withBumperSize(
-              Meters.of(robotLength + 2 * bumperWidth), Meters.of(robotWidth + 2 * bumperWidth))
+          .withBumperSize(Meters.of(fullRobotLength), Meters.of(fullRobotWidth))
           // Configures the robot mass (for realistic dynamics)
           .withRobotMass(
               Kilograms.of(robotMassKg * 0.5)); // Multiplied by 0.5 to match real robot speed

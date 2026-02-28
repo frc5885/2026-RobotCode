@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
-import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathUnderTrenchCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
@@ -24,6 +24,7 @@ import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.util.ControllerUtil;
+import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -52,6 +53,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
+    Zones.logAllZones();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -73,11 +75,13 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    DefaultCommands.setDefaultDriveCommand(
-        DriveCommands.joystickDrive(
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+    // DefaultCommands.setDefaultDriveCommand(
+    //     DriveCommands.joystickDrive(
+    //         () -> -controller.getLeftY(),
+    //         () -> -controller.getLeftX(),
+    //         () -> -controller.getRightX()));
+
+    DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
 
     DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
 

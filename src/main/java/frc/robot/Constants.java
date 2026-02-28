@@ -34,4 +34,9 @@ public final class Constants {
   public static boolean isSim() {
     return currentMode == Mode.SIM;
   }
+
+  public static class ControllerConstants {
+    public static final double controllerDeadband = 0.1;
+    public static final double controllerRumble = 0.3;
+  }
 }
