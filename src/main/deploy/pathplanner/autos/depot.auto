@@ -11,7 +11,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "intake"
+                  "name": "Intake"
                 }
               },
               {
@@ -29,21 +29,21 @@
                       "data": {
                         "commands": [
                           {
-                            "type": "wait",
+                            "type": "named",
                             "data": {
-                              "waitTime": 6.0
+                              "name": "WaitUntilHopperIsEmpty"
                             }
                           },
                           {
                             "type": "named",
                             "data": {
-                              "name": "shoot"
+                              "name": "Shoot"
                             }
                           },
                           {
                             "type": "named",
                             "data": {
-                              "name": "stop"
+                              "name": "Stop"
                             }
                           }
                         ]
@@ -58,7 +58,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "shoot"
+                        "name": "Shoot"
                       }
                     }
                   ]

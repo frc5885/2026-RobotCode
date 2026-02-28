@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.turret.LaunchCalculator;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
@@ -130,6 +131,10 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
     resetSimulationField();
+    if (Constants.isSim()) {
+      // Preloaded fuel *yum*
+      IntakeSubsystem.getInstance().getIntakeSimulation().setGamePiecesCount(8);
+    }
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
