@@ -10,6 +10,7 @@ public class ShootCommandGroup extends ParallelCommandGroup {
   /** Creates a new ShootCommandGroup. */
   public ShootCommandGroup() {
     addCommands(
+        new SlowDriveSpeedCommand(),
         new AimHoodAndSpinFlywheelCommand(),
         TurretCommands.setActiveLaunchingModeCommand(),
         new ShootIfReadyCommand());

@@ -28,7 +28,8 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
   @Override
   public void execute() {
     LaunchingParameters launchingParameters = LaunchCalculator.getInstance().getParameters();
-    shooterSubsystem.setHoodPosition(launchingParameters.hoodAngle());
+    shooterSubsystem.setHoodGoal(
+        launchingParameters.hoodAngle(), launchingParameters.hoodVelocity());
     shooterSubsystem.setFlywheelVelocity(
         Units.radiansPerSecondToRotationsPerMinute(launchingParameters.flywheelSpeed()));
   }
@@ -36,7 +37,7 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooterSubsystem.setHoodPosition(HoodConstants.idleAngleRadians);
+    shooterSubsystem.setHoodGoalPosition(HoodConstants.idleAngleRadians);
     shooterSubsystem.setFlywheelVelocity(0.0);
   }
 

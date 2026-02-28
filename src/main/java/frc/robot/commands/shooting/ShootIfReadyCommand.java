@@ -35,7 +35,7 @@ public class ShootIfReadyCommand extends Command {
     boolean isReadyToShoot =
         TurretSubsystem.getInstance().isAtGoal()
             && ShooterSubsystem.getInstance().isFlywheelAtSetpoint()
-            && ShooterSubsystem.getInstance().isHoodAtSetpoint()
+            && ShooterSubsystem.getInstance().isHoodAtGoal()
             && LaunchCalculator.getInstance().getParameters().isValid();
     Logger.recordOutput("ShootIfReadyCommand/IsReadyToShoot", isReadyToShoot);
 
