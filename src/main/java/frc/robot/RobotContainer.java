@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +16,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathUnderTrenchCommand;
-import frc.robot.commands.SysIDCommands;
+import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
+import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
+import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
@@ -42,13 +45,21 @@ public class RobotContainer {
     // Init all subsystems
     SubsystemFactory.initAllSubsystems();
 
+    // Init all named commands
+    // must be before the set up auto routines
+    NamedCommands.registerCommand("Intake", new IntakeCommand());
+    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
+    NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
+    NamedCommands.registerCommand("Stop", new StopDrivingCommand());
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
