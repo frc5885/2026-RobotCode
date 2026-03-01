@@ -31,11 +31,10 @@ public class WaitUntilHopperIsEmptyCommand extends Command {
   @Override
   public boolean isFinished() {
     if (Constants.isSim()) {
-      boolean isEmpty = IntakeSubsystem.getInstance().getSimHopperFuelCount() == 0;
-      return isEmpty;
+      return IntakeSubsystem.getInstance().getSimHopperFuelCount() == 0;
     } else {
       // Add logic for real robot here :)
-      return true;
+      return false;
     }
   }
 }

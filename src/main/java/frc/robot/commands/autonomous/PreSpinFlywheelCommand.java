@@ -17,6 +17,7 @@ public class PreSpinFlywheelCommand extends Command {
   /** Creates a new PreSpinFlywheelCommand. */
   public PreSpinFlywheelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(shooterSubsystem);
   }
 
   // Called when the command is initially scheduled.
