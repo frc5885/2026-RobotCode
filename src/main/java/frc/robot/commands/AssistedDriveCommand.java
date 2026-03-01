@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.controller.ControllerConstants;
+import frc.robot.controllers.ControllerConstants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FieldConstants;
@@ -138,6 +138,10 @@ public class AssistedDriveCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    currentDriveMode = DriveMode.NORMAL;
+    trenchYController.reset();
+    rotationController.reset();
+    driveLimiter.reset(new Translation2d());
     flipFactor =
         DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
