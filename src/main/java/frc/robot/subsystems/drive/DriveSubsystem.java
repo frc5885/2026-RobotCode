@@ -234,7 +234,7 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Runs the drive at the desired velocity.
    *
-   * @param speeds Speeds in meters/sec
+   * @param speeds Robot-relative speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
@@ -253,6 +253,15 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  }
+
+  /**
+   * Runs the drive at the desired velocity.
+   *
+   * @param speeds Field-relative speeds in meters/sec
+   */
+  public void runVelocityFieldRelative(ChassisSpeeds speeds) {
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation()));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
