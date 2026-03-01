@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ControllerConstants;
+import frc.robot.controller.ControllerConstants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FieldConstants;
@@ -167,13 +167,22 @@ public class AssistedDriveCommand extends Command {
         break;
       case TRENCH_LOCK:
         trenchYController.setSetpoint(getTrenchY().in(Meters));
-        double yVel = trenchYController.calculate(driveSubsystem.getPose().getY());
+        // Clamp the y velocity to the max linear speed
+        double yVel =
+            MathUtil.clamp(
+                trenchYController.calculate(driveSubsystem.getPose().getY()),
+                -driveSubsystem.getMaxLinearSpeedMetersPerSec(),
+                driveSubsystem.getMaxLinearSpeedMetersPerSec());
         if (trenchYController.atSetpoint()) {
           yVel = 0;
         }
         rotationController.setSetpoint(getTrenchLockAngle().getRadians());
+        // Clamp the rotation speed to the max angular speed
         double rotSpeedToStraight =
-            rotationController.calculate(driveSubsystem.getRotation().getRadians());
+            MathUtil.clamp(
+                rotationController.calculate(driveSubsystem.getRotation().getRadians()),
+                -driveSubsystem.getMaxAngularSpeedRadPerSec(),
+                driveSubsystem.getMaxAngularSpeedRadPerSec());
         if (rotationController.atSetpoint()) {
           rotSpeedToStraight = 0;
         }
@@ -185,8 +194,12 @@ public class AssistedDriveCommand extends Command {
         break;
       case BUMP_LOCK:
         rotationController.setSetpoint(getBumpLockAngle().getRadians());
+        // Clamp the rotation speed to the max angular speed
         double rotSpeedToDiagonal =
-            rotationController.calculate(driveSubsystem.getRotation().getRadians());
+            MathUtil.clamp(
+                rotationController.calculate(driveSubsystem.getRotation().getRadians()),
+                -driveSubsystem.getMaxAngularSpeedRadPerSec(),
+                driveSubsystem.getMaxAngularSpeedRadPerSec());
         if (rotationController.atSetpoint()) {
           rotSpeedToDiagonal = 0;
         }
