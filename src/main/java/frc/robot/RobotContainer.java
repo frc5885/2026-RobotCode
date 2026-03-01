@@ -75,13 +75,12 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
+    DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
     // DefaultCommands.setDefaultDriveCommand(
     //     DriveCommands.joystickDrive(
     //         () -> -controller.getLeftY(),
     //         () -> -controller.getLeftX(),
     //         () -> -controller.getRightX()));
-
-    DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
 
     DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
 

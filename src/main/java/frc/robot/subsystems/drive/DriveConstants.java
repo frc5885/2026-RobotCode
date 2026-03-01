@@ -131,6 +131,7 @@ public class DriveConstants {
 
   public static final PathConstraints pathConstraints = new PathConstraints(4.1, 8.0, 8.8, 16.0);
 
+  // Drive Assist Constants
   public static final double driveAssistTranslationKp = 6.0;
   public static final double driveAssistTranslationKi = 0.0;
   public static final double driveAssistTranslationKd = 0.0;
@@ -138,6 +139,9 @@ public class DriveConstants {
   public static final double driveAssistRotationKp = 6.0;
   public static final double driveAssistRotationKi = 0.0;
   public static final double driveAssistRotationKd = 0.0;
+
+  public static final double trenchAlignPositionTolerance = Units.inchesToMeters(4.0);
+  public static final double rotationAlignTolerance = Units.degreesToRadians(5.0);
 
   public static final double trenchAlignTimeSeconds = 0.5;
   public static final double bumpAlignTimeSeconds = 0.3;
