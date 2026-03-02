@@ -39,7 +39,7 @@ public class TurretSubsystem extends SubsystemBase {
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
-          INSTANCE = new TurretSubsystem(new TurretIOSpark());
+          INSTANCE = new TurretSubsystem(new TurretIOTalonFX());
           break;
 
         case SIM:

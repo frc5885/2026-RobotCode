@@ -162,7 +162,7 @@ public class Zones {
   private static final PredictiveXBaseZone redBottomTrench = blueBottomTrench.mirroredX();
   private static final PredictiveXBaseZone redTopTrench = blueTopTrench.mirroredX();
 
-  public static final PredictiveXZoneCollection TRENCH_ZONES =
+  public static final PredictiveXZoneCollection trenchZones =
       new PredictiveXZoneCollection(blueBottomTrench, blueTopTrench, redBottomTrench, redTopTrench);
 
   private static final PredictiveXBaseZone blueBottomTrenchDuck =
@@ -179,7 +179,7 @@ public class Zones {
   private static final PredictiveXBaseZone redBottomTrenchDuck = blueBottomTrenchDuck.mirroredX();
   private static final PredictiveXBaseZone redTopTrenchDuck = blueTopTrenchDuck.mirroredX();
 
-  public static final PredictiveXZoneCollection TRENCH_DUCK_ZONES =
+  public static final PredictiveXZoneCollection trenchDuckZones =
       new PredictiveXZoneCollection(
           blueBottomTrenchDuck, blueTopTrenchDuck, redBottomTrenchDuck, redTopTrenchDuck);
 
@@ -199,7 +199,7 @@ public class Zones {
   private static final PredictiveXBaseZone redBottomBump = blueBottomBump.mirroredX();
   private static final PredictiveXBaseZone redTopBump = blueTopBump.mirroredX();
 
-  public static final PredictiveXZoneCollection BUMP_ZONES =
+  public static final PredictiveXZoneCollection bumpZones =
       new PredictiveXZoneCollection(blueBottomBump, blueTopBump, redBottomBump, redTopBump);
 
   public static void logAllZones() {

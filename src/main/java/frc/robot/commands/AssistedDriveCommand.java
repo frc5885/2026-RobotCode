@@ -13,7 +13,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ControllerConstants;
+import frc.robot.controllers.ControllerConstants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FieldConstants;
@@ -65,8 +64,12 @@ public class AssistedDriveCommand extends Command {
     this.omegaSupplier = () -> -controller.getRightX();
     this.driveLimiter = new SlewRateLimiter2d(DriveConstants.maxAccelerationMetersPerSec2);
 
+    trenchYController.setTolerance(DriveConstants.trenchAlignPositionTolerance);
+    rotationController.setTolerance(DriveConstants.rotationAlignTolerance);
+    rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
     inTrenchZoneTrigger =
-        Zones.TRENCH_ZONES
+        Zones.trenchZones
             .willContain(
                 driveSubsystem::getPose,
                 driveSubsystem::getFieldRelativeChassisSpeeds,
@@ -74,7 +77,7 @@ public class AssistedDriveCommand extends Command {
             .debounce(0.1);
 
     inBumpZoneTrigger =
-        Zones.BUMP_ZONES
+        Zones.bumpZones
             .willContain(
                 driveSubsystem::getPose,
                 driveSubsystem::getFieldRelativeChassisSpeeds,
@@ -98,9 +101,7 @@ public class AssistedDriveCommand extends Command {
     linearMagnitude = linearMagnitude * linearMagnitude;
 
     // Return new linear velocity
-    return new Pose2d(new Translation2d(), linearDirection)
-        .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-        .getTranslation();
+    return new Translation2d(linearMagnitude, linearDirection);
   }
 
   private Distance getTrenchY() {
@@ -126,12 +127,21 @@ public class AssistedDriveCommand extends Command {
   }
 
   private Command updateDriveMode(DriveMode driveMode) {
-    return Commands.runOnce(() -> currentDriveMode = driveMode);
+    return Commands.runOnce(
+        () -> {
+          currentDriveMode = driveMode;
+          rotationController.reset();
+          trenchYController.reset();
+        });
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    currentDriveMode = DriveMode.NORMAL;
+    trenchYController.reset();
+    rotationController.reset();
+    driveLimiter.reset(new Translation2d());
     flipFactor =
         DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
@@ -153,45 +163,55 @@ public class AssistedDriveCommand extends Command {
 
     switch (currentDriveMode) {
       case NORMAL:
-        driveSubsystem.runVelocity(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
+        driveSubsystem.runVelocityFieldRelative(
+            new ChassisSpeeds(
                 MetersPerSecond.of(linearVelocity.getX()),
                 MetersPerSecond.of(linearVelocity.getY()),
-                RadiansPerSecond.of(driveSubsystem.getMaxAngularSpeedRadPerSec()).times(omega),
-                driveSubsystem.getRotation()));
+                RadiansPerSecond.of(driveSubsystem.getMaxAngularSpeedRadPerSec()).times(omega)));
         break;
       case TRENCH_LOCK:
         trenchYController.setSetpoint(getTrenchY().in(Meters));
-        double yVel = trenchYController.calculate(driveSubsystem.getPose().getY());
+        // Clamp the y velocity to the max linear speed
+        double yVel =
+            MathUtil.clamp(
+                trenchYController.calculate(driveSubsystem.getPose().getY()),
+                -driveSubsystem.getMaxLinearSpeedMetersPerSec(),
+                driveSubsystem.getMaxLinearSpeedMetersPerSec());
         if (trenchYController.atSetpoint()) {
           yVel = 0;
         }
         rotationController.setSetpoint(getTrenchLockAngle().getRadians());
+        // Clamp the rotation speed to the max angular speed
         double rotSpeedToStraight =
-            rotationController.calculate(driveSubsystem.getRotation().getRadians());
+            MathUtil.clamp(
+                rotationController.calculate(driveSubsystem.getRotation().getRadians()),
+                -driveSubsystem.getMaxAngularSpeedRadPerSec(),
+                driveSubsystem.getMaxAngularSpeedRadPerSec());
         if (rotationController.atSetpoint()) {
           rotSpeedToStraight = 0;
         }
-        driveSubsystem.runVelocity(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
+        driveSubsystem.runVelocityFieldRelative(
+            new ChassisSpeeds(
                 MetersPerSecond.of(linearVelocity.getX()),
                 MetersPerSecond.of(yVel),
-                RadiansPerSecond.of(rotSpeedToStraight),
-                driveSubsystem.getRotation()));
+                RadiansPerSecond.of(rotSpeedToStraight)));
         break;
       case BUMP_LOCK:
         rotationController.setSetpoint(getBumpLockAngle().getRadians());
+        // Clamp the rotation speed to the max angular speed
         double rotSpeedToDiagonal =
-            rotationController.calculate(driveSubsystem.getRotation().getRadians());
+            MathUtil.clamp(
+                rotationController.calculate(driveSubsystem.getRotation().getRadians()),
+                -driveSubsystem.getMaxAngularSpeedRadPerSec(),
+                driveSubsystem.getMaxAngularSpeedRadPerSec());
         if (rotationController.atSetpoint()) {
           rotSpeedToDiagonal = 0;
         }
-        driveSubsystem.runVelocity(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
+        driveSubsystem.runVelocityFieldRelative(
+            new ChassisSpeeds(
                 MetersPerSecond.of(linearVelocity.getX()),
                 MetersPerSecond.of(linearVelocity.getY()),
-                RadiansPerSecond.of(rotSpeedToDiagonal),
-                driveSubsystem.getRotation()));
+                RadiansPerSecond.of(rotSpeedToDiagonal)));
         break;
     }
   }

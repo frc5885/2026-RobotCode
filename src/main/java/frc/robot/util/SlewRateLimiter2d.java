@@ -27,10 +27,13 @@ public class SlewRateLimiter2d {
    * @param rateLimit The maximum rate of change. (Positive)
    */
   public SlewRateLimiter2d(double rateLimit) {
+    if (rateLimit <= 0) {
+      throw new IllegalArgumentException("Rate limit must be positive");
+    }
     this.rateLimit = rateLimit;
 
     prevTranslation = new Translation2d();
-    prevTime = Seconds.zero();
+    prevTime = RobotController.getMeasureTime();
   }
 
   /**
@@ -71,6 +74,9 @@ public class SlewRateLimiter2d {
   }
 
   public void setRateLimit(double rateLimit) {
+    if (rateLimit <= 0) {
+      throw new IllegalArgumentException("Rate limit must be positive");
+    }
     this.rateLimit = rateLimit;
   }
 }
