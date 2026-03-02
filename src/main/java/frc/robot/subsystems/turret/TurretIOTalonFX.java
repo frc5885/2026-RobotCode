@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.turret;
 
-import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
@@ -15,6 +14,7 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -35,8 +35,10 @@ public class TurretIOTalonFX implements TurretIO {
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<Voltage> appliedVolts;
   private final StatusSignal<Current> current;
+  private final VoltageOut voltageRequest = new VoltageOut(0.0).withEnableFOC(false);
 
   private final double timeoutSeconds = 0.25;
+  private final double updateFrequency = 50.0; // Hz
 
   public TurretIOTalonFX() {
     motor = new TalonFX(TurretConstants.canId);
@@ -52,12 +54,12 @@ public class TurretIOTalonFX implements TurretIO {
                     .withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withSupplyCurrentLimit(TurretConstants.currentLimit)
-                    .withSupplyCurrentLimitEnable(true))
+                    .withStatorCurrentLimit(TurretConstants.currentLimit)
+                    .withStatorCurrentLimitEnable(true))
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(12.0).withPeakReverseVoltage(-12.0))
             .withFeedback(
-                new FeedbackConfigs().withSensorToMechanismRatio(1.0 / TurretConstants.gearRatio));
+                new FeedbackConfigs().withSensorToMechanismRatio(TurretConstants.gearRatio));
 
     PhoenixUtil.tryUntilOk(5, () -> motor.getConfigurator().apply(turretConfig, timeoutSeconds));
 
@@ -66,12 +68,14 @@ public class TurretIOTalonFX implements TurretIO {
     appliedVolts = motor.getMotorVoltage();
     current = motor.getTorqueCurrent();
 
-    PhoenixUtil.registerStatusSignals(Hertz.of(50), position, velocity, appliedVolts, current);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        updateFrequency, position, velocity, appliedVolts, current);
     motor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
+    BaseStatusSignal.refreshAll(position, velocity, appliedVolts, current);
     boolean motorStatus = BaseStatusSignal.isAllGood(position, velocity, appliedVolts, current);
     inputs.motorConnected = motorConnectedDebounce.calculate(motorStatus);
     inputs.positionRadians = position.getValue().in(Radians);
@@ -82,6 +86,6 @@ public class TurretIOTalonFX implements TurretIO {
 
   @Override
   public void setMotorVoltage(double volts) {
-    motor.setVoltage(volts);
+    motor.setControl(voltageRequest.withOutput(volts));
   }
 }
