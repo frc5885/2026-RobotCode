@@ -110,7 +110,7 @@ public class LaunchCalculator {
     // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose = DriveSubsystem.getInstance().getPose();
 
-    if (estimatedPose.getX() <= AllianceFlipUtil.applyX(FieldConstants.LinesVertical.hubCenter)) {
+    if (AllianceFlipUtil.applyX(estimatedPose.getX()) <= FieldConstants.LinesVertical.hubCenter) {
       launchMode = LaunchMode.SHOOTING;
     } else {
       launchMode = LaunchMode.PASSING;
