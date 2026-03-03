@@ -132,6 +132,10 @@ public class DriveConstants {
 
   public static final PathConstraints pathConstraints = new PathConstraints(4.1, 8.0, 8.8, 16.0);
 
+  // Drive To Pose Tolerances
+  public static final double driveToPoseTranslationTolerance = Units.inchesToMeters(1.0);
+  public static final double driveToPoseRotationTolerance = Units.degreesToRadians(3.0);
+
   // Drive Assist Constants
   public static final double driveAssistTranslationKp = 6.0;
   public static final double driveAssistTranslationKi = 0.0;
