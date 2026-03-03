@@ -33,6 +33,14 @@ public class ChassisTrapezoidalController {
 
   private Debouncer m_atGoalDwellDebouncer = new Debouncer(0.1); // hehehehehe
 
+  /**
+   * Creates a new ChassisTrapezoidalController.
+   *
+   * @param translateConstraints The constraints for the translation profile.
+   * @param thetaConstraints The constraints for the rotation profile.
+   * @param translateController The PID controller for translation.
+   * @param thetaController The PID controller for rotation.
+   */
   public ChassisTrapezoidalController(
       TrapezoidProfile.Constraints translateConstraints,
       TrapezoidProfile.Constraints thetaConstraints,
@@ -56,6 +64,12 @@ public class ChassisTrapezoidalController {
     m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
+  /**
+   * Sets the goal for the controller.
+   *
+   * @param translateGoal The goal for translation.
+   * @param thetaGoal The goal for rotation.
+   */
   public void setGoal(TrapezoidProfile.State translateGoal, TrapezoidProfile.State thetaGoal) {
     m_translateGoalState = translateGoal;
     m_thetaGoalState = thetaGoal;
@@ -66,6 +80,13 @@ public class ChassisTrapezoidalController {
             m_goalPose.getX(), m_goalPose.getY(), Rotation2d.fromRadians(thetaGoal.position)));
   }
 
+  /**
+   * Sets the immediate tracking goal pose for the controller. This is the pose the robot actively
+   * drives toward during calculation. For continuous paths, this can be updated dynamically while
+   * keeping the final goal fixed.
+   *
+   * @param goal The immediate tracking goal pose.
+   */
   public void setGoalPose(Pose2d goal) {
     m_goalPose = goal;
     setGoal(
@@ -73,18 +94,40 @@ public class ChassisTrapezoidalController {
         new TrapezoidProfile.State(goal.getRotation().getRadians(), 0));
   }
 
+  /**
+   * Sets the ultimate destination pose for the controller. This is used to determine if the overall
+   * motion has been fully achieved (e.g., when checking isGoalAchieved() at the end of a path).
+   *
+   * @param goal The ultimate destination pose.
+   */
   public void setFinalGoalPose(Pose2d goal) {
     m_finalGoalPose = goal;
   }
 
+  /**
+   * Gets the immediate tracking goal pose for the controller.
+   *
+   * @return The current immediate tracking goal pose.
+   */
   public Pose2d getGoalPose() {
     return m_goalPose;
   }
 
+  /**
+   * Gets the ultimate destination pose for the controller.
+   *
+   * @return The ultimate destination pose.
+   */
   public Pose2d getFinalGoalPose() {
     return m_finalGoalPose;
   }
 
+  /**
+   * Sets the current state of the controller.
+   *
+   * @param robotPose The current robot pose.
+   * @param chassisSpeeds The current robot-relative chassis speeds.
+   */
   public void setCurrentState(Pose2d robotPose, ChassisSpeeds chassisSpeeds) {
     m_currentPose = robotPose;
 
@@ -113,6 +156,12 @@ public class ChassisTrapezoidalController {
     m_thetaController.reset();
   }
 
+  /**
+   * Calculates the chassis speeds to reach the goal pose.
+   *
+   * @param robotPose The current robot pose.
+   * @return The chassis speeds to reach the goal pose.
+   */
   public ChassisSpeeds calculate(Pose2d robotPose) {
     double dt = 0.02;
     m_currentPose = robotPose;
@@ -193,6 +242,11 @@ public class ChassisTrapezoidalController {
         vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond, robotPose.getRotation());
   }
 
+  /**
+   * Checks if the goal has been achieved. Debounced to prevent false positives.
+   *
+   * @return true if the goal has been achieved, false otherwise.
+   */
   public boolean isGoalAchieved() {
     double distanceThreshold = m_translateController.getErrorTolerance();
     double angleThreshold = m_thetaController.getErrorTolerance();
@@ -202,7 +256,7 @@ public class ChassisTrapezoidalController {
         Math.abs(
                 MathUtil.angleModulus(
                     m_currentPose.getRotation().getRadians()
-                        - m_goalPose.getRotation().getRadians()))
+                        - m_finalGoalPose.getRotation().getRadians()))
             < angleThreshold);
     Logger.recordOutput(
         "Odometry/ChassisController/TranslateAtSetpoint",
@@ -215,13 +269,19 @@ public class ChassisTrapezoidalController {
             && Math.abs(
                     MathUtil.angleModulus(
                         m_currentPose.getRotation().getRadians()
-                            - m_goalPose.getRotation().getRadians()))
+                            - m_finalGoalPose.getRotation().getRadians()))
                 < angleThreshold;
     // wait for goal to be achieved for a certain amount of time before ending
     return m_atGoalDwellDebouncer.calculate(isAchieved);
   }
 
-  // Add this method to ChassisTrapezoidalController.java
+  /**
+   * Resets the controller to the given robot pose and goal pose.
+   *
+   * @param robotPose The current robot pose.
+   * @param chassisSpeeds The current robot-relative chassis speeds.
+   * @param goalPose The goal pose.
+   */
   public void reset(Pose2d robotPose, ChassisSpeeds chassisSpeeds, Pose2d goalPose) {
     // Reset goal poses first
     m_goalPose = goalPose;

@@ -24,6 +24,7 @@ public class DriveToPoseCommand extends Command {
   /** Creates a new DriveToPoseCommand. */
   public DriveToPoseCommand(Supplier<Pose2d> goalPoseSupplier) {
     this.goalPoseSupplier = goalPoseSupplier;
+
     drivePIDController =
         new PIDController(
             DriveConstants.pathplannerDrivePID.kP,
@@ -34,9 +35,11 @@ public class DriveToPoseCommand extends Command {
             DriveConstants.pathplannerTurnPID.kP,
             DriveConstants.pathplannerTurnPID.kI,
             DriveConstants.pathplannerTurnPID.kD);
+
     drivePIDController.setTolerance(DriveConstants.driveToPoseTranslationTolerance);
     turnPIDController.setTolerance(DriveConstants.driveToPoseRotationTolerance);
     turnPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
     chassisController =
         new ChassisTrapezoidalController(
             new TrapezoidProfile.Constraints(
@@ -47,6 +50,7 @@ public class DriveToPoseCommand extends Command {
                 DriveConstants.pathConstraints.maxAngularAccelerationRadPerSecSq()),
             drivePIDController,
             turnPIDController);
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(driveSubsystem);
   }
