@@ -343,7 +343,6 @@ public class FieldConstants {
 
   // Checks robot pose to determine which target to use
   public static Translation2d getTurretTarget(Pose2d robotPose) {
-    double xOffset = Units.inchesToMeters(54);
     Pose2d flippedRobotPose = AllianceFlipUtil.apply(robotPose);
 
     // Define target positions using Translation2d for the targeting point

@@ -19,6 +19,7 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -36,6 +37,8 @@ public class LaunchCalculator {
   private double hoodAngle = Double.NaN;
   private double turretVelocity;
   private double hoodVelocity;
+
+  private LaunchMode launchMode;
 
   public static LaunchCalculator getInstance() {
     if (instance == null) instance = new LaunchCalculator();
@@ -65,7 +68,7 @@ public class LaunchCalculator {
 
   static {
     minDistance = 1.34;
-    maxDistance = FieldConstants.fieldLength / 2;
+    maxDistance = 5.60;
     phaseDelay = 0.03;
 
     launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(71.0));
@@ -106,6 +109,13 @@ public class LaunchCalculator {
 
     // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose = DriveSubsystem.getInstance().getPose();
+
+    if (estimatedPose.getX() <= AllianceFlipUtil.applyX(FieldConstants.LinesVertical.hubCenter)) {
+      launchMode = LaunchMode.SHOOTING;
+    } else {
+      launchMode = LaunchMode.PASSING;
+    }
+
     ChassisSpeeds robotRelativeVelocity = DriveSubsystem.getInstance().getChassisSpeeds();
     estimatedPose =
         estimatedPose.exp(
@@ -143,7 +153,7 @@ public class LaunchCalculator {
     Pose2d lookaheadPose = turretPosition;
     double lookaheadTurretToTargetDistance = turretToTargetDistance;
     for (int i = 0; i < 20; i++) {
-      timeOfFlight = timeOfFlightMap.get(lookaheadTurretToTargetDistance);
+      timeOfFlight = getTimeOfFlight(lookaheadTurretToTargetDistance);
       double offsetX = turretVelocityX * timeOfFlight;
       double offsetY = turretVelocityY * timeOfFlight;
       lookaheadPose =
@@ -155,7 +165,7 @@ public class LaunchCalculator {
 
     // Calculate parameters accounted for imparted velocity
     turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
-    hoodAngle = launchHoodAngleMap.get(lookaheadTurretToTargetDistance).getRadians();
+    hoodAngle = getHoodAngle(lookaheadTurretToTargetDistance);
     if (lastTurretAngle == null) lastTurretAngle = turretAngle;
     if (Double.isNaN(lastHoodAngle)) lastHoodAngle = hoodAngle;
     turretVelocity =
@@ -164,10 +174,8 @@ public class LaunchCalculator {
     hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.dtSeconds);
     lastTurretAngle = turretAngle;
     lastHoodAngle = hoodAngle;
-    boolean isValid =
-        lookaheadTurretToTargetDistance >= minDistance
-            && lookaheadTurretToTargetDistance <= maxDistance;
-    double flywheelSpeed = launchFlywheelSpeedMap.get(lookaheadTurretToTargetDistance);
+    boolean isValid = checkIfValid(lookaheadTurretToTargetDistance);
+    double flywheelSpeed = getFlywheelSpeed(lookaheadTurretToTargetDistance);
     latestParameters =
         new LaunchingParameters(
             isValid, turretAngle, turretVelocity, hoodAngle, hoodVelocity, flywheelSpeed);
@@ -181,11 +189,61 @@ public class LaunchCalculator {
     Logger.recordOutput("LaunchCalculator/TurretVelocity", turretVelocity);
     Logger.recordOutput("LaunchCalculator/HoodVelocity", hoodVelocity);
     Logger.recordOutput("LaunchCalculator/FlywheelSpeed", flywheelSpeed);
+    Logger.recordOutput("LaunchCalculator/LaunchMode", launchMode);
 
     return latestParameters;
   }
 
   public void clearLaunchingParameters() {
     latestParameters = null;
+  }
+
+  public enum LaunchMode {
+    SHOOTING,
+    PASSING
+  }
+
+  private double getHoodAngle(double distance) {
+    switch (launchMode) {
+      case SHOOTING:
+        return launchHoodAngleMap.get(distance).getRadians();
+      default:
+        return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 45.0);
+    }
+  }
+
+  private double getFlywheelSpeed(double distance) {
+    switch (launchMode) {
+      case SHOOTING:
+        return launchFlywheelSpeedMap.get(distance);
+      default:
+        return ((0.903 * Math.pow(distance, 2)) + (10.68 * distance) + 194.0) * 0.8;
+    }
+  }
+
+  private double getTimeOfFlight(double distance) {
+    switch (launchMode) {
+      case SHOOTING:
+        return timeOfFlightMap.get(distance);
+      default:
+        return ((0.043856 * distance) + 0.93);
+    }
+  }
+
+  public void setLaunchMode(LaunchMode launchMode) {
+    this.launchMode = launchMode;
+  }
+
+  private boolean checkIfValid(double distance) {
+    switch (launchMode) {
+      case SHOOTING:
+        return distance >= minDistance && distance <= maxDistance;
+      default:
+        return true;
+    }
+  }
+
+  public LaunchMode getLaunchMode() {
+    return launchMode;
   }
 }

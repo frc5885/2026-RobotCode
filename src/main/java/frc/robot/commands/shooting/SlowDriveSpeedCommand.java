@@ -7,6 +7,7 @@ package frc.robot.commands.shooting;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.turret.LaunchCalculator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SlowDriveSpeedCommand extends Command {
@@ -21,7 +22,11 @@ public class SlowDriveSpeedCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    driveSubsystem.setDriveSpeedMultiplier(DriveConstants.shootOnTheMoveSpeedMultiplier);
+    if (LaunchCalculator.getInstance().getLaunchMode() == LaunchCalculator.LaunchMode.SHOOTING) {
+      driveSubsystem.setDriveSpeedMultiplier(DriveConstants.shootOnTheMoveSpeedMultiplier);
+    } else {
+      driveSubsystem.setDriveSpeedMultiplier(DriveConstants.passOnTheMoveSpeedMultiplier);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
