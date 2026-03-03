@@ -233,10 +233,6 @@ public class LaunchCalculator {
     }
   }
 
-  public void setLaunchMode(LaunchMode launchMode) {
-    this.launchMode = launchMode;
-  }
-
   private boolean checkIfValid(double distance) {
     switch (launchMode) {
       case SHOOTING:
