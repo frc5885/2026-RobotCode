@@ -38,7 +38,7 @@ public class LaunchCalculator {
   private double turretVelocity;
   private double hoodVelocity;
 
-  private LaunchMode launchMode;
+  private LaunchMode launchMode = LaunchMode.SHOOTING;
 
   public static LaunchCalculator getInstance() {
     if (instance == null) instance = new LaunchCalculator();
@@ -208,6 +208,7 @@ public class LaunchCalculator {
       case SHOOTING:
         return launchHoodAngleMap.get(distance).getRadians();
       default:
+        // Probably need to tune this
         return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 45.0);
     }
   }
@@ -217,6 +218,7 @@ public class LaunchCalculator {
       case SHOOTING:
         return launchFlywheelSpeedMap.get(distance);
       default:
+        // Probably need to tune this
         return ((0.903 * Math.pow(distance, 2)) + (10.68 * distance) + 194.0) * 0.8;
     }
   }
@@ -226,6 +228,7 @@ public class LaunchCalculator {
       case SHOOTING:
         return timeOfFlightMap.get(distance);
       default:
+        // Probably need to tune this
         return ((0.043856 * distance) + 0.93);
     }
   }
@@ -239,6 +242,7 @@ public class LaunchCalculator {
       case SHOOTING:
         return distance >= minDistance && distance <= maxDistance;
       default:
+        // Passing is always valid
         return true;
     }
   }
