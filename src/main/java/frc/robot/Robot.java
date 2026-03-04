@@ -119,8 +119,6 @@ public class Robot extends LoggedRobot {
     LaunchCalculator.getInstance().clearLaunchingParameters();
 
     // Log hub state
-    Logger.recordOutput("HubShift/Official", HubShiftUtil.getOfficialShiftInfo());
-    Logger.recordOutput("HubShift/Shifted", HubShiftUtil.getShiftedShiftInfo());
     HubShiftUtil.updateDashboardOutputs();
   }
 
@@ -146,7 +144,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
-
     HubShiftUtil.initialize();
   }
 
@@ -164,7 +161,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
     HubShiftUtil.initialize();
   }
 
