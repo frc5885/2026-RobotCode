@@ -246,4 +246,12 @@ public class LaunchCalculator {
   public LaunchMode getLaunchMode() {
     return launchMode;
   }
+
+  public static double getMinTimeOfFlight() {
+    return 0.0;
+  }
+
+  public static double getMaxTimeOfFlight() {
+    return 1.6;
+  }
 }
