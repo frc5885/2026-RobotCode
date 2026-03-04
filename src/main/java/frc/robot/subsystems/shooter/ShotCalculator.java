@@ -7,11 +7,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.util.FieldConstants;
+
 import java.io.File;
 import java.io.IOException;
 import org.ironmaple.simulation.SimulatedArena;
@@ -45,19 +48,24 @@ public class ShotCalculator {
 
   // decompresses the data into separate variables
   private static AimData decompressData(int data) {
+    // 32 bit integer limit is used for null values
     if (data == Integer.MAX_VALUE) return null;
 
+    // first four digits are used to store turret angle
     double turretAngle = (data / 1000000) / 10.0;
     data -= (data / 1000000) * 1000000;
 
+    // next three digits are used to store hood angle
     double hoodAngle = (data / 1000) / 10.0;
     data -= (data / 1000) * 1000;
 
+    // last three digits are used to store velocity
     double velocity = data / 10.0;
 
     return new AimData(turretAngle, hoodAngle, velocity);
   }
 
+  // trilinear interpolation method
   private static double trilinearInterpolation(
       double c000,
       double c100,
@@ -90,25 +98,28 @@ public class ShotCalculator {
     // It just needs to return a ShotParameters object which will be used to launch the simulated
     // ball
 
-    Pose2d hubPose = new Pose2d(0, 0, null);
+    Translation3d hubPose = FieldConstants.Hub.topCenterPoint;
 
+    // distance and angle from the hub
     double dx = hubPose.getX() - robotPose.getX();
     double dy = hubPose.getY() - robotPose.getY();
 
     double distance = sqrt(dx * dx + dy * dy);
     double HUBangle = atan2(dy, dx);
 
+    // gets robot velocity
     double vx = fieldRelativeSpeeds.vxMetersPerSecond;
     double vy = fieldRelativeSpeeds.vyMetersPerSecond;
 
-    double velocity = sqrt(vx * vx + vy * vy);
+    double velocityMagnitude = sqrt(vx * vx + vy * vy);
     double velocityAngle = atan2(vy, vx);
 
+    // calculates angle relative to the distance vector
     double angle = (velocityAngle - HUBangle) * 180 / PI;
 
     // converts the raw values to theoretical indices
     double dIndex = (distance - 1.0) / 0.5;
-    double vIndex = velocity / 0.25;
+    double vIndex = velocityMagnitude / 0.25;
     double aIndex = (angle + 180) / 15.0;
 
     // lower bound indices
@@ -177,7 +188,7 @@ public class ShotCalculator {
             c111.turretAngle,
             distanceWeight,
             angleWeight,
-            velocityWeight);
+            velocityWeight) + toDegrees(HUBangle);
 
     // performs trilinear interpolation to calculate the hood angle
     double hoodAngle =
