@@ -340,4 +340,29 @@ public class FieldConstants {
     }
     return AllianceFlipUtil.apply(returnPose);
   }
+
+  // Checks robot pose to determine which target to use
+  public static Translation2d getTurretTarget(Pose2d robotPose) {
+    Pose2d flippedRobotPose = AllianceFlipUtil.apply(robotPose);
+
+    // Define target positions using Translation2d for the targeting point
+    Translation2d targetRight = new Translation2d(fieldLength / 8, fieldWidth / 4);
+
+    Translation2d targetLeft = new Translation2d(fieldLength / 8, fieldWidth / 4 + fieldWidth / 2);
+
+    Translation2d targetHub = new Translation2d(LinesVertical.hubCenter, LinesHorizontal.center);
+
+    // Find closest path under the trench
+    Translation2d target;
+    if (flippedRobotPose.getX() <= LinesVertical.hubCenter) {
+      target = targetHub;
+    } else {
+      if (flippedRobotPose.getY() <= LinesHorizontal.center) {
+        target = targetRight;
+      } else {
+        target = targetLeft;
+      }
+    }
+    return AllianceFlipUtil.apply(target);
+  }
 }
