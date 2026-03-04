@@ -204,14 +204,16 @@ public class HubShiftUtil {
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
 
     // Update from HubShiftUtil
-    Logger.recordOutput("HubShift/Official", HubShiftUtil.getOfficialShiftInfo());
-    Logger.recordOutput("HubShift/Shifted", HubShiftUtil.getShiftedShiftInfo());
+    ShiftInfo official = HubShiftUtil.getOfficialShiftInfo();
+    ShiftInfo shifted = HubShiftUtil.getShiftedShiftInfo();
+    Logger.recordOutput("HubShift/Official", official);
+    Logger.recordOutput("HubShift/Shifted", shifted);
     SmartDashboard.putString(
         "Shifts/Remaining Shift Time",
-        String.format("%.1f", Math.max(HubShiftUtil.getShiftedShiftInfo().remainingTime(), 0.0)));
-    SmartDashboard.putBoolean("Shifts/Shift Active", HubShiftUtil.getShiftedShiftInfo().active());
+        String.format("%.1f", Math.max(shifted.remainingTime(), 0.0)));
+    SmartDashboard.putBoolean("Shifts/Shift Active", shifted.active());
     SmartDashboard.putString(
-        "Shifts/Game State", HubShiftUtil.getShiftedShiftInfo().currentShift().toString());
+        "Shifts/Game State", shifted.currentShift().toString());
     SmartDashboard.putBoolean(
         "Shifts/Active First?",
         DriverStation.getAlliance().orElse(Alliance.Blue) == HubShiftUtil.getFirstActiveAlliance());
