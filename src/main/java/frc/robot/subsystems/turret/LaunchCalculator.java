@@ -110,12 +110,6 @@ public class LaunchCalculator {
     // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose = DriveSubsystem.getInstance().getPose();
 
-    if (AllianceFlipUtil.applyX(estimatedPose.getX()) <= FieldConstants.LinesVertical.hubCenter) {
-      launchMode = LaunchMode.SHOOTING;
-    } else {
-      launchMode = LaunchMode.PASSING;
-    }
-
     ChassisSpeeds robotRelativeVelocity = DriveSubsystem.getInstance().getChassisSpeeds();
     estimatedPose =
         estimatedPose.exp(
@@ -123,6 +117,12 @@ public class LaunchCalculator {
                 robotRelativeVelocity.vxMetersPerSecond * phaseDelay,
                 robotRelativeVelocity.vyMetersPerSecond * phaseDelay,
                 robotRelativeVelocity.omegaRadiansPerSecond * phaseDelay));
+
+    if (AllianceFlipUtil.applyX(estimatedPose.getX()) <= FieldConstants.LinesVertical.hubCenter) {
+      launchMode = LaunchMode.SHOOTING;
+    } else {
+      launchMode = LaunchMode.PASSING;
+    }
 
     // Calculate distance from turret to target
     Translation2d target = FieldConstants.getTurretTarget(estimatedPose);
