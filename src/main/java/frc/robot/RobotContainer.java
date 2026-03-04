@@ -23,7 +23,7 @@ import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
-import frc.robot.commands.shooting.ShootCommandGroup;
+import frc.robot.commands.shooting.ShootCommandGroupNoTurret;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -85,9 +85,10 @@ public class RobotContainer {
     //         () -> -controller.getLeftX(),
     //         () -> -controller.getRightX()));
 
-    DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
+    DefaultCommands.setDefaultTurretCommand(
+        TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.kZero));
 
-    controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
+    controller.rightTrigger(0.1).whileTrue(new ShootCommandGroupNoTurret(controller));
 
     controller
         .povLeft()
