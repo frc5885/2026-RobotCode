@@ -51,6 +51,40 @@ public class HubShiftUtil {
   private static final boolean[] activeSchedule = {true, true, false, true, false, true};
   private static final boolean[] inactiveSchedule = {true, false, true, false, true, true};
 
+  // Precomputed shifted start/end times for reuse to avoid per-call allocations.
+  private static final double[] shiftedStartsActive = {
+    0.0,
+    10.0,
+    35.0 + endingActiveFudge,
+    60.0 + approachingActiveFudge,
+    85.0 + endingActiveFudge,
+    110.0 + approachingActiveFudge
+  };
+  private static final double[] shiftedEndsActive = {
+    10.0,
+    35.0 + endingActiveFudge,
+    60.0 + approachingActiveFudge,
+    85.0 + endingActiveFudge,
+    110.0 + approachingActiveFudge,
+    140.0
+  };
+  private static final double[] shiftedStartsInactive = {
+    0.0,
+    10.0 + endingActiveFudge,
+    35.0 + approachingActiveFudge,
+    60.0 + endingActiveFudge,
+    85.0 + approachingActiveFudge,
+    110.0
+  };
+  private static final double[] shiftedEndsInactive = {
+    10.0 + endingActiveFudge,
+    35.0 + approachingActiveFudge,
+    60.0 + endingActiveFudge,
+    85.0 + approachingActiveFudge,
+    110.0,
+    140.0
+  };
+
   // Will add allieance win override if needed
   // @Setter private static Supplier<Optional<Boolean>> allianceWinOverride = () ->
   // Optional.empty();
@@ -159,43 +193,10 @@ public class HubShiftUtil {
 
   public static ShiftInfo getShiftedShiftInfo() {
     boolean[] shiftSchedule = getSchedule();
-    // Starting active
-    if (shiftSchedule[1] == true) {
-      double[] shiftedShiftStartTimes = {
-        0.0,
-        10.0,
-        35.0 + endingActiveFudge,
-        60.0 + approachingActiveFudge,
-        85.0 + endingActiveFudge,
-        110.0 + approachingActiveFudge
-      };
-      double[] shiftedShiftEndTimes = {
-        10.0,
-        35.0 + endingActiveFudge,
-        60.0 + approachingActiveFudge,
-        85.0 + endingActiveFudge,
-        110.0 + approachingActiveFudge,
-        140.0
-      };
-      return getShiftInfo(shiftSchedule, shiftedShiftStartTimes, shiftedShiftEndTimes);
-    }
-    double[] shiftedShiftStartTimes = {
-      0.0,
-      10.0 + endingActiveFudge,
-      35.0 + approachingActiveFudge,
-      60.0 + endingActiveFudge,
-      85.0 + approachingActiveFudge,
-      110.0
-    };
-    double[] shiftedShiftEndTimes = {
-      10.0 + endingActiveFudge,
-      35.0 + approachingActiveFudge,
-      60.0 + endingActiveFudge,
-      85.0 + approachingActiveFudge,
-      110.0,
-      140.0
-    };
-    return getShiftInfo(shiftSchedule, shiftedShiftStartTimes, shiftedShiftEndTimes);
+    // Choose precomputed arrays based on whether the second shift starts active
+    double[] starts = shiftSchedule[1] ? shiftedStartsActive : shiftedStartsInactive;
+    double[] ends = shiftSchedule[1] ? shiftedEndsActive : shiftedEndsInactive;
+    return getShiftInfo(shiftSchedule, starts, ends);
     // }
   }
 
@@ -212,8 +213,7 @@ public class HubShiftUtil {
         "Shifts/Remaining Shift Time",
         String.format("%.1f", Math.max(shifted.remainingTime(), 0.0)));
     SmartDashboard.putBoolean("Shifts/Shift Active", shifted.active());
-    SmartDashboard.putString(
-        "Shifts/Game State", shifted.currentShift().toString());
+    SmartDashboard.putString("Shifts/Game State", shifted.currentShift().toString());
     SmartDashboard.putBoolean(
         "Shifts/Active First?",
         DriverStation.getAlliance().orElse(Alliance.Blue) == HubShiftUtil.getFirstActiveAlliance());
