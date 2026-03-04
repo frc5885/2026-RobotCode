@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class ChassisTrapezoidalController {
@@ -163,7 +164,7 @@ public class ChassisTrapezoidalController {
    * @return The chassis speeds to reach the goal pose.
    */
   public ChassisSpeeds calculate(Pose2d robotPose) {
-    double dt = 0.02;
+
     m_currentPose = robotPose;
 
     // Calculate distance error to goal
@@ -172,7 +173,8 @@ public class ChassisTrapezoidalController {
 
     // Generate profile for translation (goal is to reach 0 distance)
     TrapezoidProfile.State translateSetpoint =
-        m_translateProfile.calculate(dt, m_translatePrevSetpoint, m_translateGoalState);
+        m_translateProfile.calculate(
+            Constants.dtSeconds, m_translatePrevSetpoint, m_translateGoalState);
 
     // Calculate direction vector to goal
     Translation2d errorVector = m_goalPose.getTranslation().minus(robotPose.getTranslation());
@@ -207,7 +209,7 @@ public class ChassisTrapezoidalController {
     m_thetaGoalState.position = goalMinDistance + robotPose.getRotation().getRadians();
     m_thetaPrevSetpoint.position = setpointMinDistance + robotPose.getRotation().getRadians();
     TrapezoidProfile.State thetaSetpoint =
-        m_thetaProfile.calculate(dt, m_thetaPrevSetpoint, m_thetaGoalState);
+        m_thetaProfile.calculate(Constants.dtSeconds, m_thetaPrevSetpoint, m_thetaGoalState);
 
     // Calculate angular velocity using PID
     double omegaRadiansPerSecond =
