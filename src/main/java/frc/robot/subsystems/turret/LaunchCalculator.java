@@ -189,4 +189,12 @@ public class LaunchCalculator {
   public void clearLaunchingParameters() {
     latestParameters = null;
   }
+
+  public static double getMinTimeOfFlight() {
+    return 0.0;
+  }
+
+  public static double getMaxTimeOfFlight() {
+    return 1.6;
+  }
 }
