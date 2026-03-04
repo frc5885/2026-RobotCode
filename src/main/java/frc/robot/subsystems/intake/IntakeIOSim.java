@@ -8,6 +8,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.Constants;
 
 /** Sim intake implementation */
 public class IntakeIOSim implements IntakeIO {
@@ -41,7 +42,7 @@ public class IntakeIOSim implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    intakeSim.update(0.02);
+    intakeSim.update(Constants.dtSeconds);
     inputs.intakePositionRotations = 0.0;
     inputs.intakeVelocityRPM = intakeSim.getAngularVelocityRPM();
     inputs.intakeAppliedVolts = intakeAppliedVolts;
@@ -50,7 +51,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.intakeLeftMotorConnected = true;
     inputs.intakeRightMotorConnected = true;
 
-    extensionSim.update(0.02);
+    extensionSim.update(Constants.dtSeconds);
     inputs.extensionPositionRadians = extensionSim.getAngleRads();
     inputs.extensionVelocityRadiansPerSecond = extensionSim.getVelocityRadPerSec();
     inputs.extensionAppliedVolts = extensionAppliedVolts;
