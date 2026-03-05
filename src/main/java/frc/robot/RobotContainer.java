@@ -57,6 +57,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
     NamedCommands.registerCommand(
         "DriveToPose", new DriveToPoseCommand(() -> new Pose2d(2.5, 5, new Rotation2d())));
+    NamedCommands.registerCommand(
+        "DriveToClimbPoseSequentialCommand", new DriveToClimbPoseSequentialCommand());
     Zones.logAllZones();
 
     // Set up auto routines
