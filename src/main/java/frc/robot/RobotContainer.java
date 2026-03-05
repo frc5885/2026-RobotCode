@@ -19,7 +19,7 @@ import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
-import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
+import frc.robot.commands.autonomous.ShootUntilHopperEmptyNoTurretCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
@@ -50,7 +50,7 @@ public class RobotContainer {
     // Init all named commands
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
-    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyNoTurretCommand());
     NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
