@@ -15,6 +15,6 @@ import frc.robot.commands.shooting.AutoShootCommandGroupNoTurret;
 public class ShootUntilHopperEmptyNoTurretCommand extends ParallelDeadlineGroup {
   public ShootUntilHopperEmptyNoTurretCommand() {
     super(new WaitUntilHopperIsEmptyCommand());
-    addCommands(new AutoShootCommandGroupNoTurret());
+    addCommands(AutoShootCommandGroupNoTurret.create());
   }
 }
