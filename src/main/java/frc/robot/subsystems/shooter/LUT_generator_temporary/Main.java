@@ -9,9 +9,9 @@ package frc.robot.subsystems.shooter.LUT_generator_temporary;
 // import com.fasterxml.jackson.databind.ObjectMapper;
 // import com.fasterxml.jackson.databind.SerializationFeature;
 
-class Main {
-  public static void main(String[] args) {
-    LookupTableMaker.makeLookupTable();
+// class Main {
+//   public static void main(String[] args) {
+//     LookupTableMaker.makeLookupTable();
 
     //     // ProjectileSolver.CoordinatePair robotPos = new ProjectileSolver.CoordinatePair(-4.0,
     // 2.0);
@@ -24,7 +24,7 @@ class Main {
     //     // System.out.println(aimData.velocity);
     //     // System.out.println(aimData.launchAngle * 180/PI);
     //     // System.out.println(aimData.turretAngle * 180/PI);
-  }
+  // }
 
   // public static void main(String[] args) throws Exception {
   //     ObjectMapper mapper = new ObjectMapper();
@@ -37,4 +37,4 @@ class Main {
 
   //     mapper.writeValue(new File("test.json"), test);
   // }
-}
+// }

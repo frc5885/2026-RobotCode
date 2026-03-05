@@ -396,23 +396,23 @@ public class ProjectileSolver {
   public static AimData getAimData(double HUBdistance, Vector robotVelocity) {
 
     // constants
-    final double targetY = 1.8288;
+    final double targetY = 1.6088;
 
     // calculates component vectors of robot velocity
     Vector HUBvelocity = new Vector(robotVelocity.magnitude * cos(robotVelocity.angle), 0);
     Vector perpenVelocity = new Vector(robotVelocity.magnitude * sin(robotVelocity.angle), PI / 2);
 
     // calculates the angle based on the robot velocity for a static shot
-    double staticTargetAngle = 70 + HUBvelocity.magnitude * 5;
+    double staticLaunchAngle = 70 + HUBvelocity.magnitude * 5;
 
-    if (staticTargetAngle > 80) staticTargetAngle = 80;
-    else if (staticTargetAngle < 60) staticTargetAngle = 60;
+    if (staticLaunchAngle > 80) staticLaunchAngle = 80;
+    else if (staticLaunchAngle < 60) staticLaunchAngle = 60;
 
-    double targetAngleRadians = staticTargetAngle * PI / 180;
+    double launchAngleRadians = staticLaunchAngle * PI / 180;
 
     // gets velocity data
     TargetVelocity fuelVelocityData =
-        getTargetVelocityRefined(HUBdistance, targetY, staticTargetAngle, HUBvelocity.magnitude);
+        getTargetVelocityRefined(HUBdistance, targetY, staticLaunchAngle, HUBvelocity.magnitude);
 
     if (fuelVelocityData == null) {
       return null;
@@ -424,20 +424,18 @@ public class ProjectileSolver {
     }
 
     // gets component vectors for fuel velocity
-    double fuelVelocityForwardComponent = fuelVelocityData.velocity * cos(targetAngleRadians);
-    double fuelVelocityVerticalComponent = fuelVelocityData.velocity * sin(targetAngleRadians);
+    double fuelVelocityForwardComponent = fuelVelocityData.velocity * cos(launchAngleRadians);
+    double fuelVelocityVerticalComponent = fuelVelocityData.velocity * sin(launchAngleRadians);
     double fuelVelocityLateralComponent = perpenVelocity.magnitude * -1;
 
     // calculates the horizontal angle of the turret relative to the field
     double turretAngle = (atan2(fuelVelocityLateralComponent, fuelVelocityForwardComponent));
 
     // calculates the new ideal launch angle
-    double targetAngle =
+    double launchAngle =
         atan2(
             fuelVelocityVerticalComponent,
-            sqrt(
-                fuelVelocityForwardComponent * fuelVelocityForwardComponent
-                    + fuelVelocityLateralComponent * fuelVelocityLateralComponent));
+            hypot(fuelVelocityForwardComponent, fuelVelocityLateralComponent));
 
     // calculates the velocity of the ball
     double targetVelocity =
@@ -446,7 +444,7 @@ public class ProjectileSolver {
                 + fuelVelocityLateralComponent * fuelVelocityLateralComponent
                 + fuelVelocityVerticalComponent * fuelVelocityVerticalComponent);
 
-    AimData aimData = new AimData(targetVelocity, targetAngle, turretAngle);
+    AimData aimData = new AimData(targetVelocity, launchAngle, turretAngle);
 
     // System.out.println(fuelVelocityForwardComponent);
     // System.out.println(fuelVelocityLateralComponent);

@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FieldConstants;
-
 import java.io.File;
 import java.io.IOException;
 import org.ironmaple.simulation.SimulatedArena;
@@ -41,7 +40,7 @@ public class ShotCalculator {
     }
   }
 
-  private record AimData(double turretAngle, double hoodAngle, double velocity) {}
+  private record AimData(double turretAngle, double launchAngle, double velocity) {}
 
   // creates the lookup table for the sample trajectory calculations
   private static final int[][][] sampleCalcsTable = loadLookupTable();
@@ -56,13 +55,13 @@ public class ShotCalculator {
     data -= (data / 1000000) * 1000000;
 
     // next three digits are used to store hood angle
-    double hoodAngle = (data / 1000) / 10.0;
+    double launchAngle = (data / 1000) / 10.0;
     data -= (data / 1000) * 1000;
 
     // last three digits are used to store velocity
     double velocity = data / 10.0;
 
-    return new AimData(turretAngle, hoodAngle, velocity);
+    return new AimData(turretAngle, launchAngle, velocity);
   }
 
   // trilinear interpolation method
@@ -104,14 +103,14 @@ public class ShotCalculator {
     double dx = hubPose.getX() - robotPose.getX();
     double dy = hubPose.getY() - robotPose.getY();
 
-    double distance = sqrt(dx * dx + dy * dy);
+    double distance = hypot(dx, dy);
     double HUBangle = atan2(dy, dx);
 
     // gets robot velocity
     double vx = fieldRelativeSpeeds.vxMetersPerSecond;
     double vy = fieldRelativeSpeeds.vyMetersPerSecond;
 
-    double velocityMagnitude = sqrt(vx * vx + vy * vy);
+    double velocityMagnitude = hypot(vx, vy);
     double velocityAngle = atan2(vy, vx);
 
     // calculates angle relative to the distance vector
@@ -188,19 +187,20 @@ public class ShotCalculator {
             c111.turretAngle,
             distanceWeight,
             angleWeight,
-            velocityWeight) + toDegrees(HUBangle);
+            velocityWeight)
+            + toDegrees(HUBangle);
 
     // performs trilinear interpolation to calculate the hood angle
-    double hoodAngle =
+    double launchAngle =
         trilinearInterpolation(
-            c000.hoodAngle,
-            c100.hoodAngle,
-            c010.hoodAngle,
-            c110.hoodAngle,
-            c001.hoodAngle,
-            c101.hoodAngle,
-            c011.hoodAngle,
-            c111.hoodAngle,
+            c000.launchAngle,
+            c100.launchAngle,
+            c010.launchAngle,
+            c110.launchAngle,
+            c001.launchAngle,
+            c101.launchAngle,
+            c011.launchAngle,
+            c111.launchAngle,
             distanceWeight,
             angleWeight,
             velocityWeight);
@@ -222,7 +222,7 @@ public class ShotCalculator {
 
     // isValid, turretAngle (field-relative), hoodAngle (above horizontal), ballExitVelocity (m/s)
     return new ShotParameters(
-        true, Rotation2d.fromDegrees(turretAngle), Rotation2d.fromDegrees(hoodAngle), fuelVelocity);
+        true, Rotation2d.fromDegrees(turretAngle), Rotation2d.fromDegrees(launchAngle), fuelVelocity);
   }
 
   public static Command launchSimulatedFuel() {
@@ -265,7 +265,7 @@ public class ShotCalculator {
                       // initial velocity, in m/s
                       Units.MetersPerSecond.of(shotParameters.ballExitVelocity),
                       // shooter angle (above horizontal)
-                      Units.Radians.of(shotParameters.hoodAngle.getRadians()))
+                      Units.Radians.of(shotParameters.launchAngle.getRadians()))
                   .withProjectileTrajectoryDisplayCallBack(
                       // Successful seems to not work properly, all shots get logged as missed
                       // This is probably a maple sim bug
@@ -289,7 +289,7 @@ public class ShotCalculator {
       // absolute angle of the turret relative to the field, CCW positive
       Rotation2d turretAngle,
       // rotation above horizontal
-      Rotation2d hoodAngle,
+      Rotation2d launchAngle,
       // velocity of the ball as it leaves the shooter in m/s
       double ballExitVelocity) {}
 }
