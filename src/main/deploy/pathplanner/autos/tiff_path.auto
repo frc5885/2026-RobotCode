@@ -5,13 +5,25 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "tiff_path.0"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
-                  "pathName": "tiff_path.0"
+                  "pathName": "tiff_path.1"
                 }
               },
               {
@@ -24,34 +36,21 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "RetractIntake"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "tiff_path.1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PreSpinFlywheel"
-                }
-              }
-            ]
+            "pathName": "tiff_path.2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Stop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToClimbPoseSequentialCommand"
           }
         }
       ]
