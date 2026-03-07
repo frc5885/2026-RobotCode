@@ -13,7 +13,7 @@ import frc.robot.subsystems.intake.extension.ExtensionConstants;
 public class IntakeCommand extends Command {
   private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
-  private static final double intakeRollerVoltage = 6.0;
+  private static final double intakeRollerVoltage = 12.0;
   /** Creates a new IntakeCommand. */
   public IntakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.

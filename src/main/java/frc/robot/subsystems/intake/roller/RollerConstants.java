@@ -10,8 +10,8 @@ public class RollerConstants {
   public static final int leftCanId = 42;
   public static final int rightCanId = 43;
   public static final boolean leftMotorInverted = false;
-  public static final boolean motorsOppositeDirections = false;
-  public static final int currentLimit = 30;
+  public static final boolean motorsOppositeDirections = true;
+  public static final int currentLimit = 40;
   // Motor Rotations -> Intake Rotations
   public static final double positionConversionFactor = 1 / gearRatio;
   // Motor RPM -> Intake RPM

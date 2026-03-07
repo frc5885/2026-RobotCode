@@ -58,7 +58,7 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   private final Alert turretMotorDisconnectedAlert =
-      new Alert("Turret motor disconnected!", AlertType.kWarning);
+      new Alert("Turret motor disconnected!", AlertType.kError);
   private final TurretIO turretIO;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
   private final SysIdRoutine sysId;
