@@ -7,7 +7,7 @@ package frc.robot.subsystems.shooter.hood;
 import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
-  public static final double gearRatio = 10.0 / 1.0;
+  public static final double gearRatio = 16.0 * 18.5 / 1.0;
   public static final double minAngleRadians = Units.degreesToRadians(0);
   public static final double maxAngleRadians = Units.degreesToRadians(90);
   public static final double startingAngleRadians = Units.degreesToRadians(80);

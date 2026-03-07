@@ -7,7 +7,7 @@ package frc.robot.subsystems.intake.extension;
 import edu.wpi.first.math.util.Units;
 
 public class ExtensionConstants {
-  public static final double gearRatio = 10.0 / 1.0;
+  public static final double gearRatio = 50.0 / 1.0;
   public static final double minAngleRadians = Units.degreesToRadians(0.0);
   public static final double maxAngleRadians = Units.degreesToRadians(90.0);
   public static final double startingAngleRadians = Units.degreesToRadians(90.0);
