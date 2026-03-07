@@ -7,7 +7,7 @@ package frc.robot.subsystems.shooter.hood;
 import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
-  public static final double gearRatio = 16.0 * 18.5 / 1.0;
+  public static final double gearRatio = 25.0 * 18.5 / 1.0;
   public static final double minAngleRadians = Units.degreesToRadians(0);
   public static final double maxAngleRadians = Units.degreesToRadians(90);
   public static final double startingAngleRadians = Units.degreesToRadians(80);
@@ -29,9 +29,9 @@ public class HoodConstants {
   public static final double kd = 0.0;
   // Ran sysID in sim
   public static final double ks = 0.00010268;
-  public static final double kg = 0.030181 / 30.0;
-  public static final double kv = 0.10265 * 30.0;
-  public static final double ka = 5.2044e-05 * Math.pow(30.0, 2.0);
+  public static final double kg = 0.030181 / (30.0 * 1.5);
+  public static final double kv = 0.10265 * (30.0 * 1.5);
+  public static final double ka = 5.2044e-05 * Math.pow((30.0 * 1.5), 2.0);
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
   public static final double velocityToleranceRadiansPerSecond = Units.degreesToRadians(6.0);
 
