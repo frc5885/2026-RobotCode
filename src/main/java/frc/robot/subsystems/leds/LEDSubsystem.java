@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,15 +37,6 @@ public class LEDSubsystem extends SubsystemBase {
     leds.setData(buffer);
     leds.setColorOrder(ColorOrder.kRGB);
 
-    // ledState = LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Percent.per(Second).of(25.0));
-    ledState = LEDPattern.solid(Color.kRed);
-    // ledState =
-    //     LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kCyan, Color.kBlack)
-    //         .scrollAtRelativeSpeed(Percent.per(Second).of(100.0));
-    // ledState =
-    //     LEDPattern.solid(Color.kRed)
-    //         .blink(Seconds.of(0.1))
-    //         .overlayOn(LEDPattern.solid(Color.kBlue));
     ledState = LEDConstants.States.disabled;
     leds.start();
   }

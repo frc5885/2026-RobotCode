@@ -13,12 +13,19 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDConstants {
   public static final int ledPort = 0;
-  public static final int length = 79; // update this later
+  public static final int length = 79;
 
   public final class States {
     public static final LEDPattern disabled =
         LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Percent.per(Second).of(25.0));
     public static final LEDPattern intakeRunning =
         LEDPattern.solid(Color.kCyan).blink(Seconds.of(0.2));
+    public static final LEDPattern cyanScrollingGradient =
+        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kCyan, Color.kBlack)
+            .scrollAtRelativeSpeed(Percent.per(Second).of(100.0));
+    public static final LEDPattern policeSirens =
+        LEDPattern.solid(Color.kRed)
+            .blink(Seconds.of(0.1))
+            .overlayOn(LEDPattern.solid(Color.kBlue));
   }
 }
