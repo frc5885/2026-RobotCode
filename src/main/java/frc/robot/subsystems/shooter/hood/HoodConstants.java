@@ -8,10 +8,10 @@ import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
   public static final double gearRatio = 25.0 * 18.5 / 1.0;
-  public static final double minAngleRadians = Units.degreesToRadians(0);
-  public static final double maxAngleRadians = Units.degreesToRadians(90);
+  public static final double minAngleRadians = Units.degreesToRadians(45);
+  public static final double maxAngleRadians = Units.degreesToRadians(80);
   public static final double startingAngleRadians = Units.degreesToRadians(80);
-  public static final double idleAngleRadians = Units.degreesToRadians(85.0);
+  public static final double idleAngleRadians = Units.degreesToRadians(80.0);
   public static final double armOffsetToHorizontalRadians = -0.0042524; // from sysID
   public static final double armLengthMeters = 0.1;
   public static final double armMassKG = 0.05;

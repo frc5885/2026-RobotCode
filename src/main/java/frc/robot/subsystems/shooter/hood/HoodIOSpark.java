@@ -7,6 +7,7 @@ package frc.robot.subsystems.shooter.hood;
 import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -20,6 +21,7 @@ public class HoodIOSpark implements HoodIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
+  private boolean isEncoderZeroed = false;
 
   public HoodIOSpark() {
     motor = new SparkMax(HoodConstants.canId, MotorType.kBrushless);
@@ -65,11 +67,23 @@ public class HoodIOSpark implements HoodIO {
         (values) -> inputs.appliedVolts = values[0] * values[1]);
     ifOk(motor, motor::getOutputCurrent, (value) -> inputs.currentAmps = value);
     inputs.motorConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
+
+    if (!isEncoderZeroed && inputs.motorConnected) {
+      if (zeroEncoder() == REVLibError.kOk) {
+        isEncoderZeroed = true;
+        System.out.println("Hood encoder zeroed");
+      }
+    }
   }
 
   /** Run open loop at the specified voltage. */
   @Override
   public void setMotorVoltage(double volts) {
     motor.setVoltage(volts);
+  }
+
+  /** Sets encoder starting angle */
+  private REVLibError zeroEncoder() {
+    return encoder.setPosition(HoodConstants.startingAngleRadians);
   }
 }
