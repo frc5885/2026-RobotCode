@@ -8,15 +8,25 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.PathUnderTrenchCommand;
-import frc.robot.commands.SpinIntakeCommand;
-import frc.robot.commands.SpinShooterCommand;
-import frc.robot.util.ControllerUtil;
+import frc.robot.commands.AssistedDriveCommand;
+import frc.robot.commands.DefaultCommands;
+import frc.robot.commands.DriveToClimbPoseSequentialCommand;
+import frc.robot.commands.DriveToPoseCommand;
+import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
+import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
+import frc.robot.commands.autonomous.StopDrivingCommand;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.RetractIntakeCommand;
+import frc.robot.commands.shooting.ShootCommandGroup;
+import frc.robot.commands.shooting.TurretCommands;
+import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -38,11 +48,24 @@ public class RobotContainer {
     // Init all subsystems
     SubsystemFactory.initAllSubsystems();
 
+    // Init all named commands
+    // must be before the set up auto routines
+    NamedCommands.registerCommand("Intake", new IntakeCommand());
+    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
+    NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
+    NamedCommands.registerCommand("Stop", new StopDrivingCommand());
+    NamedCommands.registerCommand(
+        "DriveToPose", new DriveToPoseCommand(() -> new Pose2d(2.5, 5, new Rotation2d())));
+    Zones.logAllZones();
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    DriveCommands.addDriveSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -56,17 +79,23 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    DriveCommands.setDefaultDriveCommand(
-        DriveCommands.joystickDrive(
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+    DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
+    // DefaultCommands.setDefaultDriveCommand(
+    //     DriveCommands.joystickDrive(
+    //         () -> -controller.getLeftY(),
+    //         () -> -controller.getLeftX(),
+    //         () -> -controller.getRightX()));
 
-    controller.a().whileTrue(new SpinShooterCommand());
-    controller.b().whileTrue(new SpinIntakeCommand());
+    DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
+
+    controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
+
     controller
         .povLeft()
-        .onTrue(new PathUnderTrenchCommand(() -> ControllerUtil.isLeftJoystickMoved(controller)));
+        .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
+    controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
+    controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
+    controller.leftBumper().onTrue(new RetractIntakeCommand());
   }
 
   /**

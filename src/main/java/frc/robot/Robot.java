@@ -9,10 +9,15 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.revrobotics.util.StatusLogger;
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.turret.LaunchCalculator;
+import frc.robot.util.HubShiftUtil;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -79,6 +84,9 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
 
+    // Override Simulation Field
+    overrideSimulationField();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
@@ -87,7 +95,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     // For pathplanner
-    FollowPathCommand.warmupCommand().schedule();
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
   }
 
   /** This function is called periodically during all modes. */
@@ -106,6 +114,12 @@ public class Robot extends LoggedRobot {
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
+
+    // Clear launch parameters
+    LaunchCalculator.getInstance().clearLaunchingParameters();
+
+    // Log hub state
+    HubShiftUtil.updateDashboardOutputs();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -121,11 +135,16 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
     resetSimulationField();
+    if (Constants.isSim()) {
+      // Preloaded fuel *yum*
+      IntakeSubsystem.getInstance().getIntakeSimulation().setGamePiecesCount(8);
+    }
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
+    HubShiftUtil.initialize();
   }
 
   /** This function is called periodically during autonomous. */
@@ -142,6 +161,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    HubShiftUtil.initialize();
   }
 
   /** This function is called periodically during operator control. */
@@ -162,6 +182,10 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    // set default sim alliance station to blue 1
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.notifyNewData();
+
     setupSimulationField();
     resetSimulationField();
   }
@@ -177,16 +201,20 @@ public class Robot extends LoggedRobot {
   private void setupSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
-    // Setup the arena with custom settings
+    // Register the drivetrain simulation to the default simulation world
+    SimulatedArena.getInstance()
+        .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
+  }
+
+  /** Setup the arena with custom settings. Must be called before RobotContainer */
+  private void overrideSimulationField() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
+
     boolean addRampCollider = false; // Disable drive over ramp
     boolean efficiencyMode = true; // Spawn reduced number of balls
     Arena2026Rebuilt arena = new Arena2026Rebuilt(addRampCollider);
     arena.setEfficiencyMode(efficiencyMode);
     SimulatedArena.overrideInstance(arena);
-
-    // Register the drivetrain simulation to the default simulation world
-    SimulatedArena.getInstance()
-        .addDriveTrainSimulation(DriveSubsystem.getInstance().getSwerveDriveSimulation());
   }
 
   private void resetSimulationField() {

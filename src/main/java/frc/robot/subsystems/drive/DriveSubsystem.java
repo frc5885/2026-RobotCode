@@ -17,6 +17,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -103,6 +104,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+
+  private static double driveSpeedMultiplier = 1.0;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
@@ -231,7 +234,7 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Runs the drive at the desired velocity.
    *
-   * @param speeds Speeds in meters/sec
+   * @param speeds Robot-relative speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
@@ -250,6 +253,15 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  }
+
+  /**
+   * Runs the drive at the desired velocity.
+   *
+   * @param speeds Field-relative speeds in meters/sec
+   */
+  public void runVelocityFieldRelative(ChassisSpeeds speeds) {
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation()));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -308,10 +320,16 @@ public class DriveSubsystem extends SubsystemBase {
     return states;
   }
 
-  /** Returns the measured chassis speeds of the robot. */
+  /** Returns the measured robot-relative chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
+  }
+
+  /** Returns the field-relative chassis speeds of the robot. */
+  @AutoLogOutput(key = "SwerveChassisSpeeds/FieldRelative")
+  public ChassisSpeeds getFieldRelativeChassisSpeeds() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
   }
 
   @AutoLogOutput(key = "Odometry/VelocityMagnitude")
@@ -373,12 +391,22 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return maxSpeedMetersPerSec;
+    return maxSpeedMetersPerSec * driveSpeedMultiplier;
   }
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return maxSpeedMetersPerSec / driveBaseRadius;
+    return maxSpeedMetersPerSec * driveSpeedMultiplier / driveBaseRadius;
+  }
+
+  /**
+   * Sets a multiplier [0.0, 1.0] on the max drive speed
+   *
+   * @param multiplier
+   */
+  public void setDriveSpeedMultiplier(double multiplier) {
+    double clampedMultiplier = MathUtil.clamp(multiplier, 0.0, 1.0);
+    driveSpeedMultiplier = clampedMultiplier;
   }
 
   /** Returns the maple sim drivetrain. */

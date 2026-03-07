@@ -30,4 +30,8 @@ public final class Constants {
   }
 
   public static final double dtSeconds = 0.02; // Robot loop time (20ms)
+
+  public static boolean isSim() {
+    return currentMode == Mode.SIM;
+  }
 }

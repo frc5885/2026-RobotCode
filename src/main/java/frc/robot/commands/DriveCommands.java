@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import java.text.DecimalFormat;
@@ -31,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -289,34 +287,5 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
-  }
-
-  /*
-   * Set up joystrick drive command as default
-   */
-  public static void setDefaultDriveCommand(Command command) {
-    DriveSubsystem.getInstance().setDefaultCommand(command);
-  }
-
-  /*
-   * Add all drive SysID commands to autochooser
-   */
-  public static void addDriveSysIdToAutoChooser(LoggedDashboardChooser<Command> autoChooser) {
-    DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
-
-    autoChooser.addOption("Drive Wheel Radius Characterization", wheelRadiusCharacterization());
-    autoChooser.addOption("Drive Simple FF Characterization", feedforwardCharacterization());
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        driveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        driveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)",
-        driveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)",
-        driveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 }
