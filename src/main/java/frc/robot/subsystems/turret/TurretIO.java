@@ -25,4 +25,11 @@ public interface TurretIO {
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public default void setBrakeMode(boolean brakeModeEnabled) {}
 }

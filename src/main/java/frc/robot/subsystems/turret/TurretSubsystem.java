@@ -298,4 +298,14 @@ public class TurretSubsystem extends SubsystemBase {
         "Mechanism3d/2-Turret",
         new Pose3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, getPosition())));
   }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    turretIO.setBrakeMode(brakeModeEnabled);
+    runOpenLoop(0.0);
+  }
 }

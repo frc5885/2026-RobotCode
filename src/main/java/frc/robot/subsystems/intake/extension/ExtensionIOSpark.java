@@ -109,4 +109,27 @@ public class ExtensionIOSpark implements ExtensionIO {
   private REVLibError zeroEncoder() {
     return encoder.setPosition(ExtensionConstants.startingAngleRadians);
   }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  @Override
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(brakeModeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    tryUntilOk(
+        leftMotor,
+        5,
+        () ->
+            leftMotor.configure(
+                config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+    tryUntilOk(
+        rightMotor,
+        5,
+        () ->
+            rightMotor.configure(
+                config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+  }
 }

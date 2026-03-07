@@ -75,4 +75,16 @@ public class TurretIOSpark implements TurretIO {
   public void setMotorVoltage(double volts) {
     motor.setVoltage(volts);
   }
+
+  @Override
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(brakeModeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+  }
 }

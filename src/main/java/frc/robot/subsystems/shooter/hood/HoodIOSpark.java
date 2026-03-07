@@ -86,4 +86,21 @@ public class HoodIOSpark implements HoodIO {
   private REVLibError zeroEncoder() {
     return encoder.setPosition(HoodConstants.startingAngleRadians);
   }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  @Override
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(brakeModeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+  }
 }

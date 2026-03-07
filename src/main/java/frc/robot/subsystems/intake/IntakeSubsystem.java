@@ -70,6 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final RollerIOInputsAutoLogged rollerInputs = new RollerIOInputsAutoLogged();
   private final PIDController extensionPID =
       new PIDController(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
+  private boolean runExtensionClosedLoop = true;
 
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
@@ -101,7 +102,9 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerLeftMotorDisconnectedAlert.set(!rollerInputs.leftMotorConnected);
     rollerRightMotorDisconnectedAlert.set(!rollerInputs.rightMotorConnected);
 
-    setExtensionVoltage(extensionPID.calculate(extensionInputs.positionRadians));
+    if (runExtensionClosedLoop) {
+      setExtensionVoltage(extensionPID.calculate(extensionInputs.positionRadians));
+    }
 
     visualizationUpdate();
   }
@@ -112,6 +115,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setIntakeRollerVoltage(double volts) {
     rollerIO.setMotorVoltage(volts);
+  }
+
+  public void runExtensionOpenLoop(double volts) {
+    runExtensionClosedLoop = false;
+    setExtensionVoltage(volts);
   }
 
   /**
@@ -134,6 +142,7 @@ public class IntakeSubsystem extends SubsystemBase {
             ExtensionConstants.minAngleRadians,
             ExtensionConstants.maxAngleRadians);
     extensionPID.setSetpoint(extensionSetpoint);
+    runExtensionClosedLoop = true;
   }
 
   public boolean isExtensionAtSetPoint() {
@@ -176,5 +185,15 @@ public class IntakeSubsystem extends SubsystemBase {
       return 0;
     }
     return intakeSimulation.getGamePiecesAmount();
+  }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    extensionIO.setBrakeMode(brakeModeEnabled);
+    runExtensionOpenLoop(0.0);
   }
 }

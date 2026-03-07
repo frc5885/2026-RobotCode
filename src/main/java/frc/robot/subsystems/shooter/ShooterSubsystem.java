@@ -272,4 +272,14 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return run(() -> runHoodOpenLoop(0.0)).withTimeout(1.0).andThen(hoodSysId.dynamic(direction));
   }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    hoodIO.setBrakeMode(brakeModeEnabled);
+    runHoodOpenLoop(0.0);
+  }
 }

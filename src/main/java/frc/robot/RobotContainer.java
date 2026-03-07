@@ -21,6 +21,7 @@ import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
+import frc.robot.commands.SetBrakeModeCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
@@ -28,6 +29,7 @@ import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
+import frc.robot.controllers.OperatorPanel;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -41,6 +43,7 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final OperatorPanel operatorPanel = new OperatorPanel(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -96,6 +99,12 @@ public class RobotContainer {
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
+
+    // Operator Switches
+    operatorPanel
+        .getBrakeModeSwitch()
+        .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
+        .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
   }
 
   /**
