@@ -17,7 +17,7 @@ public class HoodConstants {
   public static final double armMassKG = 0.05;
   public static final double maxVelocityRadiansPerSecond = Units.degreesToRadians(90);
   public static final double maxAccelerationRadiansPerSecondSquared = Units.degreesToRadians(360);
-  public static final int canId = 45;
+  public static final int canId = 31;
   public static final boolean motorInverted = false;
   public static final int currentLimit = 30;
   // Motor Rotations -> Radians

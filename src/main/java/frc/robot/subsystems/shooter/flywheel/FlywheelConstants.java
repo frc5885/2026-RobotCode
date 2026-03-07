@@ -7,8 +7,8 @@ package frc.robot.subsystems.shooter.flywheel;
 public class FlywheelConstants {
   public static final double gearRatio = 1.0 / 1.0;
   public static final double momentOfInertia = 0.025; // kg*m^2
-  public static final int leftCanId = 43;
-  public static final int rightCanId = 44;
+  public static final int leftCanId = 32;
+  public static final int rightCanId = 33;
   public static final boolean leftMotorInverted = false;
   public static final boolean motorsOppositeDirections = false;
   public static final int currentLimit = 30;

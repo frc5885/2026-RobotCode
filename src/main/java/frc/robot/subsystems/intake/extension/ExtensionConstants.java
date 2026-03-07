@@ -13,8 +13,8 @@ public class ExtensionConstants {
   public static final double startingAngleRadians = Units.degreesToRadians(90.0);
   public static final double armLengthMeters = 0.2;
   public static final double armMassKG = 0.1;
-  public static final int leftCanId = 35;
-  public static final int rightCanId = 36;
+  public static final int leftCanId = 40;
+  public static final int rightCanId = 41;
   public static final boolean leftMotorInverted = false;
   public static final boolean motorsOppositeDirections = false;
   public static final int currentLimit = 30;
