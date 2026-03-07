@@ -74,7 +74,8 @@ public class AssistedDriveCommand extends Command {
                 driveSubsystem::getPose,
                 driveSubsystem::getFieldRelativeChassisSpeeds,
                 Seconds.of(DriveConstants.trenchAlignTimeSeconds))
-            .debounce(0.1);
+            .debounce(0.1)
+            .and(() -> !DriverStation.isTest());
 
     inBumpZoneTrigger =
         Zones.bumpZones
@@ -82,7 +83,8 @@ public class AssistedDriveCommand extends Command {
                 driveSubsystem::getPose,
                 driveSubsystem::getFieldRelativeChassisSpeeds,
                 Seconds.of(DriveConstants.bumpAlignTimeSeconds))
-            .debounce(0.1);
+            .debounce(0.1)
+            .and(() -> !DriverStation.isTest());
 
     inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
     inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));

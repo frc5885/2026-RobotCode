@@ -4,6 +4,7 @@
 
 package frc.robot.commands.shooting;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.hopper.HopperSubsystem;
@@ -39,7 +40,7 @@ public class ShootIfReadyCommand extends Command {
             && LaunchCalculator.getInstance().getParameters().isValid();
     Logger.recordOutput("ShootIfReadyCommand/IsReadyToShoot", isReadyToShoot);
 
-    if (isReadyToShoot) {
+    if (isReadyToShoot || DriverStation.isTest()) {
       hopperSubsystem.setKickerVoltage(kickerVoltage);
       hopperSubsystem.setSpindexerVoltage(spindexerVoltage);
 

@@ -11,9 +11,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -80,13 +82,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
-    // DefaultCommands.setDefaultDriveCommand(
-    //     DriveCommands.joystickDrive(
-    //         () -> -controller.getLeftY(),
-    //         () -> -controller.getLeftX(),
-    //         () -> -controller.getRightX()));
-
-    DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
+    DefaultCommands.setDefaultTurretCommand(
+        new ConditionalCommand(
+            TurretCommands.runTrackTargetCommand(),
+            TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.fromDegrees(0.0)),
+            () -> !DriverStation.isTest()));
 
     controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
 

@@ -5,6 +5,7 @@
 package frc.robot.commands.shooting;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
@@ -14,6 +15,9 @@ import frc.robot.subsystems.turret.LaunchCalculator.LaunchingParameters;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AimHoodAndSpinFlywheelCommand extends Command {
   private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
+
+  private final double testModeHoodAngle = Units.degreesToRadians(45.0);
+  private final double testFlywheelRPM = 1000.0;
   /** Creates a new AimHoodAndSpinFlywheelCommand. */
   public AimHoodAndSpinFlywheelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,11 +31,16 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    LaunchingParameters launchingParameters = LaunchCalculator.getInstance().getParameters();
-    shooterSubsystem.setHoodGoal(
-        launchingParameters.hoodAngle(), launchingParameters.hoodVelocity());
-    shooterSubsystem.setFlywheelVelocity(
-        Units.radiansPerSecondToRotationsPerMinute(launchingParameters.flywheelSpeed()));
+    if (!DriverStation.isTest()) {
+      LaunchingParameters launchingParameters = LaunchCalculator.getInstance().getParameters();
+      shooterSubsystem.setHoodGoal(
+          launchingParameters.hoodAngle(), launchingParameters.hoodVelocity());
+      shooterSubsystem.setFlywheelVelocity(
+          Units.radiansPerSecondToRotationsPerMinute(launchingParameters.flywheelSpeed()));
+    } else {
+      shooterSubsystem.setHoodGoal(testModeHoodAngle, 0.0);
+      shooterSubsystem.setFlywheelVelocity(testFlywheelRPM);
+    }
   }
 
   // Called once the command ends or is interrupted.
