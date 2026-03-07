@@ -7,6 +7,7 @@ package frc.robot.subsystems.intake.extension;
 import static frc.robot.util.SparkUtil.*;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -23,6 +24,7 @@ public class ExtensionIOSpark implements ExtensionIO {
   private final RelativeEncoder encoder;
   private final Debouncer leftMotorConnectedDebounce = new Debouncer(0.5);
   private final Debouncer rightMotorConnectedDebounce = new Debouncer(0.5);
+  private boolean isEncoderZeroed = false;
 
   public ExtensionIOSpark() {
     leftMotor = new SparkMax(ExtensionConstants.leftCanId, MotorType.kBrushless);
@@ -88,11 +90,23 @@ public class ExtensionIOSpark implements ExtensionIO {
     inputs.rightMotorConnected = rightMotorConnectedDebounce.calculate(!sparkStickyFault);
 
     inputs.currentAmps = currents;
+
+    if (!isEncoderZeroed && inputs.leftMotorConnected) {
+      if (zeroEncoder() == REVLibError.kOk) {
+        isEncoderZeroed = true;
+        System.out.println("Intake extension encoder zeroed");
+      }
+    }
   }
 
   /** Run open loop at the specified voltage. */
   @Override
   public void setMotorVoltage(double volts) {
     leftMotor.setVoltage(volts);
+  }
+
+  /** Sets encoder starting angle */
+  private REVLibError zeroEncoder() {
+    return encoder.setPosition(ExtensionConstants.startingAngleRadians);
   }
 }
