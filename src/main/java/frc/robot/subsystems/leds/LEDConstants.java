@@ -15,7 +15,7 @@ public class LEDConstants {
   public static final int ledPort = 0;
   public static final int length = 79;
 
-  public final class States {
+  public static final class States {
     public static final LEDPattern disabled =
         LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Percent.per(Second).of(25.0));
     public static final LEDPattern intakeRunning =

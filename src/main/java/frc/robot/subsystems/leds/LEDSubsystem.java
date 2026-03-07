@@ -28,7 +28,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   /** Creates a new LEDSubsystem. */
-  public LEDSubsystem() {
+  private LEDSubsystem() {
     leds = new AddressableLED(LEDConstants.ledPort);
     buffer = new AddressableLEDBuffer(LEDConstants.length);
     view = buffer.createView(0, LEDConstants.length - 1);
@@ -49,6 +49,6 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public static Command setLEDState(LEDPattern pattern) {
-    return new InstantCommand(() -> ledState = pattern);
+    return new InstantCommand(() -> ledState = pattern, getInstance());
   }
 }
