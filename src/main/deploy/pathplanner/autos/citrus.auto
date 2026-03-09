@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ConditionalShootPreload"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
