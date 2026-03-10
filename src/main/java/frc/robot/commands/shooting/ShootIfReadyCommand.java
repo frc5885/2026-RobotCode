@@ -18,7 +18,7 @@ public class ShootIfReadyCommand extends Command {
   private final HopperSubsystem hopperSubsystem = HopperSubsystem.getInstance();
 
   private final double kickerVoltage = 6.0;
-  private final double spindexerVoltage = 6.0;
+  private final double spindexerVoltage = 8.0;
 
   /** Creates a new ShootIfReadyCommand. */
   public ShootIfReadyCommand() {

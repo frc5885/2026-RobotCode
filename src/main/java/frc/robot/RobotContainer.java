@@ -22,6 +22,7 @@ import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.SetBrakeModeCommand;
+import frc.robot.commands.SysIDCommands;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
@@ -71,7 +72,7 @@ public class RobotContainer {
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
-    // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -102,8 +103,10 @@ public class RobotContainer {
     controller.leftBumper().onTrue(new RetractIntakeCommand());
 
     // Operator Switches
-    operatorPanel
-        .getBrakeModeSwitch()
+    // operatorPanel
+    //     .getBrakeModeSwitch()
+    controller
+        .start()
         .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
         .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
   }

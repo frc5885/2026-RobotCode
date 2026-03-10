@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
@@ -94,7 +95,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private TrapezoidProfile.State extensionGoalState =
       new TrapezoidProfile.State(ExtensionConstants.startingAngleRadians, 0.0);
   private TrapezoidProfile.State extensionPrevSetpoint = extensionGoalState;
-  private boolean runExtensionClosedLoop = true;
+  private boolean runExtensionClosedLoop = false;
 
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
@@ -135,14 +136,14 @@ public class IntakeSubsystem extends SubsystemBase {
           extensionProfile.calculate(
               Constants.dtSeconds, extensionPrevSetpoint, extensionGoalState);
       extensionPrevSetpoint = setpoint;
-      Logger.recordOutput("Intake/Extension/SetpointPosition", setpoint.position);
+      Logger.recordOutput("Intake/Extension/SetpointPositionRadians", setpoint.position);
       Logger.recordOutput("Intake/Extension/SetpointVelocity", setpoint.velocity);
 
       setExtensionVoltage(
-          extensionFF.calculate(
-                  setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
-                  setpoint.velocity)
-              + extensionPID.calculate(current.position, setpoint.position));
+          // extensionFF.calculate(
+          //         setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
+          //         setpoint.velocity)
+          +extensionPID.calculate(current.position, setpoint.position));
     }
 
     visualizationUpdate();
@@ -190,6 +191,7 @@ public class IntakeSubsystem extends SubsystemBase {
       // Reset setpoint to current state when transitioning from open-loop
       extensionPrevSetpoint = getExtensionCurrentState();
     }
+    Logger.recordOutput("Intake/Extension/GoalPositionRadians", positionRadians);
     runExtensionClosedLoop = true;
   }
 
@@ -253,9 +255,9 @@ public class IntakeSubsystem extends SubsystemBase {
   private SysIdRoutine extensionSysIdSetup() {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
-            Volts.of(0.5).per(Second),
+            Volts.of(2.0).per(Second),
             Volts.of(2.0),
-            null,
+            Seconds.of(15.0),
             (state) -> Logger.recordOutput("Intake/Extension/SysIDState", state.toString())),
         new SysIdRoutine.Mechanism(
             (voltage) -> runExtensionOpenLoop(voltage.in(Volts)), null, this));

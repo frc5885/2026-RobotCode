@@ -8,7 +8,7 @@ public class KickerConstants {
   public static final double gearRatio = 3.0 / 1.0;
   public static final double momentOfInertia = 0.001; // kg*m^2
   public static final int canId = 51;
-  public static final boolean motorInverted = false;
+  public static final boolean motorInverted = true;
   public static final int currentLimit = 30;
   // Motor Rotations -> Kicker Rotations
   public static final double positionConversionFactor = 1 / gearRatio;
