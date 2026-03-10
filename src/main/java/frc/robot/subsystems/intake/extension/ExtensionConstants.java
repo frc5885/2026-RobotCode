@@ -11,7 +11,6 @@ public class ExtensionConstants {
   public static final double minAngleRadians = Units.degreesToRadians(10.0);
   public static final double maxAngleRadians = Units.degreesToRadians(116.0);
   public static final double startingAngleRadians = Units.degreesToRadians(116.0);
-  public static final double armOffsetToHorizontalRadians = -1.5813;
   public static final double armLengthMeters = 0.2;
   public static final double armMassKG = 0.1;
   public static final int leftCanId = 40;
@@ -23,17 +22,20 @@ public class ExtensionConstants {
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
-
-  public static final double maxVelocityRadiansPerSecond = 8.0;
-  public static final double maxAccelerationRadiansPerSecondSquared = 20.0;
-
+  
+  public static final double maxVelocityRadiansPerSecond = 4.0;
+  public static final double maxAccelerationRadiansPerSecondSquared = 8.0;
+  
   public static final double kp = 5.0;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
+  // SysID Constants ⌄⌄⌄
   public static final double ks = 0.82664;
   public static final double kg = 0.43804 / 1.2;
   public static final double kv = 0.66456 * 1.2;
   public static final double ka = 0.087336 * Math.pow(1.2, 2);
+  public static final double armOffsetToHorizontalRadians = -1.5813;
+  // ^^^ SysID Constants
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
 
   public static final double intakeStowedAngle = Units.degreesToRadians(115.0);

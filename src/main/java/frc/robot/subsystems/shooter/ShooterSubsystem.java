@@ -174,10 +174,9 @@ public class ShooterSubsystem extends SubsystemBase {
             -HoodConstants.maxVelocityRadiansPerSecond,
             HoodConstants.maxVelocityRadiansPerSecond);
     hoodGoalState = new TrapezoidProfile.State(positionSetpoint, velocitySetpoint);
-    if (!runHoodClosedLoop) {
-      // Reset setpoint to current state when transitioning from open-loop
-      hoodPrevSetpoint = getHoodCurrentState();
-    }
+    // Reset setpoint to current state
+    hoodPrevSetpoint = getHoodCurrentState();
+    hoodPID.reset();
     runHoodClosedLoop = true;
   }
 

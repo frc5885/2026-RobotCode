@@ -140,9 +140,9 @@ public class IntakeSubsystem extends SubsystemBase {
       Logger.recordOutput("Intake/Extension/SetpointVelocity", setpoint.velocity);
 
       setExtensionVoltage(
-          // extensionFF.calculate(
-          //         setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
-          //         setpoint.velocity)
+          extensionFF.calculate(
+                  setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
+                  setpoint.velocity)
           +extensionPID.calculate(current.position, setpoint.position));
     }
 
@@ -187,10 +187,9 @@ public class IntakeSubsystem extends SubsystemBase {
             ExtensionConstants.minAngleRadians,
             ExtensionConstants.maxAngleRadians);
     extensionGoalState = new TrapezoidProfile.State(extensionSetpoint, 0.0);
-    if (!runExtensionClosedLoop) {
-      // Reset setpoint to current state when transitioning from open-loop
-      extensionPrevSetpoint = getExtensionCurrentState();
-    }
+    // Reset setpoint to current state
+    extensionPrevSetpoint = getExtensionCurrentState();
+    extensionPID.reset();
     Logger.recordOutput("Intake/Extension/GoalPositionRadians", positionRadians);
     runExtensionClosedLoop = true;
   }
