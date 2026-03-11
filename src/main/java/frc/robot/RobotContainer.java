@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -31,6 +32,7 @@ import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -102,6 +104,21 @@ public class RobotContainer {
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
 
+    controller
+        .a()
+        .whileTrue(
+            new StartEndCommand(
+                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(12.0),
+                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
+                IntakeSubsystem.getInstance()));
+
+    controller
+        .b()
+        .whileTrue(
+            new StartEndCommand(
+                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
+                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
+                IntakeSubsystem.getInstance()));
     // Operator Switches
     // operatorPanel
     //     .getBrakeModeSwitch()

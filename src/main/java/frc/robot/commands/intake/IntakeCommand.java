@@ -32,7 +32,8 @@ public class IntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeRollerVoltage(intakeRollerVoltage);
+    intakeSubsystem.setIntakeRollerVoltage(0.0);
+    // intakeSubsystem.setIntakeRollerVoltage(intakeRollerVoltage);
   }
 
   // Called once the command ends or is interrupted.
