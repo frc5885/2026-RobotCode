@@ -189,6 +189,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Commands the extension to move to the given angle in radians. This will reset the profile and
+   * PID and should not be called periodically
+   *
+   * @param positionRadians The angle in radians to set the extension to.
+   */
   public void setExtensionPosition(double positionRadians) {
     double extensionSetpoint =
         MathUtil.clamp(

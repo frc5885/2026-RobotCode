@@ -159,7 +159,8 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the hood goal state, consisting of a position and a velocity
+   * Sets the hood goal state, consisting of a position and a velocity. This will not reset the
+   * profile or PID and is fine to call periodically
    *
    * @param positionRadians
    * @param velocityRadiansPerSecond
@@ -174,14 +175,17 @@ public class ShooterSubsystem extends SubsystemBase {
             -HoodConstants.maxVelocityRadiansPerSecond,
             HoodConstants.maxVelocityRadiansPerSecond);
     hoodGoalState = new TrapezoidProfile.State(positionSetpoint, velocitySetpoint);
-    // Reset setpoint to current state
-    hoodPrevSetpoint = getHoodCurrentState();
-    hoodPID.reset();
+    if (!runHoodClosedLoop) {
+      // Reset setpoint to current state when transitioning from open-loop
+      hoodPrevSetpoint = getHoodCurrentState();
+      hoodPID.reset();
+    }
     runHoodClosedLoop = true;
   }
 
   /**
-   * Sets the hood goal to the given position with a velocity of 0
+   * Sets the hood goal to the given position with a velocity of 0. This will not reset the profile
+   * or PID and is fine to call periodically
    *
    * @param positionRadians
    */
