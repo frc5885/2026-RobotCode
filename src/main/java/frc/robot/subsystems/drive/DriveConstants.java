@@ -44,10 +44,10 @@ public class DriveConstants {
   public static final double bumperWidth = Units.inchesToMeters(3.0);
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(2.11);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-3.11);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.067);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.53);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(5.34);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(3.10);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.272);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(0.703);
 
   // Device CAN IDs
   public static final int frontLeftDriveCanId = 13;
