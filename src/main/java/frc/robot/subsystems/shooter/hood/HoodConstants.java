@@ -19,7 +19,7 @@ public class HoodConstants {
   public static final double maxAccelerationRadiansPerSecondSquared = Units.degreesToRadians(360);
   public static final int canId = 31;
   public static final boolean motorInverted = false;
-  public static final int currentLimit = 30;
+  public static final int currentLimit = 20;
   // Motor Rotations -> Radians
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second

@@ -11,7 +11,7 @@ public class FlywheelConstants {
   public static final int rightCanId = 33;
   public static final boolean leftMotorInverted = false;
   public static final boolean motorsOppositeDirections = false;
-  public static final int currentLimit = 30;
+  public static final int currentLimit = 40;
   // Motor Rotations -> Flywheel Rotations
   public static final double positionConversionFactor = 1 / gearRatio;
   // Motor RPM -> Flywheel RPM

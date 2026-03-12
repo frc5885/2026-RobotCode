@@ -17,7 +17,7 @@ public class TurretConstants {
   public static final double momentOfInertia = 0.0906; // kg*m^2, from CAD
   public static final int canId = 30;
   public static final boolean motorInverted = true; // CCW positive
-  public static final int currentLimit = 30;
+  public static final int currentLimit = 20;
   // Motor Rotations -> Radians
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
