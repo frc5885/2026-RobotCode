@@ -13,7 +13,7 @@ import edu.wpi.first.math.util.Units;
 
 public class TurretConstants {
   public static final double gearRatio = 9.0 * 145.0 / 21.0;
-  public static final double startingAngleRadians = Units.degreesToRadians(180.0);
+  public static final double startingAngleRadians = Units.degreesToRadians(0.0);
   public static final double momentOfInertia = 0.0906; // kg*m^2, from CAD
   public static final int canId = 30;
   public static final boolean motorInverted = true; // CCW positive
@@ -31,7 +31,7 @@ public class TurretConstants {
   public static final double maxVelocityRadiansPerSecond = 9.8;
   public static final double maxAccelerationRadiansPerSecondSquared = 44.0;
 
-  public static final double turretOffset = Units.degreesToRadians(180.0); // facing back
+  public static final double turretOffset = Units.degreesToRadians(0.0); // facing front
   private static final double minOffsetAngle = Units.degreesToRadians(-210.0);
   private static final double maxOffsetAngle = Units.degreesToRadians(210.0);
   public static final double minAngle = minOffsetAngle + turretOffset;
