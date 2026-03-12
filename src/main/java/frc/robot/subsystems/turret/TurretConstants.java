@@ -22,14 +22,14 @@ public class TurretConstants {
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
-  public static final double kp = 1.0;
-  public static final double ki = 0.0;
+  public static final double kp = 5.0;
+  public static final double ki = 0.2;
   public static final double kd = 0.0;
-  public static final double kS = 0.0;
-  public static final double kV = 0.59607 * 2.0; // from sim
-  public static final double kA = 0.125418 * 4.0; // from sim
-  public static final double maxVelocityRadiansPerSecond = (176.0 / 60.0) * 2 * Math.PI;
-  public static final double maxAccelerationRadiansPerSecondSquared = 147.2;
+  public static final double kS = 0.21262;
+  public static final double kV = 1.0343;
+  public static final double kA = 0.1046;
+  public static final double maxVelocityRadiansPerSecond = 9.8;
+  public static final double maxAccelerationRadiansPerSecondSquared = 44.0;
 
   public static final double turretOffset = Units.degreesToRadians(180.0); // facing back
   private static final double minOffsetAngle = Units.degreesToRadians(-210.0);

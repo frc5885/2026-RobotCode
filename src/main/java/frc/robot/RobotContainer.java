@@ -11,10 +11,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -28,8 +29,8 @@ import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
+import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -69,9 +70,9 @@ public class RobotContainer {
 
     // Set up SysId routines
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -86,11 +87,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
-    // DefaultCommands.setDefaultTurretCommand(
-    //     new ConditionalCommand(
-    //         TurretCommands.runTrackTargetCommand(),
-    //         TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.fromDegrees(0.0)),
-    //         () -> !DriverStation.isTest()));
+    DefaultCommands.setDefaultTurretCommand(
+        new ConditionalCommand(
+            TurretCommands.runTrackTargetCommand(),
+            TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.fromDegrees(0.1)),
+            () -> !DriverStation.isTest()));
 
     controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
 
@@ -101,21 +102,21 @@ public class RobotContainer {
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
 
-    controller
-        .a()
-        .whileTrue(
-            new StartEndCommand(
-                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(12.0),
-                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
-                IntakeSubsystem.getInstance()));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         new StartEndCommand(
+    //             () -> TurretSubsystem.getInstance().runOpenLoop(12.0),
+    //             () -> TurretSubsystem.getInstance().runOpenLoop(0),
+    //             TurretSubsystem.getInstance()));
 
-    controller
-        .b()
-        .whileTrue(
-            new StartEndCommand(
-                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
-                () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
-                IntakeSubsystem.getInstance()));
+    // controller
+    //     .b()
+    //     .whileTrue(
+    //         new StartEndCommand(
+    //             () -> TurretSubsystem.getInstance().runOpenLoop(-12.0),
+    //             () -> TurretSubsystem.getInstance().runOpenLoop(0),
+    //             TurretSubsystem.getInstance()));
     // Operator Switches
     // operatorPanel
     //     .getBrakeModeSwitch()
