@@ -169,15 +169,20 @@ public class TurretSubsystem extends SubsystemBase {
 
       switch (targetType) {
         case FIELD_RELATIVE -> {
-          turretIO.setMotorVoltage(
+          double ffVoltage = feedforward.calculate(setpoint.velocity);
+          double pidVoltage =
               pidController.calculate(
-                      inputs.positionRadians, setpoint.position - TurretConstants.turretOffset)
-                  + feedforward.calculate(setpoint.velocity));
+                  inputs.positionRadians, setpoint.position - TurretConstants.turretOffset);
+          Logger.recordOutput("Turret/FFVoltage", ffVoltage);
+          Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
+          turretIO.setMotorVoltage(pidVoltage + ffVoltage);
         }
         case ROBOT_RELATIVE -> {
-          turretIO.setMotorVoltage(
+          double pidVoltage =
               pidController.calculate(
-                  inputs.positionRadians, goalAngle.getRadians() - TurretConstants.turretOffset));
+                  inputs.positionRadians, goalAngle.getRadians() - TurretConstants.turretOffset);
+          Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
+          turretIO.setMotorVoltage(pidVoltage);
         }
       }
     }

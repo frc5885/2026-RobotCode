@@ -136,23 +136,19 @@ public class IntakeSubsystem extends SubsystemBase {
           extensionProfile.calculate(
               Constants.dtSeconds, extensionPrevSetpoint, extensionGoalState);
       extensionPrevSetpoint = setpoint;
+
+      double ffVoltage =
+          extensionFF.calculate(
+              setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
+              setpoint.velocity);
+      double pidVoltage = extensionPID.calculate(current.position, setpoint.position);
+
+      Logger.recordOutput("Intake/Extension/FFVoltage", ffVoltage);
+      Logger.recordOutput("Intake/Extension/PIDVoltage", pidVoltage);
       Logger.recordOutput("Intake/Extension/SetpointPositionRadians", setpoint.position);
       Logger.recordOutput("Intake/Extension/SetpointVelocity", setpoint.velocity);
 
-      Logger.recordOutput(
-          "Intake/Extension/FFVoltage",
-          extensionFF.calculate(
-              setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
-              setpoint.velocity));
-
-      Logger.recordOutput(
-          "Intake/Extension/PIDVoltage",
-          extensionPID.calculate(current.position, setpoint.position));
-      setExtensionVoltage(
-          extensionFF.calculate(
-                  setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
-                  setpoint.velocity)
-              + extensionPID.calculate(current.position, setpoint.position));
+      setExtensionVoltage(ffVoltage + pidVoltage);
     }
 
     visualizationUpdate();

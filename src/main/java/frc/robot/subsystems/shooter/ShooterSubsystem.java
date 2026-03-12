@@ -129,13 +129,18 @@ public class ShooterSubsystem extends SubsystemBase {
       TrapezoidProfile.State setpoint =
           hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
       hoodPrevSetpoint = setpoint;
+
+      double ffVoltage =
+          hoodFF.calculate(
+              setpoint.position + HoodConstants.armOffsetToHorizontalRadians, setpoint.velocity);
+      double pidVoltage = hoodPID.calculate(current.position, setpoint.position);
+
+      Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
+      Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
       Logger.recordOutput("Shooter/Hood/SetpointPosition", setpoint.position);
       Logger.recordOutput("Shooter/Hood/SetpointVelocity", setpoint.velocity);
 
-      setHoodVoltage(
-          hoodFF.calculate(
-                  setpoint.position + HoodConstants.armOffsetToHorizontalRadians, setpoint.velocity)
-              + hoodPID.calculate(current.position, setpoint.position));
+      setHoodVoltage(ffVoltage + pidVoltage);
     }
 
     if (runFlywheelClosedLoop) {
