@@ -26,7 +26,7 @@ public class ExtensionConstants {
   public static final double velocityConversionFactor = positionConversionFactor / 60;
 
   public static final double maxVelocityRadiansPerSecond = 5.3; // found both using advantagescope
-  public static final double maxAccelerationRadiansPerSecondSquared = 8.0;
+  public static final double maxAccelerationRadiansPerSecondSquared = 80.0;
 
   public static final double kp = 10.0;
   public static final double ki = 0.0;
