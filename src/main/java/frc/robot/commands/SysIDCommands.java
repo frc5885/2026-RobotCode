@@ -68,16 +68,35 @@ public class SysIDCommands {
     ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
     autoChooser.addOption(
         "Hood SysId (Quasistatic Forward)",
-        shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        shooterSubsystem.hoodSysIdQuasistatic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Hood SysId (Quasistatic Reverse)",
-        shooterSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        shooterSubsystem.hoodSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     autoChooser.addOption(
         "Hood SysId (Dynamic Forward)",
-        shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        shooterSubsystem.hoodSysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Hood SysId (Dynamic Reverse)",
-        shooterSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        shooterSubsystem.hoodSysIdDynamic(SysIdRoutine.Direction.kReverse));
+  }
+
+  /*
+   * Add all flywheel SysID commands to autochooser
+   */
+  public static void addFlywheelSysIdToAutoChooser(LoggedDashboardChooser<Command> autoChooser) {
+    ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
+    autoChooser.addOption(
+        "Flywheel SysId (Quasistatic Forward)",
+        shooterSubsystem.flywheelSysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Flywheel SysId (Quasistatic Reverse)",
+        shooterSubsystem.flywheelSysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Flywheel SysId (Dynamic Forward)",
+        shooterSubsystem.flywheelSysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Flywheel SysId (Dynamic Reverse)",
+        shooterSubsystem.flywheelSysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /*

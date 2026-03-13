@@ -72,6 +72,7 @@ public class RobotContainer {
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
     SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings

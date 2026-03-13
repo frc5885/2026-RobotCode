@@ -16,5 +16,12 @@ public class FlywheelConstants {
   public static final double positionConversionFactor = 1 / gearRatio;
   // Motor RPM -> Flywheel RPM
   public static final double velocityConversionFactor = positionConversionFactor;
-  public static final double velocityToleranceRPM = 50.0;
+  public static final double velocityToleranceRPM = 100.0;
+
+  public static final double kp = 0.0;
+  public static final double ki = 0.0;
+  public static final double kd = 0.0;
+  public static final double ks = 0.0;
+  public static final double kv = 0.0;
+  public static final double ka = 0.0;
 }
