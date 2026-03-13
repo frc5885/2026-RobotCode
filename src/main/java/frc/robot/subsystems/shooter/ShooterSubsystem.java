@@ -163,6 +163,11 @@ public class ShooterSubsystem extends SubsystemBase {
     setHoodVoltage(volts);
   }
 
+  public void runFlywheelOpenLoop(double volts) {
+    runFlywheelClosedLoop = false;
+    setFlywheelVoltage(volts);
+  }
+
   /**
    * Sets the hood goal state, consisting of a position and a velocity. This will not reset the
    * profile or PID and is fine to call periodically
