@@ -32,8 +32,8 @@ public class TurretConstants {
   public static final double maxAccelerationRadiansPerSecondSquared = 44.0;
 
   public static final double turretOffset = Units.degreesToRadians(0.0); // facing front
-  private static final double minOffsetAngle = Units.degreesToRadians(-210.0);
-  private static final double maxOffsetAngle = Units.degreesToRadians(210.0);
+  private static final double minOffsetAngle = Units.degreesToRadians(-213.0);
+  private static final double maxOffsetAngle = Units.degreesToRadians(180.0);
   public static final double minAngle = minOffsetAngle + turretOffset;
   public static final double maxAngle = maxOffsetAngle + turretOffset;
   public static final double trackOverlapMargin = Units.degreesToRadians(10);

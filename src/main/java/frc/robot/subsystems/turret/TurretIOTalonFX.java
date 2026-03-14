@@ -71,6 +71,8 @@ public class TurretIOTalonFX implements TurretIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         updateFrequency, position, velocity, appliedVolts, current);
     motor.optimizeBusUtilization();
+
+    motor.setPosition(TurretConstants.turretOffset);
   }
 
   @Override
