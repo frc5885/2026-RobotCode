@@ -95,7 +95,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private TrapezoidProfile.State extensionGoalState =
       new TrapezoidProfile.State(ExtensionConstants.startingAngleRadians, 0.0);
   private TrapezoidProfile.State extensionPrevSetpoint = extensionGoalState;
-  private boolean runExtensionClosedLoop = false;
+  private boolean runExtensionClosedLoop = true;
 
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
