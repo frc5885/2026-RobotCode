@@ -15,8 +15,8 @@ public class HoodConstants {
   // public static final double armOffsetToHorizontalRadians = -0.0042524; // from sysID
   public static final double armLengthMeters = 0.1;
   public static final double armMassKG = 0.05;
-  public static final double maxVelocityRadiansPerSecond = Units.degreesToRadians(90);
-  public static final double maxAccelerationRadiansPerSecondSquared = Units.degreesToRadians(360);
+  public static final double maxVelocityRadiansPerSecond = 1.5;
+  public static final double maxAccelerationRadiansPerSecondSquared = 8.0;
   public static final int canId = 31;
   public static final boolean motorInverted = false;
   public static final int currentLimit = 20;
@@ -28,10 +28,10 @@ public class HoodConstants {
   public static final double ki = 0.0;
   public static final double kd = 0.2;
   // Ran sysID in sim
-  public static final double ks = 0.081786;
+  public static final double ks = 0.20006;
   // public static final double kg = 4.6706;
-  public static final double kv = 4.6706;
-  public static final double ka = 0.20294;
+  public static final double kv = 3.9723;
+  public static final double ka = 0.12179;
   public static final double positionToleranceRadians = Units.degreesToRadians(0.5);
   public static final double velocityToleranceRadiansPerSecond = Units.degreesToRadians(6.0);
 

@@ -135,25 +135,28 @@ public class ShooterSubsystem extends SubsystemBase {
           hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
       hoodPrevSetpoint = setpoint;
 
-      // double ffVoltage = -hoodFF.calculate(setpoint.position, setpoint.velocity);
+      double ffVoltage = hoodFF.calculate(hoodGoalState.position);
       double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
 
       // Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
       Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
       Logger.recordOutput("Shooter/Hood/SetpointPositionRadians", setpoint.position);
-      Logger.recordOutput("Shooter/Hood/SetpointVelocity", setpoint.velocity);
+      Logger.recordOutput("Shooter/Hood/SetpointVelocity", hoodGoalState.velocity);
 
       setHoodVoltage(pidVoltage);
     }
 
     if (runFlywheelClosedLoop) {
-      double ffVoltage = flywheelFF.calculate(flywheelPID.getSetpoint());
-      double pidVoltage = flywheelPID.calculate(flywheelInputs.velocityRPM);
+      // double ffVoltage = flywheelFF.calculate(flywheelPID.getSetpoint());
+      // double pidVoltage = flywheelPID.calculate(flywheelInputs.velocityRPM);
 
-      Logger.recordOutput("Shooter/Flywheel/FFVoltage", ffVoltage);
-      Logger.recordOutput("Shooter/Flywheel/PIDVoltage", pidVoltage);
+      // Logger.recordOutput("Shooter/Flywheel/FFVoltage", ffVoltage);
+      // Logger.recordOutput("Shooter/Flywheel/PIDVoltage", pidVoltage);
 
-      setFlywheelVoltage(ffVoltage + pidVoltage);
+      // setFlywheelVoltage(ffVoltage + pidVoltage);
+      double bb = getFlywheelRPM() < flywheelPID.getSetpoint() ? 12.0 : 0.0;
+      Logger.recordOutput("Shooter/Flywheel/BangBang", bb);
+      flywheelIO.setMotorVelocity(flywheelPID.getSetpoint(), bb);
     }
 
     visualizationUpdate();
@@ -279,8 +282,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private SysIdRoutine hoodSysIdSetup() {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
-            Volts.of(0.25).per(Second),
-            Volts.of(1.0),
+            Volts.of(1.0).per(Second),
+            Volts.of(6.0),
             null,
             (state) -> Logger.recordOutput("Shooter/Hood/SysIDState", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> runHoodOpenLoop(voltage.in(Volts)), null, this));
