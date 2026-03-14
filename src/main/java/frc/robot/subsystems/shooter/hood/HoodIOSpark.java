@@ -10,8 +10,10 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
@@ -22,6 +24,8 @@ public class HoodIOSpark implements HoodIO {
   private final RelativeEncoder encoder;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
   private boolean isEncoderZeroed = false;
+
+  private final double zeroingVoltage = 1.0;
 
   public HoodIOSpark() {
     motor = new SparkMax(HoodConstants.canId, MotorType.kBrushless);
@@ -48,6 +52,12 @@ public class HoodIOSpark implements HoodIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
+    hoodConfig
+        .limitSwitch
+        .forwardLimitSwitchTriggerBehavior(Behavior.kStopMovingMotorAndSetPosition)
+        .forwardLimitSwitchPosition(HoodConstants.startingAngleRadians)
+        .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
+        .reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
     tryUntilOk(
         motor,
         5,
@@ -84,7 +94,11 @@ public class HoodIOSpark implements HoodIO {
 
   /** Sets encoder starting angle */
   private REVLibError zeroEncoder() {
-    return encoder.setPosition(HoodConstants.startingAngleRadians);
+    encoder.setPosition(HoodConstants.startingAngleRadians);
+    if (!motor.getForwardLimitSwitch().isPressed()) {
+      setMotorVoltage(zeroingVoltage);
+    }
+    return REVLibError.kOk;
   }
 
   /**

@@ -12,7 +12,7 @@ public class HoodConstants {
   public static final double maxAngleRadians = Units.degreesToRadians(80);
   public static final double startingAngleRadians = Units.degreesToRadians(80);
   public static final double idleAngleRadians = Units.degreesToRadians(80.0);
-  public static final double armOffsetToHorizontalRadians = -0.0042524; // from sysID
+  // public static final double armOffsetToHorizontalRadians = -0.0042524; // from sysID
   public static final double armLengthMeters = 0.1;
   public static final double armMassKG = 0.05;
   public static final double maxVelocityRadiansPerSecond = Units.degreesToRadians(90);
@@ -24,15 +24,15 @@ public class HoodConstants {
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
-  public static final double kp = 1.0;
+  public static final double kp = 40.0;
   public static final double ki = 0.0;
-  public static final double kd = 0.0;
+  public static final double kd = 0.2;
   // Ran sysID in sim
-  public static final double ks = 0.00010268;
-  public static final double kg = 0.030181 / (30.0 * 1.5);
-  public static final double kv = 0.10265 * (30.0 * 1.5);
-  public static final double ka = 5.2044e-05 * Math.pow((30.0 * 1.5), 2.0);
-  public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
+  public static final double ks = 0.081786;
+  // public static final double kg = 4.6706;
+  public static final double kv = 4.6706;
+  public static final double ka = 0.20294;
+  public static final double positionToleranceRadians = Units.degreesToRadians(0.5);
   public static final double velocityToleranceRadiansPerSecond = Units.degreesToRadians(6.0);
 
   public static final double extraDuckDistance = Units.inchesToMeters(12.0);
