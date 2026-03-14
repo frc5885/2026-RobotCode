@@ -40,7 +40,10 @@ public class ShootIfReadyCommand extends Command {
             && LaunchCalculator.getInstance().getParameters().isValid();
     Logger.recordOutput("ShootIfReadyCommand/IsReadyToShoot", isReadyToShoot);
 
-    if (isReadyToShoot || DriverStation.isTest()) {
+    boolean isReadyTestMode =
+        DriverStation.isTest() && ShooterSubsystem.getInstance().isFlywheelAtSetpoint();
+
+    if (isReadyToShoot || isReadyTestMode) {
       hopperSubsystem.setKickerVoltage(kickerVoltage);
       hopperSubsystem.setSpindexerVoltage(spindexerVoltage);
 
