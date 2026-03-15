@@ -11,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -86,7 +85,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final SimpleMotorFeedforward flywheelFF =
       new SimpleMotorFeedforward(FlywheelConstants.ks, FlywheelConstants.kv, FlywheelConstants.ka);
   private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.25);
-  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2, DebounceType.kBoth);
+  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2);
 
   private TrapezoidProfile hoodProfile =
       new TrapezoidProfile(
