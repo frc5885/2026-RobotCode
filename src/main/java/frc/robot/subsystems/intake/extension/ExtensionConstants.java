@@ -43,6 +43,8 @@ public class ExtensionConstants {
 
   public static final double intakeStowedAngle = Units.degreesToRadians(116.0);
   public static final double intakeExtendedAngle = Units.degreesToRadians(12.0);
+  public static final double agitateTopAngle = 0.82;
+  public static final double agitateBottomAngle = 0.19;
 
   public static final double intakeExtensionLengthMeters = Units.inchesToMeters(12.0);
 }

@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -28,9 +30,11 @@ import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
+import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -70,10 +74,10 @@ public class RobotContainer {
 
     // Set up SysId routines
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
-    // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -100,24 +104,33 @@ public class RobotContainer {
         .povLeft()
         .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
-    controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
+    controller
+        .leftTrigger(0.1)
+        .whileTrue(new IntakeCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     controller.leftBumper().onTrue(new RetractIntakeCommand());
+    controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
 
     // controller
     //     .a()
     //     .whileTrue(
     //         new StartEndCommand(
-    //             () -> TurretSubsystem.getInstance().runOpenLoop(12.0),
-    //             () -> TurretSubsystem.getInstance().runOpenLoop(0),
-    //             TurretSubsystem.getInstance()));
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(12.0),
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
+    //             IntakeSubsystem.getInstance()));
 
     // controller
     //     .b()
     //     .whileTrue(
     //         new StartEndCommand(
-    //             () -> TurretSubsystem.getInstance().runOpenLoop(-12.0),
-    //             () -> TurretSubsystem.getInstance().runOpenLoop(0),
-    //             TurretSubsystem.getInstance()));
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
+    //             IntakeSubsystem.getInstance()));
+    controller
+        .back()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    DriveSubsystem.getInstance().setPose(new Pose2d(3.0, 4.0, Rotation2d.kZero))));
     // Operator Switches
     // operatorPanel
     //     .getBrakeModeSwitch()
