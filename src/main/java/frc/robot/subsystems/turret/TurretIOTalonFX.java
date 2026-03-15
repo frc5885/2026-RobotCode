@@ -101,8 +101,7 @@ public class TurretIOTalonFX implements TurretIO {
                 Rotations.of(
                     TurretConstants.absoluteEncoder2OffsetRotations)) // set after mechanical zero
             .withMechanismRange(
-                Radians.of(-Math.PI),
-                Radians.of(Math.PI)) // assume we aren't starting in the ~10 degree overlap
+                Radians.of(TurretConstants.minAngle), Radians.of(TurretConstants.maxAngle))
             .withMatchTolerance(Degrees.of(5.0)) // had it smaller but it was unreliable
             .withAbsoluteEncoderInversions(false, false);
 
