@@ -49,7 +49,7 @@ public class ShootIfReadyCommand extends Command {
 
     boolean isReadyTestMode =
         DriverStation.isTest()
-            // && ShooterSubsystem.getInstance().isHoodAtGoal()
+            && ShooterSubsystem.getInstance().isHoodAtGoal()
             && hasFlywheelSpunUp;
 
     if (isReadyToShoot || isReadyTestMode) {

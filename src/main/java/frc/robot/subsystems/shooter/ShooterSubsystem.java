@@ -131,16 +131,18 @@ public class ShooterSubsystem extends SubsystemBase {
 
     if (runHoodClosedLoop) {
       TrapezoidProfile.State current = getHoodCurrentState();
-      TrapezoidProfile.State setpoint =
-          hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
-      hoodPrevSetpoint = setpoint;
+      // TrapezoidProfile.State setpoint =
+      //     hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
+      // hoodPrevSetpoint = setpoint;
 
-      double ffVoltage = hoodFF.calculate(setpoint.velocity);
-      double pidVoltage = hoodPID.calculate(current.position, setpoint.position);
+      // Profiled PID was bad, now only using regular PID to goal state and FF only for velocity
+      // target from LaunchCalculator
+      double ffVoltage = hoodFF.calculate(hoodGoalState.velocity);
+      double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
 
       Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
       Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
-      Logger.recordOutput("Shooter/Hood/SetpointPositionRadians", setpoint.position);
+      Logger.recordOutput("Shooter/Hood/SetpointPositionRadians", hoodGoalState.position);
       Logger.recordOutput("Shooter/Hood/SetpointVelocity", hoodGoalState.velocity);
 
       setHoodVoltage(ffVoltage + pidVoltage);

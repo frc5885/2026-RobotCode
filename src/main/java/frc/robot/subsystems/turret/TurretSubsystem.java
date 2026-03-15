@@ -94,6 +94,8 @@ public class TurretSubsystem extends SubsystemBase {
     turretIO = io;
     sysId = sysIdSetup();
 
+    pidController.setTolerance(TurretConstants.turretPositionToleranceRadians);
+
     AutoLogOutputManager.addObject(this);
   }
 
@@ -175,7 +177,12 @@ public class TurretSubsystem extends SubsystemBase {
                   inputs.positionRadians, setpoint.position - TurretConstants.turretOffset);
           Logger.recordOutput("Turret/FFVoltage", ffVoltage);
           Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
-          turretIO.setMotorVoltage(pidVoltage + ffVoltage);
+          // To avoid chattering
+          if (Math.abs(pidVoltage + ffVoltage) < 0.25) {
+            turretIO.setMotorVoltage(0.0);
+          } else {
+            turretIO.setMotorVoltage(pidVoltage + ffVoltage);
+          }
         }
         case ROBOT_RELATIVE -> {
           double pidVoltage =
