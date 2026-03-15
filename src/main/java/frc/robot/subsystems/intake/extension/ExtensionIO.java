@@ -15,6 +15,7 @@ public interface ExtensionIO {
     public boolean leftMotorConnected = false;
     public boolean rightMotorConnected = false;
     public double positionRadians = 0.0;
+    public double absolutePositionRadians = 0.0;
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = {0.0, 0.0};

@@ -32,6 +32,7 @@ public class ExtensionIOSim implements ExtensionIO {
   public void updateInputs(ExtensionIOInputs inputs) {
     extensionSim.update(Constants.dtSeconds);
     inputs.positionRadians = extensionSim.getAngleRads();
+    inputs.absolutePositionRadians = extensionSim.getAngleRads();
     inputs.velocityRadiansPerSecond = extensionSim.getVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
     double currentPerMotor = extensionSim.getCurrentDrawAmps() / 2.0;

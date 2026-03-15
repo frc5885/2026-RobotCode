@@ -12,7 +12,8 @@ public class ExtensionConstants {
   public static final double maxAngleRadians = Units.degreesToRadians(117.17);
   public static final double startingAngleRadians =
       Units.degreesToRadians(
-          117.17); // 90 dgerees is defined as the forward linkage perpendicular to chassis
+          117.17); // 90 degrees is defined as the forward linkage perpendicular to chassis
+  public static final double absoluteEncoderOffset = 4.536 - 2.045;
   public static final double armLengthMeters = 0.2;
   public static final double armMassKG = 0.1;
   public static final int leftCanId = 40;

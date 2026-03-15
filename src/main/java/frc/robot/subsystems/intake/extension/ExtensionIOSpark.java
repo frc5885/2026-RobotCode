@@ -10,18 +10,21 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.util.Units;
 import java.util.function.DoubleSupplier;
 
 public class ExtensionIOSpark implements ExtensionIO {
   private final SparkMax leftMotor;
   private final SparkMax rightMotor;
   private final RelativeEncoder encoder;
+  private final SparkAbsoluteEncoder absoluteEncoder;
   private final Debouncer leftMotorConnectedDebounce = new Debouncer(0.5);
   private final Debouncer rightMotorConnectedDebounce = new Debouncer(0.5);
   private boolean isEncoderZeroed = false;
@@ -30,6 +33,7 @@ public class ExtensionIOSpark implements ExtensionIO {
     leftMotor = new SparkMax(ExtensionConstants.leftCanId, MotorType.kBrushless);
     rightMotor = new SparkMax(ExtensionConstants.rightCanId, MotorType.kBrushless);
     encoder = leftMotor.getEncoder();
+    absoluteEncoder = leftMotor.getAbsoluteEncoder();
 
     SparkMaxConfig leftMotorConfig = new SparkMaxConfig();
     leftMotorConfig
@@ -43,6 +47,10 @@ public class ExtensionIOSpark implements ExtensionIO {
         .uvwAverageDepth(2)
         .positionConversionFactor(ExtensionConstants.positionConversionFactor)
         .velocityConversionFactor(ExtensionConstants.velocityConversionFactor);
+    leftMotorConfig
+        .absoluteEncoder
+        .positionConversionFactor(Units.rotationsToRadians(1.0))
+        .velocityConversionFactor(Units.rotationsPerMinuteToRadiansPerSecond(1.0));
     leftMotorConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
@@ -76,6 +84,11 @@ public class ExtensionIOSpark implements ExtensionIO {
     // Left motor
     sparkStickyFault = false;
     ifOk(leftMotor, encoder::getPosition, (value) -> inputs.positionRadians = value);
+    ifOk(
+        leftMotor,
+        absoluteEncoder::getPosition,
+        (value) ->
+            inputs.absolutePositionRadians = value - ExtensionConstants.absoluteEncoderOffset);
     ifOk(leftMotor, encoder::getVelocity, (value) -> inputs.velocityRadiansPerSecond = value);
     ifOk(
         leftMotor,
@@ -92,7 +105,7 @@ public class ExtensionIOSpark implements ExtensionIO {
     inputs.currentAmps = currents;
 
     if (!isEncoderZeroed && inputs.leftMotorConnected) {
-      if (zeroEncoder() == REVLibError.kOk) {
+      if (zeroEncoder(inputs.absolutePositionRadians) == REVLibError.kOk) {
         isEncoderZeroed = true;
         System.out.println("Intake extension encoder zeroed");
       }
@@ -106,8 +119,8 @@ public class ExtensionIOSpark implements ExtensionIO {
   }
 
   /** Sets encoder starting angle */
-  private REVLibError zeroEncoder() {
-    return encoder.setPosition(ExtensionConstants.startingAngleRadians);
+  private REVLibError zeroEncoder(double absolutePosition) {
+    return encoder.setPosition(absolutePosition);
   }
 
   /**

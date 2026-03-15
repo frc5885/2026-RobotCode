@@ -149,7 +149,6 @@ public class TurretIOTalonFX implements TurretIO {
     Logger.recordOutput("Turret/CRTStatus", crt.getLastStatus().name());
 
     if (absolutePosition.isPresent()) {
-
       PhoenixUtil.tryUntilOk(5, () -> motor.setPosition(absolutePosition.get().in(Rotations)));
       isEncoderZeroed = true;
       Logger.recordOutput("Turret/EncoderZeroed", true);
