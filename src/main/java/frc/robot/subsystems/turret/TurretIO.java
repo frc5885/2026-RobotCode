@@ -18,6 +18,11 @@ public interface TurretIO {
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
+
+    public boolean absoluteEncoder1Connected = false;
+    public boolean absoluteEncoder2Connected = false;
+    public double absoluteEncoder1PositionRotations = 0.0;
+    public double absoluteEncoder2PositionRotations = 0.0;
   }
 
   /** Updates the set of loggable inputs. */

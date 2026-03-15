@@ -46,4 +46,14 @@ public class TurretConstants {
 
   public static final double turretPositionToleranceRadians = Units.degreesToRadians(3.0);
   public static final double turretVelocityToleranceRadiansPerSecond = Units.degreesToRadians(5.0);
+
+  public static final int absoluteEncoder1Port = 1;
+  public static final int absoluteEncoder2Port = 2;
+  public static final int absoluteEncoder1Teeth = 21;
+  public static final int absoluteEncoder2Teeth = 22;
+  public static final int bigGearTeeth = 145;
+
+  // keep the negative sign
+  public static final double absoluteEncoder1OffsetRotations = -0.6196;
+  public static final double absoluteEncoder2OffsetRotations = -0.1502;
 }

@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.turret;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -23,11 +25,21 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.util.PhoenixUtil;
+import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
+import yams.units.EasyCRT;
+import yams.units.EasyCRTConfig;
 
 public class TurretIOTalonFX implements TurretIO {
   private final TalonFX motor;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
+
+  private final DutyCycleEncoder absoluteEncoder1;
+  private final DutyCycleEncoder absoluteEncoder2;
+  private boolean isEncoderZeroed = false;
+  private final EasyCRT crt;
 
   private final TalonFXConfiguration turretConfig;
 
@@ -72,7 +84,31 @@ public class TurretIOTalonFX implements TurretIO {
         updateFrequency, position, velocity, appliedVolts, current);
     motor.optimizeBusUtilization();
 
-    motor.setPosition(TurretConstants.turretOffset);
+    absoluteEncoder1 = new DutyCycleEncoder(TurretConstants.absoluteEncoder1Port);
+    absoluteEncoder2 = new DutyCycleEncoder(TurretConstants.absoluteEncoder2Port);
+
+    EasyCRTConfig easyCrtConfig =
+        new EasyCRTConfig(
+                () -> Rotations.of(absoluteEncoder1.get()),
+                () -> Rotations.of(absoluteEncoder2.get()))
+            .withCommonDriveGear(
+                /* commonRatio (mech:drive) */ 1.0, // we don't care about this
+                /* driveGearTeeth */ TurretConstants.bigGearTeeth,
+                /* encoder1Pinion */ TurretConstants.absoluteEncoder1Teeth,
+                /* encoder2Pinion */ TurretConstants.absoluteEncoder2Teeth)
+            .withAbsoluteEncoderOffsets(
+                Rotations.of(TurretConstants.absoluteEncoder1OffsetRotations),
+                Rotations.of(
+                    TurretConstants.absoluteEncoder2OffsetRotations)) // set after mechanical zero
+            .withMechanismRange(
+                Radians.of(-Math.PI),
+                Radians.of(Math.PI)) // assume we aren't starting in the ~10 degree overlap
+            .withMatchTolerance(Degrees.of(5.0)) // had it smaller but it was unreliable
+            .withAbsoluteEncoderInversions(false, false);
+
+    // Create the solver:
+    crt = new EasyCRT(easyCrtConfig);
+    Logger.recordOutput("Turret/EncoderZeroed", false);
   }
 
   @Override
@@ -84,6 +120,18 @@ public class TurretIOTalonFX implements TurretIO {
     inputs.velocityRadiansPerSecond = velocity.getValue().in(RadiansPerSecond);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = current.getValueAsDouble();
+
+    inputs.absoluteEncoder1Connected = absoluteEncoder1.isConnected();
+    inputs.absoluteEncoder2Connected = absoluteEncoder2.isConnected();
+    inputs.absoluteEncoder1PositionRotations = absoluteEncoder1.get();
+    inputs.absoluteEncoder2PositionRotations = absoluteEncoder2.get();
+
+    if (!isEncoderZeroed
+        && inputs.motorConnected
+        && inputs.absoluteEncoder1Connected
+        && inputs.absoluteEncoder2Connected) {
+      zeroEncoder();
+    }
   }
 
   @Override
@@ -95,5 +143,18 @@ public class TurretIOTalonFX implements TurretIO {
   public void setBrakeMode(boolean brakeModeEnabled) {
     NeutralModeValue mode = brakeModeEnabled ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     PhoenixUtil.tryUntilOk(5, () -> motor.setNeutralMode(mode));
+  }
+
+  private void zeroEncoder() {
+    Optional<Angle> absolutePosition = crt.getAngleOptional();
+    Logger.recordOutput("Turret/CRTStatus", crt.getLastStatus().name());
+
+    if (absolutePosition.isPresent()) {
+
+      PhoenixUtil.tryUntilOk(5, () -> motor.setPosition(absolutePosition.get().in(Rotations)));
+      isEncoderZeroed = true;
+      Logger.recordOutput("Turret/EncoderZeroed", true);
+      System.out.println("Turret zeroed via CRT: " + absolutePosition.get().in(Degrees) + " deg");
+    }
   }
 }
