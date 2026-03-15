@@ -16,8 +16,8 @@ import frc.robot.subsystems.turret.LaunchCalculator.LaunchingParameters;
 public class AimHoodAndSpinFlywheelCommand extends Command {
   private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
 
-  private final double testModeHoodAngle = Units.degreesToRadians(60.0);
-  private final double testFlywheelRPM = 3000.0;
+  private final double testModeHoodAngle = Units.degreesToRadians(70.0);
+  private final double testFlywheelRPM = 2500.0;
   /** Creates a new AimHoodAndSpinFlywheelCommand. */
   public AimHoodAndSpinFlywheelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.

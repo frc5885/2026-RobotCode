@@ -9,6 +9,10 @@ import static frc.robot.util.SparkUtil.*;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -16,11 +20,13 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelIOSpark implements FlywheelIO {
   private final SparkFlex leftMotor;
   private final SparkFlex rightMotor;
   private final RelativeEncoder encoder;
+  private final SparkClosedLoopController controller;
   private final Debouncer leftMotorConnectedDebounce = new Debouncer(0.5);
   private final Debouncer rightMotorConnectedDebounce = new Debouncer(0.5);
 
@@ -28,6 +34,7 @@ public class FlywheelIOSpark implements FlywheelIO {
     leftMotor = new SparkFlex(FlywheelConstants.leftCanId, MotorType.kBrushless);
     rightMotor = new SparkFlex(FlywheelConstants.rightCanId, MotorType.kBrushless);
     encoder = leftMotor.getEncoder();
+    controller = leftMotor.getClosedLoopController();
 
     SparkFlexConfig leftMotorConfig = new SparkFlexConfig();
     leftMotorConfig
@@ -37,8 +44,9 @@ public class FlywheelIOSpark implements FlywheelIO {
         .voltageCompensation(12.0);
     leftMotorConfig
         .encoder
-        .uvwMeasurementPeriod(10)
+        .uvwMeasurementPeriod(8)
         .uvwAverageDepth(2)
+        .quadratureMeasurementPeriod(8)
         .positionConversionFactor(FlywheelConstants.positionConversionFactor)
         .velocityConversionFactor(FlywheelConstants.velocityConversionFactor);
     leftMotorConfig
@@ -50,6 +58,15 @@ public class FlywheelIOSpark implements FlywheelIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
+    leftMotorConfig.closedLoop.feedForward.sva(
+        FlywheelConstants.ks, FlywheelConstants.kv, FlywheelConstants.ka);
+    leftMotorConfig.closedLoop.pid(
+        FlywheelConstants.kp, FlywheelConstants.ki, FlywheelConstants.kd);
+    leftMotorConfig.closedLoop.minOutput(0.0, ClosedLoopSlot.kSlot0); // don't allow negative
+    leftMotorConfig.closedLoop.maxOutput(1.0, ClosedLoopSlot.kSlot0);
+    leftMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+    // output
+    // .allowedClosedLoopError(FlywheelConstants.velocityToleranceRPM, ClosedLoopSlot.kSlot0);
     tryUntilOk(
         leftMotor,
         5,
@@ -94,5 +111,10 @@ public class FlywheelIOSpark implements FlywheelIO {
   @Override
   public void setMotorVoltage(double volts) {
     leftMotor.setVoltage(volts);
+  }
+
+  @Override
+  public void setMotorVelocity(double velocityRPM) {
+    controller.setSetpoint(velocityRPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 }

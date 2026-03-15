@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -84,8 +85,8 @@ public class ShooterSubsystem extends SubsystemBase {
       new PIDController(FlywheelConstants.kp, FlywheelConstants.ki, FlywheelConstants.kd);
   private final SimpleMotorFeedforward flywheelFF =
       new SimpleMotorFeedforward(FlywheelConstants.ks, FlywheelConstants.kv, FlywheelConstants.ka);
-  private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.1);
-  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
+  private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.25);
+  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2, DebounceType.kBoth);
 
   private TrapezoidProfile hoodProfile =
       new TrapezoidProfile(
@@ -147,16 +148,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     if (runFlywheelClosedLoop) {
-      // double ffVoltage = flywheelFF.calculate(flywheelPID.getSetpoint());
-      // double pidVoltage = flywheelPID.calculate(flywheelInputs.velocityRPM);
-
-      // Logger.recordOutput("Shooter/Flywheel/FFVoltage", ffVoltage);
-      // Logger.recordOutput("Shooter/Flywheel/PIDVoltage", pidVoltage);
-
-      // setFlywheelVoltage(ffVoltage + pidVoltage);
-      double bb = getFlywheelRPM() < flywheelPID.getSetpoint() ? 12.0 : 0.0;
-      Logger.recordOutput("Shooter/Flywheel/BangBang", bb);
-      flywheelIO.setMotorVelocity(flywheelPID.getSetpoint(), bb);
+      flywheelIO.setMotorVelocity(flywheelPID.getSetpoint());
     }
 
     visualizationUpdate();
