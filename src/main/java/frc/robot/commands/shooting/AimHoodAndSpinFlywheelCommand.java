@@ -7,17 +7,22 @@ package frc.robot.commands.shooting;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.shooter.hood.HoodConstants;
 import frc.robot.subsystems.turret.LaunchCalculator;
 import frc.robot.subsystems.turret.LaunchCalculator.LaunchingParameters;
+import frc.robot.util.TunableDouble;
+import java.util.function.DoubleSupplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AimHoodAndSpinFlywheelCommand extends Command {
   private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
 
-  private final double testModeHoodAngle = Units.degreesToRadians(70.0);
-  private final double testFlywheelRPM = 2500.0;
+  private final DoubleSupplier testModeHoodAngle =
+      TunableDouble.register("Shooter/HoodAngle", Units.degreesToRadians(70.0));
+  private final DoubleSupplier testFlywheelRPM =
+      TunableDouble.register("Shooter/FlywheelRPM", 2500.0);
   /** Creates a new AimHoodAndSpinFlywheelCommand. */
   public AimHoodAndSpinFlywheelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -38,8 +43,12 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
       shooterSubsystem.setFlywheelVelocity(
           Units.radiansPerSecondToRotationsPerMinute(launchingParameters.flywheelSpeed()));
     } else {
-      shooterSubsystem.setHoodGoal(testModeHoodAngle, 0.0);
-      shooterSubsystem.setFlywheelVelocity(testFlywheelRPM);
+      if (Constants.isTuningEnabled) {
+        // Get these just so we can log them while testing
+        LaunchCalculator.getInstance().getParameters();
+      }
+      shooterSubsystem.setHoodGoal(testModeHoodAngle.getAsDouble(), 0.0);
+      shooterSubsystem.setFlywheelVelocity(testFlywheelRPM.getAsDouble());
     }
   }
 
