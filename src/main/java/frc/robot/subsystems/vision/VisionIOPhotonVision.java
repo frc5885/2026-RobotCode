@@ -127,4 +127,9 @@ public class VisionIOPhotonVision implements VisionIO {
   public String getName() {
     return camera.getName();
   }
+
+  @Override
+  public Transform3d getRobotToCamera() {
+    return robotToCamera;
+  }
 }

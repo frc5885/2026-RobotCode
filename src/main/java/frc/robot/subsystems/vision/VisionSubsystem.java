@@ -14,6 +14,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -211,6 +213,7 @@ public class VisionSubsystem extends SubsystemBase {
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+    logAllCameraVectors();
   }
 
   @FunctionalInterface
@@ -219,5 +222,16 @@ public class VisionSubsystem extends SubsystemBase {
         Pose2d visionRobotPoseMeters,
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
+  }
+
+  private void logAllCameraVectors() {
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      Pose3d startPose =
+          new Pose3d(DriveSubsystem.getInstance().getPose())
+              .transformBy(io[cameraIndex].getRobotToCamera());
+      Pose3d endPose = startPose.transformBy(new Transform3d(0.5, 0, 0, new Rotation3d()));
+      Logger.recordOutput(
+          "Vision/CameraVectors/" + io[cameraIndex].getName(), new Pose3d[] {startPose, endPose});
+    }
   }
 }

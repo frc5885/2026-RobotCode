@@ -9,6 +9,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
@@ -43,5 +44,9 @@ public interface VisionIO {
 
   public default String getName() {
     return "CAMERA_NAME";
+  }
+
+  public default Transform3d getRobotToCamera() {
+    return new Transform3d();
   }
 }
