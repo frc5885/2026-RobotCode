@@ -86,8 +86,8 @@ public class LaunchCalculator {
     launchHoodAngleMap.put(6.265, Rotation2d.fromDegrees(64.0));
 
     launchFlywheelSpeedMap.put(1.322, Units.rotationsPerMinuteToRadiansPerSecond(1800));
-    launchFlywheelSpeedMap.put(1.712, Units.rotationsPerMinuteToRadiansPerSecond(2000));
-    launchFlywheelSpeedMap.put(2.015, Units.rotationsPerMinuteToRadiansPerSecond(2000));
+    launchFlywheelSpeedMap.put(1.712, Units.rotationsPerMinuteToRadiansPerSecond(2056));
+    launchFlywheelSpeedMap.put(2.015, Units.rotationsPerMinuteToRadiansPerSecond(2056));
     launchFlywheelSpeedMap.put(2.686, Units.rotationsPerMinuteToRadiansPerSecond(2100));
     launchFlywheelSpeedMap.put(3.479, Units.rotationsPerMinuteToRadiansPerSecond(2200));
     launchFlywheelSpeedMap.put(3.896, Units.rotationsPerMinuteToRadiansPerSecond(2350));

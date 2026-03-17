@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -104,9 +103,7 @@ public class RobotContainer {
         .povLeft()
         .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
-    controller
-        .leftTrigger(0.1)
-        .whileTrue(new IntakeCommand());
+    controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
     controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
 
