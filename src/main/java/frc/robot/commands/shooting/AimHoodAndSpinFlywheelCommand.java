@@ -20,7 +20,7 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
   private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
 
   private final DoubleSupplier testModeHoodAngle =
-      TunableDouble.register("Shooter/HoodAngle", Units.degreesToRadians(70.0));
+      TunableDouble.register("Shooter/HoodAngleDegrees", 70.0);
   private final DoubleSupplier testFlywheelRPM =
       TunableDouble.register("Shooter/FlywheelRPM", 2500.0);
   /** Creates a new AimHoodAndSpinFlywheelCommand. */
@@ -47,7 +47,7 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
         // Get these just so we can log them while testing
         LaunchCalculator.getInstance().getParameters();
       }
-      shooterSubsystem.setHoodGoal(testModeHoodAngle.getAsDouble(), 0.0);
+      shooterSubsystem.setHoodGoal(Units.degreesToRadians(testModeHoodAngle.getAsDouble()), 0.0);
       shooterSubsystem.setFlywheelVelocity(testFlywheelRPM.getAsDouble());
     }
   }

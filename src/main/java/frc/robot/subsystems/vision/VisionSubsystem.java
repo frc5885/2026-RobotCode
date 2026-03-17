@@ -37,16 +37,18 @@ public class VisionSubsystem extends SubsystemBase {
           // Real robot, instantiate hardware IO implementations
           INSTANCE =
               new VisionSubsystem(
-                  new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                  new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                  new VisionIOPhotonVision(camera0Name, robotToCamera0)
+                  // new VisionIOPhotonVision(camera1Name, robotToCamera1)
+                  );
           break;
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
           INSTANCE =
               new VisionSubsystem(
-                  new VisionIOPhotonVisionSim(camera0Name, robotToCamera0),
-                  new VisionIOPhotonVisionSim(camera1Name, robotToCamera1));
+                  new VisionIOPhotonVisionSim(camera0Name, robotToCamera0)
+                  // new VisionIOPhotonVisionSim(camera1Name, robotToCamera1)
+                  );
           break;
 
         default:

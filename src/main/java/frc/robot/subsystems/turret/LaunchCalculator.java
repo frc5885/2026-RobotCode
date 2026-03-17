@@ -98,11 +98,12 @@ public class LaunchCalculator {
     launchFlywheelSpeedMap.put(5.886, Units.rotationsPerMinuteToRadiansPerSecond(2650));
     launchFlywheelSpeedMap.put(6.265, Units.rotationsPerMinuteToRadiansPerSecond(2800));
 
-    timeOfFlightMap.put(5.68, 1.16);
-    timeOfFlightMap.put(4.55, 1.12);
-    timeOfFlightMap.put(3.15, 1.11);
-    timeOfFlightMap.put(1.88, 1.09);
-    timeOfFlightMap.put(1.38, 0.90);
+    timeOfFlightMap.put(1.544, 1.042);
+    timeOfFlightMap.put(2.468, 1.096);
+    timeOfFlightMap.put(3.542, 1.143);
+    timeOfFlightMap.put(4.390, 1.233);
+    timeOfFlightMap.put(5.196, 1.292);
+    timeOfFlightMap.put(6.177, 1.439);
   }
 
   public LaunchingParameters getParameters() {

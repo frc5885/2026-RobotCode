@@ -73,7 +73,7 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
@@ -106,7 +106,7 @@ public class RobotContainer {
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
     controller
         .leftTrigger(0.1)
-        .whileTrue(new IntakeCommand().withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        .whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
     controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
 
