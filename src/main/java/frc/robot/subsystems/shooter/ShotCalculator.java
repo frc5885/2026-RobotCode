@@ -177,17 +177,17 @@ public class ShotCalculator {
     // performs trilinear interpolation to calculate the turret angle
     double turretAngle =
         trilinearInterpolation(
-            c000.turretAngle,
-            c100.turretAngle,
-            c010.turretAngle,
-            c110.turretAngle,
-            c001.turretAngle,
-            c101.turretAngle,
-            c011.turretAngle,
-            c111.turretAngle,
-            distanceWeight,
-            angleWeight,
-            velocityWeight)
+                c000.turretAngle,
+                c100.turretAngle,
+                c010.turretAngle,
+                c110.turretAngle,
+                c001.turretAngle,
+                c101.turretAngle,
+                c011.turretAngle,
+                c111.turretAngle,
+                distanceWeight,
+                angleWeight,
+                velocityWeight)
             + toDegrees(HUBangle);
 
     // performs trilinear interpolation to calculate the hood angle
@@ -222,20 +222,23 @@ public class ShotCalculator {
 
     // isValid, turretAngle (field-relative), hoodAngle (above horizontal), ballExitVelocity (m/s)
     return new ShotParameters(
-        true, Rotation2d.fromDegrees(turretAngle), Rotation2d.fromDegrees(launchAngle), fuelVelocity);
+        true,
+        Rotation2d.fromDegrees(turretAngle),
+        Rotation2d.fromDegrees(launchAngle),
+        fuelVelocity);
   }
 
   public static Command launchSimulatedFuel() {
     // Get the drive simulation
     SwerveDriveSimulation driveSimulation = DriveSubsystem.getInstance().getSwerveDriveSimulation();
 
-    // Get the robot pose and field-relative speeds
-    Pose2d robotPose = driveSimulation.getSimulatedDriveTrainPose();
-    ChassisSpeeds fieldRelativeSpeeds =
-        driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
-
     return Commands.runOnce(
         () -> {
+          // Get the robot pose and field-relative speeds at execution time
+          Pose2d robotPose = driveSimulation.getSimulatedDriveTrainPose();
+          ChassisSpeeds fieldRelativeSpeeds =
+              driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
+
           // Calculate the shot parameters
           ShotParameters shotParameters = calculateShotParameters(robotPose, fieldRelativeSpeeds);
 

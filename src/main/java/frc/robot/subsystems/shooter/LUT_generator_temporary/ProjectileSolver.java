@@ -422,7 +422,7 @@ public class ProjectileSolver {
     if (fuelVelocityData.error > 0.1) {
       return null;
     }
- 
+
     // gets component vectors for fuel velocity
     double fuelVelocityForwardComponent = fuelVelocityData.velocity * cos(launchAngleRadians);
     double fuelVelocityVerticalComponent = fuelVelocityData.velocity * sin(launchAngleRadians);
@@ -433,7 +433,8 @@ public class ProjectileSolver {
 
     // calculates the new ideal launch angle
     double launchAngle =
-        atan2(fuelVelocityVerticalComponent,
+        atan2(
+            fuelVelocityVerticalComponent,
             hypot(fuelVelocityForwardComponent, fuelVelocityLateralComponent));
 
     // calculates the velocity of the ball
