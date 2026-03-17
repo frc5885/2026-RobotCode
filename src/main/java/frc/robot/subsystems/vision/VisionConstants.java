@@ -20,15 +20,37 @@ public class VisionConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String camera0Name = "kowalski";
-  //   public static String camera1Name = "private";
+  public static String camera1Name = "private";
+  public static String camera2Name = "skipper";
+  public static String camera3Name = "rico";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =
       new Transform3d(
-          -0.0104, -0.0174, 0.635, new Rotation3d(0.0, -Units.degreesToRadians(20.0), 0.0));
-  //   public static Transform3d robotToCamera1 =
-  //       new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+          -0.19021425,
+          -0.08601456,
+          0.514521196,
+          new Rotation3d(0.0, -Units.degreesToRadians(20.0), 0.0));
+
+  public static Transform3d robotToCamera1 =
+      new Transform3d(
+          -0.325795386,
+          -0.291894514,
+          0.423041826,
+          new Rotation3d(0.0, 0.0, Units.degreesToRadians(170.0)));
+
+  public static Transform3d robotToCamera2 =
+      new Transform3d(
+          -0.291822124,
+          -0.325782686,
+          0.423041826,
+          new Rotation3d(0.0, 0.0, Units.degreesToRadians(280.0)));
+
+  // Should be -X (small-ish number), +Y (large-ish number), +Z (large-ish number)
+  // Rotation is facing straight out the left side of the robot
+  public static Transform3d robotToCamera3 =
+      new Transform3d(-0.0, 0.0, 0.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -44,6 +66,8 @@ public class VisionConstants {
   public static double[] cameraStdDevFactors =
       new double[] {
         1.0, // Camera 0
-        1.0 // Camera 1
+        1.0, // Camera 1
+        1.0, // Camera 2
+        1.0 // Camera 3
       };
 }

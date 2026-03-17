@@ -37,24 +37,28 @@ public class VisionSubsystem extends SubsystemBase {
           // Real robot, instantiate hardware IO implementations
           INSTANCE =
               new VisionSubsystem(
-                  new VisionIOPhotonVision(camera0Name, robotToCamera0)
-                  // new VisionIOPhotonVision(camera1Name, robotToCamera1)
-                  );
+                  new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                  new VisionIOPhotonVision(camera1Name, robotToCamera1),
+                  new VisionIOPhotonVision(camera2Name, robotToCamera2),
+                  new VisionIOPhotonVision(camera3Name, robotToCamera3));
           break;
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
           INSTANCE =
               new VisionSubsystem(
-                  new VisionIOPhotonVisionSim(camera0Name, robotToCamera0)
-                  // new VisionIOPhotonVisionSim(camera1Name, robotToCamera1)
-                  );
+                  new VisionIOPhotonVisionSim(camera0Name, robotToCamera0),
+                  new VisionIOPhotonVisionSim(camera1Name, robotToCamera1),
+                  new VisionIOPhotonVisionSim(camera2Name, robotToCamera2),
+                  new VisionIOPhotonVisionSim(camera3Name, robotToCamera3));
           break;
 
         default:
           // Replayed robot, disable IO implementations
           // (Use same number of dummy implementations as the real robot)
-          INSTANCE = new VisionSubsystem(new VisionIO() {}, new VisionIO() {});
+          INSTANCE =
+              new VisionSubsystem(
+                  new VisionIO() {}, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
           break;
       }
     }
@@ -82,7 +86,8 @@ public class VisionSubsystem extends SubsystemBase {
     for (int i = 0; i < inputs.length; i++) {
       disconnectedAlerts[i] =
           new Alert(
-              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+              "Vision camera " + io[i].getName() + " (index " + i + ") is disconnected.",
+              AlertType.kError);
     }
 
     AutoLogOutputManager.addObject(this);
