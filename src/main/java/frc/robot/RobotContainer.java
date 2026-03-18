@@ -104,7 +104,9 @@ public class RobotContainer {
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
+
     controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
+    controller.b().whileTrue(new OuttakeCommand());
 
     // controller
     //     .a()
@@ -121,13 +123,7 @@ public class RobotContainer {
     //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
     //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
     //             IntakeSubsystem.getInstance()));
-    // controller
-    //     .back()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () ->
-    //                 DriveSubsystem.getInstance().setPose(new Pose2d(3.0, 4.0,
-    // Rotation2d.kZero))));
+
     // Operator Switches
     // operatorPanel
     //     .getBrakeModeSwitch()
@@ -135,9 +131,6 @@ public class RobotContainer {
         .start()
         .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
         .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
-
-    // temp
-    controller.back().whileTrue(new OuttakeCommand());
   }
 
   /**

@@ -27,10 +27,6 @@ public class OuttakeCommand extends Command {
   @Override
   public void initialize() {
     intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
-    // idc bout sim
-    // if (Constants.isSim()) {
-    //   intakeSubsystem.getIntakeSimulation().startIntake();;
-    // }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
