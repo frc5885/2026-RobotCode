@@ -17,6 +17,7 @@ import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.turret.LaunchCalculator;
+import frc.robot.util.HubShiftUtil;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -116,6 +117,9 @@ public class Robot extends LoggedRobot {
 
     // Clear launch parameters
     LaunchCalculator.getInstance().clearLaunchingParameters();
+
+    // Log hub state
+    HubShiftUtil.updateDashboardOutputs();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -140,6 +144,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
+    HubShiftUtil.initialize();
   }
 
   /** This function is called periodically during autonomous. */
@@ -156,6 +161,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    HubShiftUtil.initialize();
   }
 
   /** This function is called periodically during operator control. */

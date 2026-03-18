@@ -15,6 +15,7 @@ public interface ExtensionIO {
     public boolean leftMotorConnected = false;
     public boolean rightMotorConnected = false;
     public double positionRadians = 0.0;
+    public double absolutePositionRadians = 0.0;
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = {0.0, 0.0};
@@ -25,4 +26,11 @@ public interface ExtensionIO {
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public default void setBrakeMode(boolean brakeModeEnabled) {}
 }

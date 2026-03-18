@@ -34,4 +34,6 @@ public final class Constants {
   public static boolean isSim() {
     return currentMode == Mode.SIM;
   }
+
+  public static final boolean isTuningEnabled = true;
 }

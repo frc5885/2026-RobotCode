@@ -14,6 +14,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -38,7 +40,9 @@ public class VisionSubsystem extends SubsystemBase {
           INSTANCE =
               new VisionSubsystem(
                   new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                  new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                  new VisionIOPhotonVision(camera1Name, robotToCamera1),
+                  new VisionIOPhotonVision(camera2Name, robotToCamera2),
+                  new VisionIOPhotonVision(camera3Name, robotToCamera3));
           break;
 
         case SIM:
@@ -46,13 +50,17 @@ public class VisionSubsystem extends SubsystemBase {
           INSTANCE =
               new VisionSubsystem(
                   new VisionIOPhotonVisionSim(camera0Name, robotToCamera0),
-                  new VisionIOPhotonVisionSim(camera1Name, robotToCamera1));
+                  new VisionIOPhotonVisionSim(camera1Name, robotToCamera1),
+                  new VisionIOPhotonVisionSim(camera2Name, robotToCamera2),
+                  new VisionIOPhotonVisionSim(camera3Name, robotToCamera3));
           break;
 
         default:
           // Replayed robot, disable IO implementations
           // (Use same number of dummy implementations as the real robot)
-          INSTANCE = new VisionSubsystem(new VisionIO() {}, new VisionIO() {});
+          INSTANCE =
+              new VisionSubsystem(
+                  new VisionIO() {}, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
           break;
       }
     }
@@ -80,7 +88,8 @@ public class VisionSubsystem extends SubsystemBase {
     for (int i = 0; i < inputs.length; i++) {
       disconnectedAlerts[i] =
           new Alert(
-              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+              "Vision camera " + io[i].getName() + " (index " + i + ") is disconnected.",
+              AlertType.kError);
     }
 
     AutoLogOutputManager.addObject(this);
@@ -204,6 +213,7 @@ public class VisionSubsystem extends SubsystemBase {
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+    logAllCameraVectors();
   }
 
   @FunctionalInterface
@@ -212,5 +222,16 @@ public class VisionSubsystem extends SubsystemBase {
         Pose2d visionRobotPoseMeters,
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
+  }
+
+  private void logAllCameraVectors() {
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      Pose3d startPose =
+          new Pose3d(DriveSubsystem.getInstance().getPose())
+              .transformBy(io[cameraIndex].getRobotToCamera());
+      Pose3d endPose = startPose.transformBy(new Transform3d(0.5, 0, 0, new Rotation3d()));
+      Logger.recordOutput(
+          "Vision/CameraVectors/" + io[cameraIndex].getName(), new Pose3d[] {startPose, endPose});
+    }
   }
 }

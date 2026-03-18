@@ -17,6 +17,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
@@ -67,37 +68,44 @@ public class LaunchCalculator {
       new InterpolatingDoubleTreeMap();
 
   static {
-    minDistance = 1.34;
-    maxDistance = 5.60;
+    minDistance = 1.142;
+    maxDistance = 6.317;
     phaseDelay = 0.03;
 
-    launchHoodAngleMap.put(1.34, Rotation2d.fromDegrees(71.0));
-    launchHoodAngleMap.put(1.78, Rotation2d.fromDegrees(71.0));
-    launchHoodAngleMap.put(2.17, Rotation2d.fromDegrees(66.0));
-    launchHoodAngleMap.put(2.81, Rotation2d.fromDegrees(63.0));
-    launchHoodAngleMap.put(3.82, Rotation2d.fromDegrees(61.0));
-    launchHoodAngleMap.put(4.09, Rotation2d.fromDegrees(60.0));
-    launchHoodAngleMap.put(4.40, Rotation2d.fromDegrees(59.0));
-    launchHoodAngleMap.put(4.77, Rotation2d.fromDegrees(58.0));
-    launchHoodAngleMap.put(5.57, Rotation2d.fromDegrees(58.0));
-    launchHoodAngleMap.put(5.60, Rotation2d.fromDegrees(55.0));
+    launchHoodAngleMap.put(1.142, Rotation2d.fromDegrees(80.0));
+    launchHoodAngleMap.put(1.532, Rotation2d.fromDegrees(80.0));
+    launchHoodAngleMap.put(1.835, Rotation2d.fromDegrees(78.0));
+    launchHoodAngleMap.put(2.506, Rotation2d.fromDegrees(75.0));
+    launchHoodAngleMap.put(3.299, Rotation2d.fromDegrees(70.0));
+    launchHoodAngleMap.put(3.716, Rotation2d.fromDegrees(70.0));
+    launchHoodAngleMap.put(4.100, Rotation2d.fromDegrees(68.0));
+    launchHoodAngleMap.put(4.484, Rotation2d.fromDegrees(67.0));
+    launchHoodAngleMap.put(4.906, Rotation2d.fromDegrees(65.0));
+    launchHoodAngleMap.put(5.269, Rotation2d.fromDegrees(65.0));
+    launchHoodAngleMap.put(5.706, Rotation2d.fromDegrees(65.0));
+    launchHoodAngleMap.put(6.085, Rotation2d.fromDegrees(64.0));
+    launchHoodAngleMap.put(6.317, Rotation2d.fromDegrees(62.0));
 
-    launchFlywheelSpeedMap.put(1.34, 210.0);
-    launchFlywheelSpeedMap.put(1.78, 220.0);
-    launchFlywheelSpeedMap.put(2.17, 220.0);
-    launchFlywheelSpeedMap.put(2.81, 230.0);
-    launchFlywheelSpeedMap.put(3.82, 250.0);
-    launchFlywheelSpeedMap.put(4.09, 255.0);
-    launchFlywheelSpeedMap.put(4.40, 260.0);
-    launchFlywheelSpeedMap.put(4.77, 265.0);
-    launchFlywheelSpeedMap.put(5.57, 275.0);
-    launchFlywheelSpeedMap.put(5.60, 290.0);
+    launchFlywheelSpeedMap.put(1.142, Units.rotationsPerMinuteToRadiansPerSecond(1800));
+    launchFlywheelSpeedMap.put(1.532, Units.rotationsPerMinuteToRadiansPerSecond(2056));
+    launchFlywheelSpeedMap.put(1.835, Units.rotationsPerMinuteToRadiansPerSecond(2056));
+    launchFlywheelSpeedMap.put(2.506, Units.rotationsPerMinuteToRadiansPerSecond(2100));
+    launchFlywheelSpeedMap.put(3.299, Units.rotationsPerMinuteToRadiansPerSecond(2200));
+    launchFlywheelSpeedMap.put(3.716, Units.rotationsPerMinuteToRadiansPerSecond(2350));
+    launchFlywheelSpeedMap.put(4.100, Units.rotationsPerMinuteToRadiansPerSecond(2400));
+    launchFlywheelSpeedMap.put(4.484, Units.rotationsPerMinuteToRadiansPerSecond(2400));
+    launchFlywheelSpeedMap.put(4.906, Units.rotationsPerMinuteToRadiansPerSecond(2500));
+    launchFlywheelSpeedMap.put(5.269, Units.rotationsPerMinuteToRadiansPerSecond(2550));
+    launchFlywheelSpeedMap.put(5.706, Units.rotationsPerMinuteToRadiansPerSecond(2650));
+    launchFlywheelSpeedMap.put(6.085, Units.rotationsPerMinuteToRadiansPerSecond(2800));
+    launchFlywheelSpeedMap.put(6.317, Units.rotationsPerMinuteToRadiansPerSecond(2800));
 
-    timeOfFlightMap.put(5.68, 1.16);
-    timeOfFlightMap.put(4.55, 1.12);
-    timeOfFlightMap.put(3.15, 1.11);
-    timeOfFlightMap.put(1.88, 1.09);
-    timeOfFlightMap.put(1.38, 0.90);
+    timeOfFlightMap.put(1.364, 1.042);
+    timeOfFlightMap.put(2.288, 1.096);
+    timeOfFlightMap.put(3.362, 1.143);
+    timeOfFlightMap.put(4.210, 1.233);
+    timeOfFlightMap.put(5.016, 1.292);
+    timeOfFlightMap.put(5.997, 1.439);
   }
 
   public LaunchingParameters getParameters() {
@@ -245,5 +253,13 @@ public class LaunchCalculator {
 
   public LaunchMode getLaunchMode() {
     return launchMode;
+  }
+
+  public static double getMinTimeOfFlight() {
+    return 0.0;
+  }
+
+  public static double getMaxTimeOfFlight() {
+    return 1.6;
   }
 }

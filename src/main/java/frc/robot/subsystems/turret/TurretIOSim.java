@@ -20,9 +20,8 @@ public class TurretIOSim implements TurretIO {
   public TurretIOSim() {
     turretSim =
         new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                DCMotor.getNEO(1), TurretConstants.momentOfInertia, TurretConstants.gearRatio),
-            DCMotor.getNEO(1));
+            LinearSystemId.createDCMotorSystem(TurretConstants.kV, TurretConstants.kA),
+            DCMotor.getFalcon500(1));
   }
 
   @Override

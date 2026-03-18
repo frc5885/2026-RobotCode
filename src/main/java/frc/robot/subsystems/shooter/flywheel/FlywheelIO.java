@@ -25,4 +25,6 @@ public interface FlywheelIO {
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
+
+  public default void setMotorVelocity(double velocityRPM) {}
 }

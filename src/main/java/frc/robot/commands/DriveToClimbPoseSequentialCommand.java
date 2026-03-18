@@ -17,21 +17,15 @@ import frc.robot.util.FieldConstants;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class DriveToClimbPoseSequentialCommand extends SequentialCommandGroup {
 
-  Pose2d leftClimbApproachPose = new Pose2d(1.5, 5.5, Rotation2d.fromDegrees(0));
-  // new Pose2d(
-  //     FieldConstants.Tower.centerPoint.getX(),
-  //     FieldConstants.Tower.centerPoint.getY() + 1,
-  //     Rotation2d.fromDegrees(0));
-  Pose2d leftClimbPose =
+  private final Pose2d leftClimbApproachPose = new Pose2d(1.5, 5.5, Rotation2d.fromDegrees(0));
+
+  private final Pose2d leftClimbPose =
       leftClimbApproachPose.transformBy(
           new Transform2d(new Translation2d(0, -0.5), Rotation2d.fromDegrees(0)));
 
-  Pose2d rightClimbApproachPose = new Pose2d(1.0, 2.2, Rotation2d.fromDegrees(0));
-  // new Pose2d(
-  //     FieldConstants.Tower.centerPoint.getX(),
-  //     FieldConstants.Tower.centerPoint.getY() + 1,
-  //     Rotation2d.fromDegrees(0));
-  Pose2d rightClimbPose =
+  private final Pose2d rightClimbApproachPose = new Pose2d(1.0, 2.2, Rotation2d.fromDegrees(0));
+
+  private final Pose2d rightClimbPose =
       rightClimbApproachPose.transformBy(
           new Transform2d(new Translation2d(0, 0.5), Rotation2d.fromDegrees(0)));
 
