@@ -24,8 +24,8 @@ public class AgitateIntakeCommand extends SequentialCommandGroup {
         new MoveIntakeToPositionCommand(ExtensionConstants.agitateBottomAngle).withTimeout(1.0));
   }
 
-  public static Command runRepeatedlyAndSpinRoller() {
-    return new AgitateIntakeCommand().repeatedly().alongWith(spinRollerCommand());
+  public Command runRepeatedlyAndSpinRoller() {
+    return this.repeatedly().alongWith(spinRollerCommand());
   }
 
   private static Command spinRollerCommand() {

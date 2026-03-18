@@ -211,7 +211,7 @@ public class Robot extends LoggedRobot {
     if (Constants.currentMode != Constants.Mode.SIM) return;
 
     boolean addRampCollider = false; // Disable drive over ramp
-    boolean efficiencyMode = false; // Spawn reduced number of balls
+    boolean efficiencyMode = true; // Spawn reduced number of balls
     Arena2026Rebuilt arena = new Arena2026Rebuilt(addRampCollider);
     arena.setEfficiencyMode(efficiencyMode);
     SimulatedArena.overrideInstance(arena);

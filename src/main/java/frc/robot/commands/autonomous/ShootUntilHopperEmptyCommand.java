@@ -23,10 +23,8 @@ public class ShootUntilHopperEmptyCommand extends ParallelDeadlineGroup {
     addCommands(new ShootCommandGroup());
   }
 
-  public static Command ConditionalShootPreload() {
+  public Command conditionalShootPreload() {
     return new ConditionalCommand(
-        new ShootUntilHopperEmptyCommand(),
-        Commands.none(),
-        () -> SmartDashboard.getBoolean("ShootPreload", false));
+        this, Commands.none(), () -> SmartDashboard.getBoolean("ShootPreload", false));
   }
 }

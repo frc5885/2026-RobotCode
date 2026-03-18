@@ -70,7 +70,7 @@ public class RobotContainer {
 
     SmartDashboard.putBoolean("ShootPreload", false);
     NamedCommands.registerCommand(
-        "ConditionalShootPreload", ShootUntilHopperEmptyCommand.ConditionalShootPreload());
+        "ConditionalShootPreload", new ShootUntilHopperEmptyCommand().conditionalShootPreload());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -110,7 +110,7 @@ public class RobotContainer {
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
 
-    controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
+    controller.a().whileTrue(new AgitateIntakeCommand().runRepeatedlyAndSpinRoller());
     controller.b().whileTrue(new OuttakeCommand());
 
     // controller
