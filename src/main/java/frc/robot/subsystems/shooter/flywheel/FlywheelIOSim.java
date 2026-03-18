@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems.shooter.flywheel;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 
@@ -14,15 +18,21 @@ public class FlywheelIOSim implements FlywheelIO {
 
   private double appliedVolts;
   private FlywheelSim flywheelSim;
+  private SimpleMotorFeedforward flywheelFF;
+  private PIDController flywheelPID;
 
   public FlywheelIOSim() {
     flywheelSim =
         new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(
-                DCMotor.getNeoVortex(2),
-                FlywheelConstants.momentOfInertia,
-                FlywheelConstants.gearRatio),
+            // Hacky way to make sim "accurate enough"
+            LinearSystemId.identifyVelocitySystem(
+                FlywheelConstants.kv / Units.rotationsPerMinuteToRadiansPerSecond(1.0),
+                FlywheelConstants.ka / (3 * Units.rotationsPerMinuteToRadiansPerSecond(1.0))),
             DCMotor.getNeoVortex(2));
+    flywheelFF =
+        new SimpleMotorFeedforward(
+            FlywheelConstants.ks, FlywheelConstants.kv, FlywheelConstants.ka);
+    flywheelPID = new PIDController(FlywheelConstants.kp * 12, 0.0, 0.0);
   }
 
   @Override
@@ -41,5 +51,16 @@ public class FlywheelIOSim implements FlywheelIO {
   public void setMotorVoltage(double volts) {
     appliedVolts = volts;
     flywheelSim.setInput(volts);
+  }
+
+  @Override
+  public void setMotorVelocity(double velocityRPM) {
+    appliedVolts =
+        MathUtil.clamp(
+            flywheelFF.calculate(velocityRPM)
+                + flywheelPID.calculate(flywheelSim.getAngularVelocityRPM(), velocityRPM),
+            0.0,
+            12.0);
+    flywheelSim.setInput(appliedVolts);
   }
 }
