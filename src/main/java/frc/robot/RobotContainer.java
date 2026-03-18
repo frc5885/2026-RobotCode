@@ -34,7 +34,6 @@ import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
-import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -72,8 +71,6 @@ public class RobotContainer {
     SmartDashboard.putBoolean("ShootPreload", false);
     NamedCommands.registerCommand(
         "ConditionalShootPreload", ShootUntilHopperEmptyCommand.ConditionalShootPreload());
-
-    Zones.logAllZones();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

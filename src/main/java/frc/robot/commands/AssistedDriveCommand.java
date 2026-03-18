@@ -24,12 +24,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.controllers.ControllerConstants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.util.ControllerUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.GeometryUtil;
 import frc.robot.util.SlewRateLimiter2d;
 import frc.robot.util.Zones;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 
 /** Default drive command to run that drives based on controller input */
 public class AssistedDriveCommand extends Command {
@@ -69,30 +71,37 @@ public class AssistedDriveCommand extends Command {
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
     inTrenchZoneTrigger =
-        Zones.trenchZones
-            .willContain(
-                driveSubsystem::getPose,
-                driveSubsystem::getFieldRelativeChassisSpeeds,
-                Seconds.of(DriveConstants.trenchAlignTimeSeconds))
-            .debounce(0.1)
-            .and(() -> !DriverStation.isTest())
-            .and(controller.leftStick().negate());
+        ControllerUtil.sprintToggle(controller)
+            .negate()
+            .and(
+                Zones.trenchZones
+                    .willContain(
+                        driveSubsystem::getPose,
+                        driveSubsystem::getFieldRelativeChassisSpeeds,
+                        Seconds.of(DriveConstants.trenchAlignTimeSeconds))
+                    .debounce(0.1))
+            .and(() -> !DriverStation.isTest());
 
     inBumpZoneTrigger =
-        Zones.bumpZones
-            .willContain(
-                driveSubsystem::getPose,
-                driveSubsystem::getFieldRelativeChassisSpeeds,
-                Seconds.of(DriveConstants.bumpAlignTimeSeconds))
-            .debounce(0.1)
-            .and(() -> !DriverStation.isTest())
-            .and(controller.leftStick().negate());
+        ControllerUtil.sprintToggle(controller)
+            .negate()
+            .and(
+                Zones.bumpZones
+                    .willContain(
+                        driveSubsystem::getPose,
+                        driveSubsystem::getFieldRelativeChassisSpeeds,
+                        Seconds.of(DriveConstants.bumpAlignTimeSeconds))
+                    .debounce(0.1))
+            .and(() -> !DriverStation.isTest());
 
     inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
     inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
     inTrenchZoneTrigger.or(inBumpZoneTrigger).onFalse(updateDriveMode(DriveMode.NORMAL));
 
     addRequirements(driveSubsystem);
+
+    Zones.logAllZones();
+    AutoLogOutputManager.addObject(this);
   }
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
