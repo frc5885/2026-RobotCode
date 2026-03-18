@@ -11,21 +11,28 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
+import frc.robot.commands.OuttakeCommand;
+import frc.robot.commands.SetBrakeModeCommand;
+import frc.robot.commands.SysIDCommands;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
+import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
+import frc.robot.controllers.OperatorPanel;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -39,6 +46,7 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final OperatorPanel operatorPanel = new OperatorPanel(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -63,9 +71,11 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -80,13 +90,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
-    // DefaultCommands.setDefaultDriveCommand(
-    //     DriveCommands.joystickDrive(
-    //         () -> -controller.getLeftY(),
-    //         () -> -controller.getLeftX(),
-    //         () -> -controller.getRightX()));
-
-    DefaultCommands.setDefaultTurretCommand(TurretCommands.runTrackTargetCommand());
+    DefaultCommands.setDefaultTurretCommand(
+        new ConditionalCommand(
+            TurretCommands.runTrackTargetCommand(),
+            TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.fromDegrees(0.1)),
+            () -> !DriverStation.isTest()));
 
     controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
 
@@ -96,6 +104,33 @@ public class RobotContainer {
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
+
+    controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
+    controller.b().whileTrue(new OuttakeCommand());
+
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         new StartEndCommand(
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(12.0),
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
+    //             IntakeSubsystem.getInstance()));
+
+    // controller
+    //     .b()
+    //     .whileTrue(
+    //         new StartEndCommand(
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
+    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
+    //             IntakeSubsystem.getInstance()));
+
+    // Operator Switches
+    // operatorPanel
+    //     .getBrakeModeSwitch()
+    controller
+        .start()
+        .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
+        .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
   }
 
   /**

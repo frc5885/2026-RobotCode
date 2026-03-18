@@ -8,9 +8,8 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -75,13 +74,18 @@ public class ShooterSubsystem extends SubsystemBase {
   private final FlywheelIOInputsAutoLogged flywheelInputs = new FlywheelIOInputsAutoLogged();
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
   private final SysIdRoutine hoodSysId;
+  private final SysIdRoutine flywheelSysId;
+
   private final PIDController hoodPID =
       new PIDController(HoodConstants.kp, HoodConstants.ki, HoodConstants.kd);
-  private final ArmFeedforward hoodFF =
-      new ArmFeedforward(HoodConstants.ks, HoodConstants.kg, HoodConstants.kv, HoodConstants.ka);
-  private final BangBangController flywheelBangBangController = new BangBangController();
-  private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.1);
-  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
+  private final SimpleMotorFeedforward hoodFF =
+      new SimpleMotorFeedforward(HoodConstants.ks, HoodConstants.kv, HoodConstants.ka);
+  private final PIDController flywheelPID =
+      new PIDController(FlywheelConstants.kp, FlywheelConstants.ki, FlywheelConstants.kd);
+  private final SimpleMotorFeedforward flywheelFF =
+      new SimpleMotorFeedforward(FlywheelConstants.ks, FlywheelConstants.kv, FlywheelConstants.ka);
+  private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.25);
+  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2);
 
   private TrapezoidProfile hoodProfile =
       new TrapezoidProfile(
@@ -91,7 +95,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private TrapezoidProfile.State hoodGoalState =
       new TrapezoidProfile.State(HoodConstants.startingAngleRadians, 0.0);
   private TrapezoidProfile.State hoodPrevSetpoint = hoodGoalState;
-  private boolean runHoodClosedLoop = true;
+  private boolean runHoodClosedLoop = false;
   private boolean runFlywheelClosedLoop = false;
 
   /** Creates a new Shooter. */
@@ -105,10 +109,11 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotorDisconnectedAlert = new Alert("Shooter hood motor disconnected!", AlertType.kError);
 
     hoodSysId = hoodSysIdSetup();
+    flywheelSysId = flywheelSysIdSetup();
 
     hoodPID.setTolerance(HoodConstants.positionToleranceRadians);
-    flywheelBangBangController.setTolerance(FlywheelConstants.velocityToleranceRPM);
-    flywheelBangBangController.setSetpoint(0);
+    flywheelPID.setTolerance(FlywheelConstants.velocityToleranceRPM);
+    flywheelPID.setSetpoint(0);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -126,20 +131,25 @@ public class ShooterSubsystem extends SubsystemBase {
 
     if (runHoodClosedLoop) {
       TrapezoidProfile.State current = getHoodCurrentState();
-      TrapezoidProfile.State setpoint =
-          hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
-      hoodPrevSetpoint = setpoint;
-      Logger.recordOutput("Shooter/Hood/SetpointPosition", setpoint.position);
-      Logger.recordOutput("Shooter/Hood/SetpointVelocity", setpoint.velocity);
+      // TrapezoidProfile.State setpoint =
+      //     hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
+      // hoodPrevSetpoint = setpoint;
 
-      setHoodVoltage(
-          hoodFF.calculate(
-                  setpoint.position + HoodConstants.armOffsetToHorizontalRadians, setpoint.velocity)
-              + hoodPID.calculate(current.position, setpoint.position));
+      // Profiled PID was bad, now only using regular PID to goal state and FF only for velocity
+      // target from LaunchCalculator
+      double ffVoltage = hoodFF.calculate(hoodGoalState.velocity);
+      double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
+
+      Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
+      Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
+      Logger.recordOutput("Shooter/Hood/SetpointPositionRadians", hoodGoalState.position);
+      Logger.recordOutput("Shooter/Hood/SetpointVelocity", hoodGoalState.velocity);
+
+      setHoodVoltage(ffVoltage + pidVoltage);
     }
 
     if (runFlywheelClosedLoop) {
-      setFlywheelVoltage(flywheelBangBangController.calculate(flywheelInputs.velocityRPM) * 12.0);
+      flywheelIO.setMotorVelocity(flywheelPID.getSetpoint());
     }
 
     visualizationUpdate();
@@ -158,8 +168,14 @@ public class ShooterSubsystem extends SubsystemBase {
     setHoodVoltage(volts);
   }
 
+  public void runFlywheelOpenLoop(double volts) {
+    runFlywheelClosedLoop = false;
+    setFlywheelVoltage(volts);
+  }
+
   /**
-   * Sets the hood goal state, consisting of a position and a velocity
+   * Sets the hood goal state, consisting of a position and a velocity. This will not reset the
+   * profile or PID and is fine to call periodically
    *
    * @param positionRadians
    * @param velocityRadiansPerSecond
@@ -177,12 +193,15 @@ public class ShooterSubsystem extends SubsystemBase {
     if (!runHoodClosedLoop) {
       // Reset setpoint to current state when transitioning from open-loop
       hoodPrevSetpoint = getHoodCurrentState();
+      hoodPID.reset();
     }
+    Logger.recordOutput("Shooter/Hood/GoalPositionRadians", positionSetpoint);
     runHoodClosedLoop = true;
   }
 
   /**
-   * Sets the hood goal to the given position with a velocity of 0
+   * Sets the hood goal to the given position with a velocity of 0. This will not reset the profile
+   * or PID and is fine to call periodically
    *
    * @param positionRadians
    */
@@ -191,21 +210,22 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void setFlywheelVelocity(double velocityRPM) {
-    flywheelBangBangController.setSetpoint(velocityRPM);
+    flywheelPID.setSetpoint(velocityRPM);
     runFlywheelClosedLoop = true;
-    // If the setpoint is 0, set the voltage to 0 because the bang bang controller will not
-    // calculate a voltage in periodic if the setpoint is 0
+    // If the setpoint is 0, set the voltage to 0 and switch to open loop
     if (velocityRPM == 0) {
       runFlywheelClosedLoop = false;
       setFlywheelVoltage(0);
     }
-    Logger.recordOutput("Shooter/FlywheelSetpoint", velocityRPM);
+    Logger.recordOutput("Shooter/Flywheel/SetpointRPM", velocityRPM);
   }
 
   /** Returns debounced flywheel at setpoint */
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
-    return flywheelAtSetpointDebouncer.calculate(flywheelBangBangController.atSetpoint());
+    return flywheelAtSetpointDebouncer.calculate(
+        EqualsUtil.epsilonEquals(
+            getFlywheelRPM(), flywheelPID.getSetpoint(), FlywheelConstants.velocityToleranceRPM));
   }
 
   /** Returns debounced hood at goal */
@@ -213,11 +233,12 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean isHoodAtGoal() {
     return hoodAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(
-                getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians)
-            && EqualsUtil.epsilonEquals(
-                getHoodVelocity(),
-                hoodGoalState.velocity,
-                HoodConstants.velocityToleranceRadiansPerSecond));
+            getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians)
+        // && EqualsUtil.epsilonEquals(
+        //     getHoodVelocity(),
+        //     hoodGoalState.velocity,
+        //     HoodConstants.velocityToleranceRadiansPerSecond)
+        );
   }
 
   public double getHoodAngle() {
@@ -254,22 +275,57 @@ public class ShooterSubsystem extends SubsystemBase {
   private SysIdRoutine hoodSysIdSetup() {
     return new SysIdRoutine(
         new SysIdRoutine.Config(
-            Volts.of(0.1).per(Second),
-            Volts.of(0.2),
+            Volts.of(1.0).per(Second),
+            Volts.of(6.0),
             null,
             (state) -> Logger.recordOutput("Shooter/Hood/SysIDState", state.toString())),
         new SysIdRoutine.Mechanism((voltage) -> runHoodOpenLoop(voltage.in(Volts)), null, this));
   }
 
   /** Returns a command to run a quasistatic test in the specified direction. */
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+  public Command hoodSysIdQuasistatic(SysIdRoutine.Direction direction) {
     return run(() -> runHoodOpenLoop(0.0))
         .withTimeout(1.0)
         .andThen(hoodSysId.quasistatic(direction));
   }
 
   /** Returns a command to run a dynamic test in the specified direction. */
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+  public Command hoodSysIdDynamic(SysIdRoutine.Direction direction) {
     return run(() -> runHoodOpenLoop(0.0)).withTimeout(1.0).andThen(hoodSysId.dynamic(direction));
+  }
+
+  private SysIdRoutine flywheelSysIdSetup() {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(1.0).per(Second),
+            Volts.of(6.0),
+            null,
+            (state) -> Logger.recordOutput("Shooter/Flywheel/SysIDState", state.toString())),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> runFlywheelOpenLoop(voltage.in(Volts)), null, this));
+  }
+
+  /** Returns a command to run a quasistatic test in the specified direction. */
+  public Command flywheelSysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return run(() -> runFlywheelOpenLoop(0.0))
+        .withTimeout(1.0)
+        .andThen(flywheelSysId.quasistatic(direction));
+  }
+
+  /** Returns a command to run a dynamic test in the specified direction. */
+  public Command flywheelSysIdDynamic(SysIdRoutine.Direction direction) {
+    return run(() -> runFlywheelOpenLoop(0.0))
+        .withTimeout(1.0)
+        .andThen(flywheelSysId.dynamic(direction));
+  }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    hoodIO.setBrakeMode(brakeModeEnabled);
+    runHoodOpenLoop(0.0);
   }
 }

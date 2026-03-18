@@ -5,6 +5,7 @@
 package frc.robot.subsystems.intake.extension;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 
@@ -17,10 +18,9 @@ public class ExtensionIOSim implements ExtensionIO {
   public ExtensionIOSim() {
     extensionSim =
         new SingleJointedArmSim(
+            LinearSystemId.identifyPositionSystem(ExtensionConstants.kv, ExtensionConstants.ka),
             DCMotor.getNeo550(2),
             ExtensionConstants.gearRatio,
-            SingleJointedArmSim.estimateMOI(
-                ExtensionConstants.armLengthMeters, ExtensionConstants.armMassKG),
             ExtensionConstants.armLengthMeters,
             ExtensionConstants.minAngleRadians,
             ExtensionConstants.maxAngleRadians,
@@ -32,6 +32,7 @@ public class ExtensionIOSim implements ExtensionIO {
   public void updateInputs(ExtensionIOInputs inputs) {
     extensionSim.update(Constants.dtSeconds);
     inputs.positionRadians = extensionSim.getAngleRads();
+    inputs.absolutePositionRadians = extensionSim.getAngleRads();
     inputs.velocityRadiansPerSecond = extensionSim.getVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
     double currentPerMotor = extensionSim.getCurrentDrawAmps() / 2.0;

@@ -5,14 +5,22 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -26,6 +34,7 @@ import frc.robot.subsystems.intake.roller.RollerIO;
 import frc.robot.subsystems.intake.roller.RollerIOInputsAutoLogged;
 import frc.robot.subsystems.intake.roller.RollerIOSim;
 import frc.robot.subsystems.intake.roller.RollerIOSpark;
+import frc.robot.util.EqualsUtil;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.AutoLogOutputManager;
@@ -68,8 +77,26 @@ public class IntakeSubsystem extends SubsystemBase {
   private final RollerIO rollerIO;
   private final ExtensionIOInputsAutoLogged extensionInputs = new ExtensionIOInputsAutoLogged();
   private final RollerIOInputsAutoLogged rollerInputs = new RollerIOInputsAutoLogged();
+  private final SysIdRoutine extensionSysId;
   private final PIDController extensionPID =
       new PIDController(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
+  private final ArmFeedforward extensionFF =
+      new ArmFeedforward(
+          ExtensionConstants.ks,
+          ExtensionConstants.kg,
+          ExtensionConstants.kv,
+          ExtensionConstants.ka);
+
+  private TrapezoidProfile extensionProfile =
+      new TrapezoidProfile(
+          new Constraints(
+              ExtensionConstants.maxVelocityRadiansPerSecond,
+              ExtensionConstants.maxAccelerationRadiansPerSecondSquared));
+  private TrapezoidProfile.State extensionGoalState =
+      new TrapezoidProfile.State(ExtensionConstants.startingAngleRadians, 0.0);
+  private TrapezoidProfile.State extensionPrevSetpoint = extensionGoalState;
+  private boolean runExtensionClosedLoop =
+      false; // Closed loop will enable as soon as we command a goal
 
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
@@ -83,7 +110,10 @@ public class IntakeSubsystem extends SubsystemBase {
         new Alert("Intake roller left motor disconnected!", AlertType.kError);
     rollerRightMotorDisconnectedAlert =
         new Alert("Intake roller right motor disconnected!", AlertType.kError);
-    extensionPID.setSetpoint(ExtensionConstants.startingAngleRadians);
+
+    extensionSysId = extensionSysIdSetup();
+
+    extensionPID.setTolerance(ExtensionConstants.positionToleranceRadians);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -101,7 +131,26 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerLeftMotorDisconnectedAlert.set(!rollerInputs.leftMotorConnected);
     rollerRightMotorDisconnectedAlert.set(!rollerInputs.rightMotorConnected);
 
-    setExtensionVoltage(extensionPID.calculate(extensionInputs.positionRadians));
+    if (runExtensionClosedLoop) {
+      TrapezoidProfile.State current = getExtensionCurrentState();
+      TrapezoidProfile.State setpoint =
+          extensionProfile.calculate(
+              Constants.dtSeconds, extensionPrevSetpoint, extensionGoalState);
+      extensionPrevSetpoint = setpoint;
+
+      double ffVoltage =
+          extensionFF.calculate(
+              setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
+              setpoint.velocity);
+      double pidVoltage = extensionPID.calculate(current.position, setpoint.position);
+
+      Logger.recordOutput("Intake/Extension/FFVoltage", ffVoltage);
+      Logger.recordOutput("Intake/Extension/PIDVoltage", pidVoltage);
+      Logger.recordOutput("Intake/Extension/SetpointPositionRadians", setpoint.position);
+      Logger.recordOutput("Intake/Extension/SetpointVelocity", setpoint.velocity);
+
+      setExtensionVoltage(ffVoltage + pidVoltage);
+    }
 
     visualizationUpdate();
   }
@@ -112,6 +161,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setIntakeRollerVoltage(double volts) {
     rollerIO.setMotorVoltage(volts);
+  }
+
+  public void runExtensionOpenLoop(double volts) {
+    runExtensionClosedLoop = false;
+    setExtensionVoltage(volts);
+  }
+
+  public TrapezoidProfile.State getExtensionCurrentState() {
+    return new TrapezoidProfile.State(
+        extensionInputs.positionRadians, extensionInputs.velocityRadiansPerSecond);
   }
 
   /**
@@ -127,17 +186,32 @@ public class IntakeSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Commands the extension to move to the given angle in radians. This will reset the profile and
+   * PID and should not be called periodically
+   *
+   * @param positionRadians The angle in radians to set the extension to.
+   */
   public void setExtensionPosition(double positionRadians) {
     double extensionSetpoint =
         MathUtil.clamp(
             positionRadians,
             ExtensionConstants.minAngleRadians,
             ExtensionConstants.maxAngleRadians);
-    extensionPID.setSetpoint(extensionSetpoint);
+    extensionGoalState = new TrapezoidProfile.State(extensionSetpoint, 0.0);
+    // Reset setpoint to current state
+    extensionPrevSetpoint = getExtensionCurrentState();
+    extensionPID.reset();
+    Logger.recordOutput("Intake/Extension/GoalPositionRadians", positionRadians);
+    runExtensionClosedLoop = true;
   }
 
+  @AutoLogOutput(key = "Intake/Extension/AtSetPoint")
   public boolean isExtensionAtSetPoint() {
-    return extensionPID.atSetpoint();
+    return EqualsUtil.epsilonEquals(
+        getExtensionCurrentState().position,
+        extensionGoalState.position,
+        ExtensionConstants.positionToleranceRadians);
   }
 
   private void visualizationUpdate() {
@@ -176,5 +250,41 @@ public class IntakeSubsystem extends SubsystemBase {
       return 0;
     }
     return intakeSimulation.getGamePiecesAmount();
+  }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    extensionIO.setBrakeMode(brakeModeEnabled);
+    runExtensionOpenLoop(0.0);
+  }
+
+  // Configure SysId
+  private SysIdRoutine extensionSysIdSetup() {
+    return new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(2.0).per(Second),
+            Volts.of(2.0),
+            Seconds.of(15.0),
+            (state) -> Logger.recordOutput("Intake/Extension/SysIDState", state.toString())),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> runExtensionOpenLoop(voltage.in(Volts)), null, this));
+  }
+
+  /** Returns a command to run a quasistatic test in the specified direction. */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return run(() -> runExtensionOpenLoop(0.0))
+        .withTimeout(1.0)
+        .andThen(extensionSysId.quasistatic(direction));
+  }
+
+  /** Returns a command to run a dynamic test in the specified direction. */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return run(() -> runExtensionOpenLoop(0.0))
+        .withTimeout(1.0)
+        .andThen(extensionSysId.dynamic(direction));
   }
 }

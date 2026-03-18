@@ -58,7 +58,7 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   private final Alert turretMotorDisconnectedAlert =
-      new Alert("Turret motor disconnected!", AlertType.kWarning);
+      new Alert("Turret motor disconnected!", AlertType.kError);
   private final TurretIO turretIO;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
   private final SysIdRoutine sysId;
@@ -93,6 +93,8 @@ public class TurretSubsystem extends SubsystemBase {
   private TurretSubsystem(TurretIO io) {
     turretIO = io;
     sysId = sysIdSetup();
+
+    pidController.setTolerance(TurretConstants.turretPositionToleranceRadians);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -169,15 +171,25 @@ public class TurretSubsystem extends SubsystemBase {
 
       switch (targetType) {
         case FIELD_RELATIVE -> {
-          turretIO.setMotorVoltage(
+          double ffVoltage = feedforward.calculate(setpoint.velocity);
+          double pidVoltage =
               pidController.calculate(
-                      inputs.positionRadians, setpoint.position - TurretConstants.turretOffset)
-                  + feedforward.calculate(setpoint.velocity));
+                  inputs.positionRadians, setpoint.position - TurretConstants.turretOffset);
+          Logger.recordOutput("Turret/FFVoltage", ffVoltage);
+          Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
+          // To avoid chattering
+          if (Math.abs(pidVoltage + ffVoltage) < 0.25) {
+            turretIO.setMotorVoltage(0.0);
+          } else {
+            turretIO.setMotorVoltage(pidVoltage + ffVoltage);
+          }
         }
         case ROBOT_RELATIVE -> {
-          turretIO.setMotorVoltage(
+          double pidVoltage =
               pidController.calculate(
-                  inputs.positionRadians, goalAngle.getRadians() - TurretConstants.turretOffset));
+                  inputs.positionRadians, goalAngle.getRadians() - TurretConstants.turretOffset);
+          Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
+          turretIO.setMotorVoltage(pidVoltage);
         }
       }
     }
@@ -297,5 +309,15 @@ public class TurretSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Mechanism3d/2-Turret",
         new Pose3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, getPosition())));
+  }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    turretIO.setBrakeMode(brakeModeEnabled);
+    runOpenLoop(0.0);
   }
 }

@@ -44,10 +44,10 @@ public class DriveConstants {
   public static final double bumperWidth = Units.inchesToMeters(3.0);
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(2.11);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-3.11);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.067);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.53);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(5.34);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(3.10);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.272);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(0.703);
 
   // Device CAN IDs
   public static final int frontLeftDriveCanId = 13;
@@ -102,13 +102,13 @@ public class DriveConstants {
       (2 * Math.PI) / 3.3; // V/Sec -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 1.0;
+  public static final double turnKp = 0.86;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
-  public static final double turnPIDToleranceRad = Units.degreesToRadians(1.0);
+  public static final double turnPIDToleranceRad = Units.degreesToRadians(2.0);
 
   // PathPlanner configuration
   public static final double robotMassKg = Units.lbsToKilograms(130.0);

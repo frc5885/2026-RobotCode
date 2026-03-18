@@ -122,4 +122,14 @@ public class VisionIOPhotonVision implements VisionIO {
       inputs.tagIds[i++] = id;
     }
   }
+
+  @Override
+  public String getName() {
+    return camera.getName();
+  }
+
+  @Override
+  public Transform3d getRobotToCamera() {
+    return robotToCamera;
+  }
 }

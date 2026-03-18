@@ -4,6 +4,7 @@
 
 package frc.robot.commands.shooting;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.hopper.HopperSubsystem;
@@ -16,8 +17,10 @@ import org.littletonrobotics.junction.Logger;
 public class ShootIfReadyCommand extends Command {
   private final HopperSubsystem hopperSubsystem = HopperSubsystem.getInstance();
 
-  private final double kickerVoltage = 12.0;
-  private final double spindexerVoltage = 12.0;
+  private final double kickerVoltage = 6.0;
+  private final double spindexerVoltage = 8.0;
+
+  private boolean hasFlywheelSpunUp = false;
 
   /** Creates a new ShootIfReadyCommand. */
   public ShootIfReadyCommand() {
@@ -27,19 +30,29 @@ public class ShootIfReadyCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    hasFlywheelSpunUp = false;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (!hasFlywheelSpunUp && ShooterSubsystem.getInstance().isFlywheelAtSetpoint()) {
+      hasFlywheelSpunUp = true;
+    }
     boolean isReadyToShoot =
         TurretSubsystem.getInstance().isAtGoal()
-            && ShooterSubsystem.getInstance().isFlywheelAtSetpoint()
+            && hasFlywheelSpunUp
             && ShooterSubsystem.getInstance().isHoodAtGoal()
             && LaunchCalculator.getInstance().getParameters().isValid();
     Logger.recordOutput("ShootIfReadyCommand/IsReadyToShoot", isReadyToShoot);
 
-    if (isReadyToShoot) {
+    boolean isReadyTestMode =
+        DriverStation.isTest()
+            && ShooterSubsystem.getInstance().isHoodAtGoal()
+            && hasFlywheelSpunUp;
+
+    if (isReadyToShoot || isReadyTestMode) {
       hopperSubsystem.setKickerVoltage(kickerVoltage);
       hopperSubsystem.setSpindexerVoltage(spindexerVoltage);
 
