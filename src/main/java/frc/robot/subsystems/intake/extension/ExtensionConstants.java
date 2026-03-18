@@ -13,7 +13,10 @@ public class ExtensionConstants {
   public static final double startingAngleRadians =
       Units.degreesToRadians(
           117.17); // 90 degrees is defined as the forward linkage perpendicular to chassis
-  public static final double absoluteEncoderOffset = 4.536 - 2.045;
+  // desired starting angle from offset is like 2.025 rad
+  // i think
+  // absolute encoder cam undone and i did some monkey stuff to get it back
+  public static final double absoluteEncoderOffset = 4.536 - 0.96;
   public static final double armLengthMeters = 0.2;
   public static final double armMassKG = 0.1;
   public static final int leftCanId = 40;
@@ -41,8 +44,8 @@ public class ExtensionConstants {
   // ^^^ SysID Constants
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
 
-  public static final double intakeStowedAngle = Units.degreesToRadians(116.0);
-  public static final double intakeExtendedAngle = Units.degreesToRadians(12.0);
+  public static final double intakeStowedAngle = Units.degreesToRadians(116.0); // 2.025
+  public static final double intakeExtendedAngle = Units.degreesToRadians(12.0); // 0.209
   public static final double agitateTopAngle = 1.32;
   public static final double agitateBottomAngle = 0.19;
 

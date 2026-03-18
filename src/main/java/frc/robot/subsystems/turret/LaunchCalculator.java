@@ -69,7 +69,7 @@ public class LaunchCalculator {
 
   static {
     minDistance = 1.142;
-    maxDistance = 6.085;
+    maxDistance = 6.317;
     phaseDelay = 0.03;
 
     launchHoodAngleMap.put(1.142, Rotation2d.fromDegrees(80.0));
@@ -84,6 +84,7 @@ public class LaunchCalculator {
     launchHoodAngleMap.put(5.269, Rotation2d.fromDegrees(65.0));
     launchHoodAngleMap.put(5.706, Rotation2d.fromDegrees(65.0));
     launchHoodAngleMap.put(6.085, Rotation2d.fromDegrees(64.0));
+    launchHoodAngleMap.put(6.317, Rotation2d.fromDegrees(62.0));
 
     launchFlywheelSpeedMap.put(1.142, Units.rotationsPerMinuteToRadiansPerSecond(1800));
     launchFlywheelSpeedMap.put(1.532, Units.rotationsPerMinuteToRadiansPerSecond(2056));
@@ -97,6 +98,7 @@ public class LaunchCalculator {
     launchFlywheelSpeedMap.put(5.269, Units.rotationsPerMinuteToRadiansPerSecond(2550));
     launchFlywheelSpeedMap.put(5.706, Units.rotationsPerMinuteToRadiansPerSecond(2650));
     launchFlywheelSpeedMap.put(6.085, Units.rotationsPerMinuteToRadiansPerSecond(2800));
+    launchFlywheelSpeedMap.put(6.317, Units.rotationsPerMinuteToRadiansPerSecond(2800));
 
     timeOfFlightMap.put(1.364, 1.042);
     timeOfFlightMap.put(2.288, 1.096);
