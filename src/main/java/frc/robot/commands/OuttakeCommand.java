@@ -17,7 +17,8 @@ public class OuttakeCommand extends Command {
   private static final double outtakeRollerVoltage = -4.0; // i chose
   private static final double reverseSpindexerVoltage = -4.0;
   private static final double reverseKickerVoltage = -4.0;
-  /** Creates a new IntakeCommand. */
+
+  /** Creates a new OuttakeCommand. */
   public OuttakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intakeSubsystem, hopperSubsystem);

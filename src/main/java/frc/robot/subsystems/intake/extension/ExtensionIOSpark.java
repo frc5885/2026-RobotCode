@@ -107,6 +107,7 @@ public class ExtensionIOSpark implements ExtensionIO {
     if (!isEncoderZeroed && inputs.leftMotorConnected) {
       if (zeroEncoder(inputs.absolutePositionRadians) == REVLibError.kOk) {
         isEncoderZeroed = true;
+        inputs.positionRadians = inputs.absolutePositionRadians;
         System.out.println("Intake extension encoder zeroed");
       }
     }

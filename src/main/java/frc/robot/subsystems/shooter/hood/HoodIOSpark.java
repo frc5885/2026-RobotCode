@@ -97,8 +97,10 @@ public class HoodIOSpark implements HoodIO {
     encoder.setPosition(HoodConstants.startingAngleRadians);
     if (!motor.getForwardLimitSwitch().isPressed()) {
       setMotorVoltage(zeroingVoltage);
+      return REVLibError.kInvalid; // not zeroed yet
     }
-    return REVLibError.kOk;
+    setMotorVoltage(0.0);
+    return REVLibError.kOk; // zeroed
   }
 
   /**
