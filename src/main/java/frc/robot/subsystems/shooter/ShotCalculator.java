@@ -53,6 +53,7 @@ public class ShotCalculator {
     // first four digits are used to store turret angle
     double turretAngle = (data / 1000000) / 10.0;
     data -= (data / 1000000) * 1000000;
+    data = abs(data);
 
     // next three digits are used to store hood angle
     double launchAngle = (data / 1000) / 10.0;
@@ -65,6 +66,7 @@ public class ShotCalculator {
   }
 
   // trilinear interpolation method
+
   private static double trilinearInterpolation(
       double c000,
       double c100,
