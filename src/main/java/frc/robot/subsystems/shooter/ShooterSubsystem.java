@@ -80,10 +80,6 @@ public class ShooterSubsystem extends SubsystemBase {
       new PIDController(HoodConstants.kp, HoodConstants.ki, HoodConstants.kd);
   private final SimpleMotorFeedforward hoodFF =
       new SimpleMotorFeedforward(HoodConstants.ks, HoodConstants.kv, HoodConstants.ka);
-  private final PIDController flywheelPID =
-      new PIDController(FlywheelConstants.kp, FlywheelConstants.ki, FlywheelConstants.kd);
-  private final SimpleMotorFeedforward flywheelFF =
-      new SimpleMotorFeedforward(FlywheelConstants.ks, FlywheelConstants.kv, FlywheelConstants.ka);
   private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.25);
   private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2);
 
@@ -95,6 +91,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private TrapezoidProfile.State hoodGoalState =
       new TrapezoidProfile.State(HoodConstants.startingAngleRadians, 0.0);
   private TrapezoidProfile.State hoodPrevSetpoint = hoodGoalState;
+  private double flywheelTargetVelocity = 0.0;
   private boolean runHoodClosedLoop = false;
   private boolean runFlywheelClosedLoop = false;
 
@@ -110,10 +107,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     hoodSysId = hoodSysIdSetup();
     flywheelSysId = flywheelSysIdSetup();
-
-    hoodPID.setTolerance(HoodConstants.positionToleranceRadians);
-    flywheelPID.setTolerance(FlywheelConstants.velocityToleranceRPM);
-    flywheelPID.setSetpoint(0);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -149,7 +142,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     if (runFlywheelClosedLoop) {
-      flywheelIO.setMotorVelocity(flywheelPID.getSetpoint());
+      flywheelIO.setMotorVelocity(flywheelTargetVelocity);
     }
 
     visualizationUpdate();
@@ -210,7 +203,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void setFlywheelVelocity(double velocityRPM) {
-    flywheelPID.setSetpoint(velocityRPM);
+    flywheelTargetVelocity = velocityRPM;
     runFlywheelClosedLoop = true;
     // If the setpoint is 0, set the voltage to 0 and switch to open loop
     if (velocityRPM == 0) {
@@ -225,7 +218,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean isFlywheelAtSetpoint() {
     return flywheelAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(
-            getFlywheelRPM(), flywheelPID.getSetpoint(), FlywheelConstants.velocityToleranceRPM));
+            getFlywheelRPM(), flywheelTargetVelocity, FlywheelConstants.velocityToleranceRPM));
   }
 
   /** Returns debounced hood at goal */

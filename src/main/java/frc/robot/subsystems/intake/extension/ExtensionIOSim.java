@@ -19,12 +19,12 @@ public class ExtensionIOSim implements ExtensionIO {
     extensionSim =
         new SingleJointedArmSim(
             LinearSystemId.identifyPositionSystem(ExtensionConstants.kv, ExtensionConstants.ka),
-            DCMotor.getNeo550(2),
+            DCMotor.getNEO(2),
             ExtensionConstants.gearRatio,
             ExtensionConstants.armLengthMeters,
             ExtensionConstants.minAngleRadians,
             ExtensionConstants.maxAngleRadians,
-            true,
+            false,
             ExtensionConstants.startingAngleRadians);
   }
 

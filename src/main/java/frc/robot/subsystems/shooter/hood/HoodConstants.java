@@ -13,8 +13,6 @@ public class HoodConstants {
   public static final double startingAngleRadians = Units.degreesToRadians(80);
   public static final double idleAngleRadians = Units.degreesToRadians(80.0);
   // public static final double armOffsetToHorizontalRadians = -0.0042524; // from sysID
-  public static final double armLengthMeters = 0.1;
-  public static final double armMassKG = 0.05;
   public static final double maxVelocityRadiansPerSecond = 2.4;
   public static final double maxAccelerationRadiansPerSecondSquared = 16.0;
   public static final int canId = 31;
@@ -29,7 +27,6 @@ public class HoodConstants {
   public static final double kd = 0.2;
   // Ran sysID in sim
   public static final double ks = 0.14402;
-  // public static final double kg = 4.6706;
   public static final double kv = 4.6706;
   public static final double ka = 0.12179;
   public static final double positionToleranceRadians = Units.degreesToRadians(0.5);

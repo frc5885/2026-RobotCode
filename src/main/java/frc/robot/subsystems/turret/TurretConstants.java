@@ -14,7 +14,6 @@ import edu.wpi.first.math.util.Units;
 public class TurretConstants {
   public static final double gearRatio = 9.0 * 145.0 / 21.0;
   public static final double startingAngleRadians = Units.degreesToRadians(0.0);
-  public static final double momentOfInertia = 0.0906; // kg*m^2, from CAD
   public static final int canId = 30;
   public static final boolean motorInverted = true; // CCW positive
   public static final int currentLimit = 20;
