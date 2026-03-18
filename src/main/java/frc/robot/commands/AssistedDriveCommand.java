@@ -70,9 +70,10 @@ public class AssistedDriveCommand extends Command {
     rotationController.setTolerance(DriveConstants.rotationAlignTolerance);
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
+    Trigger notSprinting = ControllerUtil.sprintToggle(controller).negate();
+
     inTrenchZoneTrigger =
-        ControllerUtil.sprintToggle(controller)
-            .negate()
+        notSprinting
             .and(
                 Zones.trenchZones
                     .willContain(
@@ -83,8 +84,7 @@ public class AssistedDriveCommand extends Command {
             .and(() -> !DriverStation.isTest());
 
     inBumpZoneTrigger =
-        ControllerUtil.sprintToggle(controller)
-            .negate()
+        notSprinting
             .and(
                 Zones.bumpZones
                     .willContain(
