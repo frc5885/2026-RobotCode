@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
+import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
 import frc.robot.commands.SysIDCommands;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
@@ -33,7 +33,6 @@ import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
-import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -122,12 +121,13 @@ public class RobotContainer {
     //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
     //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
     //             IntakeSubsystem.getInstance()));
-    controller
-        .back()
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    DriveSubsystem.getInstance().setPose(new Pose2d(3.0, 4.0, Rotation2d.kZero))));
+    // controller
+    //     .back()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 DriveSubsystem.getInstance().setPose(new Pose2d(3.0, 4.0,
+    // Rotation2d.kZero))));
     // Operator Switches
     // operatorPanel
     //     .getBrakeModeSwitch()
@@ -135,6 +135,9 @@ public class RobotContainer {
         .start()
         .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
         .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
+
+    // temp
+    controller.back().whileTrue(new OuttakeCommand());
   }
 
   /**
