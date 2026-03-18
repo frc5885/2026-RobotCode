@@ -4,6 +4,10 @@
 
 package frc.robot.commands.autonomous;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.commands.shooting.ShootCommandGroup;
 
@@ -17,5 +21,10 @@ public class ShootUntilHopperEmptyCommand extends ParallelDeadlineGroup {
     // addCommands().
     super(new WaitUntilHopperIsEmptyCommand());
     addCommands(new ShootCommandGroup());
+  }
+
+  public Command conditionalShootPreload() {
+    return new ConditionalCommand(
+        this, Commands.none(), () -> SmartDashboard.getBoolean("ShootPreload", false));
   }
 }

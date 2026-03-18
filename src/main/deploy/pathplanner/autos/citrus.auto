@@ -5,52 +5,59 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "tiff_path.0"
+            "name": "ConditionalShootPreload"
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "Intake"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "tiff_path.1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
+                  "pathName": "citrus.0"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "tiff_path.2"
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "citrus.1"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Stop"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToClimbPoseSequentialCommand"
+            "name": "Shoot"
           }
         }
       ]

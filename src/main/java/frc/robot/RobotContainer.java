@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -33,7 +34,6 @@ import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
-import frc.robot.util.Zones;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -65,7 +65,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
     NamedCommands.registerCommand(
         "DriveToPose", new DriveToPoseCommand(() -> new Pose2d(2.5, 5, new Rotation2d())));
-    Zones.logAllZones();
+    NamedCommands.registerCommand(
+        "DriveToClimbPoseSequentialCommand", new DriveToClimbPoseSequentialCommand());
+
+    SmartDashboard.putBoolean("ShootPreload", false);
+    NamedCommands.registerCommand(
+        "ConditionalShootPreload", new ShootUntilHopperEmptyCommand().conditionalShootPreload());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -105,7 +110,7 @@ public class RobotContainer {
     controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
     controller.leftBumper().onTrue(new RetractIntakeCommand());
 
-    controller.a().whileTrue(AgitateIntakeCommand.runRepeatedlyAndSpinRoller());
+    controller.a().whileTrue(new AgitateIntakeCommand().runRepeatedlyAndSpinRoller());
     controller.b().whileTrue(new OuttakeCommand());
 
     // controller

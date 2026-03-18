@@ -34,7 +34,7 @@ public class SimShotVisualizer {
 
   private static int score = 0;
 
-  private static final double rpmToMetersPerSecond = 0.0034; // Multiplier from John's Excel sheet
+  private static final double rpmToMetersPerSecond = 0.0036; // Multiplier from John's Excel sheet
 
   public static void launchFuelWithRateLimit() {
     if (Constants.isSim()
