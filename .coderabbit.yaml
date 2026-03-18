@@ -1,0 +1,4 @@
+reviews:
+  path_filters:
+    - '!src/main/deploy/choreo/**'
+    - '!src/main/deploy/pathplanner/**'
