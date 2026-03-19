@@ -11,7 +11,7 @@
             "title": "Auto Choices",
             "x": 0.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 512.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -124,15 +124,71 @@
               "true_icon": "None",
               "false_icon": "None"
             }
+          },
+          {
+            "title": "ShootPreload",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/ShootPreload",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
           }
         ]
       }
     },
     {
-      "name": "Autonomous",
+      "name": "Tuning",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "HoodAngleDegrees",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Shooter/HoodAngleDegrees",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "FlywheelRPM",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Shooter/FlywheelRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "TurretToTargetDistance",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/LaunchCalculator/TurretToTargetDistance",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          }
+        ]
       }
     }
   ]
