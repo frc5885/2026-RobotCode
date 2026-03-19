@@ -5,9 +5,14 @@
 package frc.robot.commands.shooting;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.MoveIntakeToPositionCommand;
+import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
 
@@ -32,5 +37,17 @@ public class AgitateIntakeCommand extends SequentialCommandGroup {
     return new StartEndCommand(
         () -> IntakeSubsystem.getInstance().setIntakeRollerVoltage(6.0),
         () -> IntakeSubsystem.getInstance().setIntakeRollerVoltage(0.0));
+  }
+
+  public Command conditionalIntakeOrRetractWhenFinishedAgitating(CommandXboxController controller) {
+    return new ConditionalCommand(
+        new IntakeCommand(), new RetractIntakeCommand(), controller.leftTrigger(0.1)::getAsBoolean);
+  }
+
+  public Command conditionalAgitateOrNothingWhenFinishedIntaking(CommandXboxController controller) {
+    return new ConditionalCommand(
+        new AgitateIntakeCommand().runRepeatedlyAndSpinRoller(),
+        Commands.none(),
+        controller.a()::getAsBoolean);
   }
 }
