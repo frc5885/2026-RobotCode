@@ -19,8 +19,11 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.shooter.flywheel.FlywheelConstants;
@@ -95,6 +98,12 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean runHoodClosedLoop = false;
   private boolean runFlywheelClosedLoop = false;
 
+  private final DigitalInput bpsSensor = new DigitalInput(0);
+  private final Trigger bpsTrigger = new Trigger(() -> !bpsSensor.get());
+
+  @AutoLogOutput(key = "Shooter/ShotCount")
+  private int shotCounter = 0;
+
   /** Creates a new Shooter. */
   private ShooterSubsystem(FlywheelIO flywheelIO, HoodIO hoodIO) {
     this.flywheelIO = flywheelIO;
@@ -107,6 +116,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     hoodSysId = hoodSysIdSetup();
     flywheelSysId = flywheelSysIdSetup();
+
+    bpsTrigger.onTrue(new InstantCommand(() -> shotCounter += 1));
 
     AutoLogOutputManager.addObject(this);
   }
