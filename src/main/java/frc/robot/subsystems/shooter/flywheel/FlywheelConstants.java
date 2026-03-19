@@ -19,7 +19,7 @@ public class FlywheelConstants {
 
   public static final double kp = 0.0005;
   public static final double ki = 0.0;
-  public static final double kd = 0.008;
+  public static final double kd = 0.0095;
   public static final double ks = 0.11267;
   public static final double kv = 0.0018079;
   public static final double ka = 0.0033313;

@@ -22,9 +22,9 @@ public class HoodConstants {
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
-  public static final double kp = 40.0;
+  public static final double kp = 44.0;
   public static final double ki = 0.0;
-  public static final double kd = 0.2;
+  public static final double kd = 0.4;
   // Ran sysID in sim
   public static final double ks = 0.14402;
   public static final double kv = 4.6706;
