@@ -177,12 +177,7 @@ public class TurretSubsystem extends SubsystemBase {
                   inputs.positionRadians, setpoint.position - TurretConstants.turretOffset);
           Logger.recordOutput("Turret/FFVoltage", ffVoltage);
           Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
-          // To avoid chattering
-          if (Math.abs(pidVoltage + ffVoltage) < 0.25) {
-            turretIO.setMotorVoltage(0.0);
-          } else {
-            turretIO.setMotorVoltage(pidVoltage + ffVoltage);
-          }
+          turretIO.setMotorVoltage(pidVoltage + ffVoltage);
         }
         case ROBOT_RELATIVE -> {
           double pidVoltage =

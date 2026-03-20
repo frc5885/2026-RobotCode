@@ -74,11 +74,11 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
