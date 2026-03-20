@@ -84,6 +84,7 @@ public class HoodIOSpark implements HoodIO {
         (values) -> inputs.appliedVolts = values[0] * values[1]);
     ifOk(motor, motor::getOutputCurrent, (value) -> inputs.currentAmps = value);
     inputs.motorConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
+    inputs.isZeroed = isEncoderZeroed;
 
     if (!isEncoderZeroed && inputs.motorConnected) {
       if (zeroEncoder() == REVLibError.kOk) {

@@ -133,7 +133,7 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelRightMotorDisconnectedAlert.set(!flywheelInputs.rightMotorConnected);
     hoodMotorDisconnectedAlert.set(!hoodInputs.motorConnected);
 
-    if (runHoodClosedLoop) {
+    if (runHoodClosedLoop && hoodInputs.isZeroed) {
       // TrapezoidProfile.State current = getHoodCurrentState();
       // TrapezoidProfile.State setpoint =
       //     hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);

@@ -13,6 +13,7 @@ public interface HoodIO {
   @AutoLog
   public static class HoodIOInputs {
     public boolean motorConnected = false;
+    public boolean isZeroed = false;
     public double positionRadians = 0.0;
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;

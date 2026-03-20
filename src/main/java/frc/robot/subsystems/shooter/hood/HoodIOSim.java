@@ -31,6 +31,7 @@ public class HoodIOSim implements HoodIO {
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = hoodSim.getCurrentDrawAmps();
     inputs.motorConnected = true;
+    inputs.isZeroed = true;
   }
 
   @Override
