@@ -84,7 +84,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final SimpleMotorFeedforward hoodFF =
       new SimpleMotorFeedforward(HoodConstants.ks, HoodConstants.kv, HoodConstants.ka);
   private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.25);
-  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2);
+  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
 
   private TrapezoidProfile hoodProfile =
       new TrapezoidProfile(
@@ -134,7 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotorDisconnectedAlert.set(!hoodInputs.motorConnected);
 
     if (runHoodClosedLoop) {
-      TrapezoidProfile.State current = getHoodCurrentState();
+      // TrapezoidProfile.State current = getHoodCurrentState();
       // TrapezoidProfile.State setpoint =
       //     hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
       // hoodPrevSetpoint = setpoint;
@@ -142,14 +142,15 @@ public class ShooterSubsystem extends SubsystemBase {
       // Profiled PID was bad, now only using regular PID to goal state and FF only for velocity
       // target from LaunchCalculator
       double ffVoltage = hoodFF.calculate(hoodGoalState.velocity);
-      double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
+      // double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
 
-      Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
-      Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
+      // Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
+      // Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
       Logger.recordOutput("Shooter/Hood/SetpointPositionRadians", hoodGoalState.position);
       Logger.recordOutput("Shooter/Hood/SetpointVelocity", hoodGoalState.velocity);
 
-      setHoodVoltage(ffVoltage + pidVoltage);
+      // setHoodVoltage(ffVoltage + pidVoltage);
+      hoodIO.setMotorPosition(hoodGoalState.position, ffVoltage);
     }
 
     if (runFlywheelClosedLoop) {

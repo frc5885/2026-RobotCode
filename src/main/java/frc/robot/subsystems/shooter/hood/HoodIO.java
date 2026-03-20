@@ -25,6 +25,8 @@ public interface HoodIO {
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
 
+  public default void setMotorPosition(double positionRads, double arbFFVolts) {}
+
   /**
    * Sets the brake mode of the motor.
    *
