@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,10 +60,6 @@ public class TurretSubsystem extends SubsystemBase {
   private final TurretIO turretIO;
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
   private final SysIdRoutine sysId;
-  private final PIDController pidController =
-      new PIDController(TurretConstants.kp, TurretConstants.ki, TurretConstants.kd);
-  private final SimpleMotorFeedforward feedforward =
-      new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
   private boolean runClosedLoop = false;
   private final Debouncer atGoalDebouncer = new Debouncer(0.1);
 
@@ -93,8 +87,6 @@ public class TurretSubsystem extends SubsystemBase {
   private TurretSubsystem(TurretIO io) {
     turretIO = io;
     sysId = sysIdSetup();
-
-    pidController.setTolerance(TurretConstants.turretPositionToleranceRadians);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -171,20 +163,12 @@ public class TurretSubsystem extends SubsystemBase {
 
       switch (targetType) {
         case FIELD_RELATIVE -> {
-          double ffVoltage = feedforward.calculate(setpoint.velocity);
-          double pidVoltage =
-              pidController.calculate(
-                  inputs.positionRadians, setpoint.position - TurretConstants.turretOffset);
-          Logger.recordOutput("Turret/FFVoltage", ffVoltage);
-          Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
-          turretIO.setMotorVoltage(pidVoltage + ffVoltage);
+          turretIO.setMotorGoalPositionVelocity(
+              setpoint.position - TurretConstants.turretOffset, setpoint.velocity);
         }
         case ROBOT_RELATIVE -> {
-          double pidVoltage =
-              pidController.calculate(
-                  inputs.positionRadians, goalAngle.getRadians() - TurretConstants.turretOffset);
-          Logger.recordOutput("Turret/PIDVoltage", pidVoltage);
-          turretIO.setMotorVoltage(pidVoltage);
+          turretIO.setMotorGoalPositionVelocity(
+              goalAngle.getRadians() - TurretConstants.turretOffset, 0.0);
         }
       }
     }
