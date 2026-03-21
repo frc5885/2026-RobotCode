@@ -127,8 +127,8 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-  public static final PIDConstants pathplannerDrivePID = new PIDConstants(6.0, 0.0, 0.6);
-  public static final PIDConstants pathplannerTurnPID = new PIDConstants(6.0, 0.0, 1.0);
+  public static final PIDConstants pathplannerDrivePID = new PIDConstants(4.7, 0.0, 0.7);
+  public static final PIDConstants pathplannerTurnPID = new PIDConstants(3.0, 0.0, 1.1);
 
   public static final PathConstraints pathConstraints = new PathConstraints(4.1, 8.0, 8.8, 16.0);
 

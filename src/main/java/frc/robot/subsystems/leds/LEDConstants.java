@@ -12,11 +12,12 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDConstants {
-  public static final int ledPort = 0;
+  public static final int ledPort = 4;
   // 42 leds for hopper
-  // leds for turret
-  // total
-  public static final int length = 79;
+  // 33 leds for turret
+  // 11 leds for rest of hopper
+  // 86 total
+  public static final int length = 86;
 
   public static final class States {
     public static final LEDPattern disabled =
