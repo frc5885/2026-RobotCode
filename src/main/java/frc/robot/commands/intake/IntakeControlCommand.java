@@ -34,7 +34,7 @@ public class IntakeControlCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    currentState = IntakeState.STOWED;
+    currentState = IntakeState.INITIAL;
     agitateTimer.stop();
   }
 
