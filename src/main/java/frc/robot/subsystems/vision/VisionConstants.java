@@ -23,7 +23,7 @@ public class VisionConstants {
   public static String camera1Name = "private";
   public static String camera2Name = "skipper";
   public static String camera3Name = "rico";
-  public static String camera4Name = "marlene";
+  public static String camera4Name = "kingJulien";
 
   // Index of the game piece detection camera
   public static final int gamePieceCameraIndex = 4;

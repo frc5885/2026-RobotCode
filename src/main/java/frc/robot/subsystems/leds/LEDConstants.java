@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class LEDConstants {
   public static final int ledPort = 0;
+  // 42 leds for hopper
+  // leds for turret
+  // total
   public static final int length = 79;
 
   public static final class States {

@@ -97,6 +97,10 @@ public class HopperSubsystem extends SubsystemBase {
     spindexerIO.setMotorVoltage(volts);
   }
 
+  public boolean isSpindexerRunning() {
+    return spindexerInputs.appliedVolts > 0.1;
+  }
+
   private void visualizationUpdate() {
     // Log the spindexer rotation as a 3D pose for mechanism visualization
     Logger.recordOutput(
