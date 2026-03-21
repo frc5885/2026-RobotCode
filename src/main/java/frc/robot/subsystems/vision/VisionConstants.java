@@ -23,6 +23,10 @@ public class VisionConstants {
   public static String camera1Name = "private";
   public static String camera2Name = "skipper";
   public static String camera3Name = "rico";
+  public static String camera4Name = "marlene";
+
+  // Index of the game piece detection camera
+  public static final int gamePieceCameraIndex = 4;
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)

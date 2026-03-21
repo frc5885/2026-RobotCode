@@ -20,6 +20,7 @@ public interface VisionIO {
         new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
     public PoseObservation[] poseObservations = new PoseObservation[0];
     public int[] tagIds = new int[0];
+    public int gamePieceCount = 0;
   }
 
   /** Represents the angle to a simple target, not used for pose estimation. */
@@ -40,6 +41,11 @@ public interface VisionIO {
     PHOTONVISION
   }
 
+  public static enum CameraType {
+    APRIL_TAG,
+    GAME_PIECE
+  }
+
   public default void updateInputs(VisionIOInputs inputs) {}
 
   public default String getName() {
@@ -48,5 +54,9 @@ public interface VisionIO {
 
   public default Transform3d getRobotToCamera() {
     return new Transform3d();
+  }
+
+  public default CameraType getCameraType() {
+    return CameraType.APRIL_TAG;
   }
 }

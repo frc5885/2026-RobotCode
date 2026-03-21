@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.vision.VisionIO.CameraType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutputManager;
@@ -42,7 +43,8 @@ public class VisionSubsystem extends SubsystemBase {
                   new VisionIOPhotonVision(camera0Name, robotToCamera0),
                   new VisionIOPhotonVision(camera1Name, robotToCamera1),
                   new VisionIOPhotonVision(camera2Name, robotToCamera2),
-                  new VisionIOPhotonVision(camera3Name, robotToCamera3));
+                  new VisionIOPhotonVision(camera3Name, robotToCamera3),
+                  new VisionIOPhotonVision(camera4Name, CameraType.GAME_PIECE));
           break;
 
         case SIM:
@@ -52,7 +54,8 @@ public class VisionSubsystem extends SubsystemBase {
                   new VisionIOPhotonVisionSim(camera0Name, robotToCamera0),
                   new VisionIOPhotonVisionSim(camera1Name, robotToCamera1),
                   new VisionIOPhotonVisionSim(camera2Name, robotToCamera2),
-                  new VisionIOPhotonVisionSim(camera3Name, robotToCamera3));
+                  new VisionIOPhotonVisionSim(camera3Name, robotToCamera3),
+                  new VisionIO() {}); // Game piece camera not simulated
           break;
 
         default:
@@ -60,7 +63,11 @@ public class VisionSubsystem extends SubsystemBase {
           // (Use same number of dummy implementations as the real robot)
           INSTANCE =
               new VisionSubsystem(
-                  new VisionIO() {}, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
+                  new VisionIO() {},
+                  new VisionIO() {},
+                  new VisionIO() {},
+                  new VisionIO() {},
+                  new VisionIO() {});
           break;
       }
     }
@@ -104,6 +111,11 @@ public class VisionSubsystem extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
+  /** Returns the number of game pieces currently detected by the game piece camera. */
+  public int getGamePieceCount() {
+    return inputs[gamePieceCameraIndex].gamePieceCount;
+  }
+
   @Override
   public void periodic() {
     // Update sim
@@ -126,6 +138,11 @@ public class VisionSubsystem extends SubsystemBase {
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
+
+      // Skip pose estimation for game piece cameras
+      if (io[cameraIndex].getCameraType() != CameraType.APRIL_TAG) {
+        continue;
+      }
 
       // Initialize logging values
       List<Pose3d> tagPoses = new LinkedList<>();
@@ -226,6 +243,9 @@ public class VisionSubsystem extends SubsystemBase {
 
   private void logAllCameraVectors() {
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      if (io[cameraIndex].getCameraType() != CameraType.APRIL_TAG) {
+        continue;
+      }
       Pose3d startPose =
           new Pose3d(DriveSubsystem.getInstance().getPose())
               .transformBy(io[cameraIndex].getRobotToCamera());
