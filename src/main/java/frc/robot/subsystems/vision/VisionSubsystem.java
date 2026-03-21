@@ -231,6 +231,9 @@ public class VisionSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
     logAllCameraVectors();
+
+    // Log balls in hopper
+    Logger.recordOutput("Vision/FuelCount", getGamePieceCount());
   }
 
   @FunctionalInterface

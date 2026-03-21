@@ -27,8 +27,8 @@ import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.IntakeControlCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
-import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
@@ -96,6 +96,8 @@ public class RobotContainer {
     DefaultCommands.setDefaultTurretCommand(
         TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
 
+    DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
+
     controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
 
     controller
@@ -103,37 +105,8 @@ public class RobotContainer {
         .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
     controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
 
-    // intake controls
-    controller.leftBumper().onTrue(new RetractIntakeCommand());
-    controller
-        .leftTrigger(0.1)
-        .whileTrue(new IntakeCommand())
-        .onFalse(
-            new AgitateIntakeCommand().conditionalAgitateOrNothingWhenFinishedIntaking(controller));
-
-    controller
-        .a()
-        .whileTrue(new AgitateIntakeCommand().runRepeatedlyAndSpinRoller())
-        .onFalse(
-            new AgitateIntakeCommand().conditionalIntakeOrRetractWhenFinishedAgitating(controller));
-
+    // todo convert to state machine
     controller.b().whileTrue(new OuttakeCommand());
-
-    // controller
-    //     .a()
-    //     .whileTrue(
-    //         new StartEndCommand(
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(12.0),
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
-    //             IntakeSubsystem.getInstance()));
-
-    // controller
-    //     .b()
-    //     .whileTrue(
-    //         new StartEndCommand(
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
-    //             IntakeSubsystem.getInstance()));
 
     // Operator Switches
     // operatorPanel
