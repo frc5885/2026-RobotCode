@@ -20,13 +20,16 @@ import frc.robot.subsystems.intake.extension.ExtensionConstants;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AgitateIntakeCommand extends SequentialCommandGroup {
+  private final double agitateTimeSeconds = 0.5;
   /** Creates a new AgitateIntakeCommand. */
   public AgitateIntakeCommand() {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new MoveIntakeToPositionCommand(ExtensionConstants.agitateTopAngle).withTimeout(1.0),
-        new MoveIntakeToPositionCommand(ExtensionConstants.agitateBottomAngle).withTimeout(1.0));
+        new MoveIntakeToPositionCommand(ExtensionConstants.agitateTopAngle)
+            .withTimeout(agitateTimeSeconds),
+        new MoveIntakeToPositionCommand(ExtensionConstants.agitateBottomAngle)
+            .withTimeout(agitateTimeSeconds));
   }
 
   public Command runRepeatedlyAndSpinRoller() {

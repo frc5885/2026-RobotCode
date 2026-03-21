@@ -8,7 +8,7 @@ import edu.wpi.first.math.util.Units;
 
 public class ExtensionConstants {
   public static final double gearRatio = 60.0 / 1.0;
-  public static final double minAngleRadians = Units.degreesToRadians(10.71);
+  public static final double minAngleRadians = Units.degreesToRadians(7.0);
   public static final double maxAngleRadians = Units.degreesToRadians(117.17);
   public static final double startingAngleRadians =
       Units.degreesToRadians(
@@ -44,9 +44,9 @@ public class ExtensionConstants {
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
 
   public static final double intakeStowedAngle = Units.degreesToRadians(116.0); // 2.025
-  public static final double intakeExtendedAngle = Units.degreesToRadians(12.0); // 0.209
+  public static final double intakeExtendedAngle = Units.degreesToRadians(7.5); // 0.209
   public static final double agitateTopAngle = 1.32;
-  public static final double agitateBottomAngle = 0.19;
+  public static final double agitateBottomAngle = 0.6;
 
   public static final double intakeExtensionLengthMeters = Units.inchesToMeters(12.0);
 }
