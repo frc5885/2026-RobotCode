@@ -4,13 +4,19 @@
 
 package frc.robot.commands.autonomous;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class WaitUntilHopperIsEmptyCommand extends Command {
   /** Creates a new WaitUntilHopperIsEmptyCommand. */
+  private final VisionSubsystem visionSubsystem = VisionSubsystem.getInstance();
+
+  private final Debouncer visionDebouncer = new Debouncer(0.5);
+
   public WaitUntilHopperIsEmptyCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -34,7 +40,7 @@ public class WaitUntilHopperIsEmptyCommand extends Command {
       return IntakeSubsystem.getInstance().getSimHopperFuelCount() == 0;
     } else {
       // Add logic for real robot here :)
-      return false;
+      return visionDebouncer.calculate(visionSubsystem.getGamePieceCount() == 0);
     }
   }
 }

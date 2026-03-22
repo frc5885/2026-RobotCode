@@ -17,7 +17,9 @@ public class LEDSubsystem extends SubsystemBase {
   private static LEDSubsystem INSTANCE = null;
   private final AddressableLED leds;
   private final AddressableLEDBuffer buffer;
-  private final AddressableLEDBufferView view;
+  private final AddressableLEDBufferView hopperLong;
+  private final AddressableLEDBufferView turret;
+  private final AddressableLEDBufferView hopperShort;
   private static LEDPattern ledState;
 
   public static LEDSubsystem getInstance() {
@@ -31,7 +33,6 @@ public class LEDSubsystem extends SubsystemBase {
   private LEDSubsystem() {
     leds = new AddressableLED(LEDConstants.ledPort);
     buffer = new AddressableLEDBuffer(LEDConstants.length);
-    view = buffer.createView(0, LEDConstants.length - 1);
 
     leds.setLength(LEDConstants.length);
     leds.setData(buffer);
@@ -39,12 +40,27 @@ public class LEDSubsystem extends SubsystemBase {
 
     ledState = LEDConstants.States.disabled;
     leds.start();
+
+    hopperLong = buffer.createView(0, LEDConstants.hopperLongLength - 1);
+    turret =
+        buffer.createView(
+            LEDConstants.hopperLongLength,
+            LEDConstants.hopperLongLength + LEDConstants.turretLength - 1);
+    hopperShort =
+        buffer.createView(
+            LEDConstants.hopperLongLength + LEDConstants.turretLength,
+            LEDConstants.hopperLongLength
+                + LEDConstants.turretLength
+                + LEDConstants.hopperShortLength
+                - 1);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    ledState.applyTo(view);
+    ledState.applyTo(hopperLong);
+    LEDConstants.States.policeSirens.applyTo(turret);
+    ledState.applyTo(hopperShort);
     leds.setData(buffer);
   }
 
