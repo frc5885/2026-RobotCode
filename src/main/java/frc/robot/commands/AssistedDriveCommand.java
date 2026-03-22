@@ -46,7 +46,15 @@ public class AssistedDriveCommand extends Command {
 
   @AutoLogOutput private final Trigger inBumpZoneTrigger;
 
+  @AutoLogOutput private final Trigger inTowerZoneTrigger;
+
   private final PIDController trenchYController =
+      new PIDController(
+          DriveConstants.driveAssistTranslationKp,
+          DriveConstants.driveAssistTranslationKi,
+          DriveConstants.driveAssistTranslationKd);
+
+  private final PIDController towerXController =
       new PIDController(
           DriveConstants.driveAssistTranslationKp,
           DriveConstants.driveAssistTranslationKi,
@@ -67,6 +75,7 @@ public class AssistedDriveCommand extends Command {
     this.driveLimiter = new SlewRateLimiter2d(DriveConstants.maxAccelerationMetersPerSec2);
 
     trenchYController.setTolerance(DriveConstants.trenchAlignPositionTolerance);
+    towerXController.setTolerance(DriveConstants.trenchAlignPositionTolerance);
     rotationController.setTolerance(DriveConstants.rotationAlignTolerance);
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -94,9 +103,24 @@ public class AssistedDriveCommand extends Command {
                     .debounce(0.1))
             .and(() -> !DriverStation.isTest());
 
+    inTowerZoneTrigger =
+        notSprinting
+            .and(
+                Zones.towerZones
+                    .willContain(
+                        driveSubsystem::getPose,
+                        driveSubsystem::getFieldRelativeChassisSpeeds,
+                        Seconds.of(DriveConstants.bumpAlignTimeSeconds))
+                    .debounce(0.1))
+            .and(() -> !DriverStation.isTest());
+
     inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
     inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
-    inTrenchZoneTrigger.or(inBumpZoneTrigger).onFalse(updateDriveMode(DriveMode.NORMAL));
+    inTowerZoneTrigger.onTrue(updateDriveMode(DriveMode.TOWER_LOCK));
+    inTrenchZoneTrigger
+        .or(inBumpZoneTrigger)
+        .or(inTowerZoneTrigger)
+        .onFalse(updateDriveMode(DriveMode.NORMAL));
 
     addRequirements(driveSubsystem);
 
@@ -124,9 +148,20 @@ public class AssistedDriveCommand extends Command {
     }
     return Meters.of(FieldConstants.RightTrench.center.getY());
   }
+  
+    private Rotation2d getTrenchLockAngle() {
+      return GeometryUtil.getNearest180Rotation(driveSubsystem.getRotation());
+    }
 
-  private Rotation2d getTrenchLockAngle() {
-    return GeometryUtil.getNearest180Rotation(driveSubsystem.getRotation());
+  private Distance getTowerX() {
+    if (driveSubsystem.getPose().getX() < FieldConstants.fieldLength / 2) {
+      return Meters.of(FieldConstants.Tower.depth / 2);
+    }
+    return Meters.of(FieldConstants.fieldLength - FieldConstants.Tower.depth / 2);
+  }
+
+  private Rotation2d getTowerLockAngle() {
+    return GeometryUtil.getNearest90or270Rotation(driveSubsystem.getRotation());
   }
 
   private Rotation2d getBumpLockAngle() {
@@ -145,6 +180,7 @@ public class AssistedDriveCommand extends Command {
           currentDriveMode = driveMode;
           rotationController.reset();
           trenchYController.reset();
+          towerXController.reset();
         });
   }
 
@@ -226,6 +262,32 @@ public class AssistedDriveCommand extends Command {
                 MetersPerSecond.of(linearVelocity.getY()),
                 RadiansPerSecond.of(rotSpeedToDiagonal)));
         break;
+
+      case TOWER_LOCK:
+        towerXController.setSetpoint(getTowerX().in(Meters));
+        double xVel =
+            MathUtil.clamp(
+                towerXController.calculate(driveSubsystem.getPose().getX()),
+                -driveSubsystem.getMaxLinearSpeedMetersPerSec(),
+                driveSubsystem.getMaxLinearSpeedMetersPerSec());
+        if (towerXController.atSetpoint()) {
+          xVel = 0;
+        }
+        rotationController.setSetpoint(getTowerLockAngle().getRadians());
+        double rotSpeedToSideways =
+            MathUtil.clamp(
+                rotationController.calculate(driveSubsystem.getRotation().getRadians()),
+                -driveSubsystem.getMaxAngularSpeedRadPerSec(),
+                driveSubsystem.getMaxAngularSpeedRadPerSec());
+        if (rotationController.atSetpoint()) {
+          rotSpeedToSideways = 0;
+        }
+        driveSubsystem.runVelocityFieldRelative(
+            new ChassisSpeeds(
+                MetersPerSecond.of(xVel),
+                MetersPerSecond.of(linearVelocity.getY()),
+                RadiansPerSecond.of(rotSpeedToSideways)));
+        break;
     }
   }
 
@@ -242,6 +304,7 @@ public class AssistedDriveCommand extends Command {
   private enum DriveMode {
     NORMAL,
     TRENCH_LOCK,
-    BUMP_LOCK
+    BUMP_LOCK,
+    TOWER_LOCK
   }
 }

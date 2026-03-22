@@ -15,4 +15,8 @@ public class GeometryUtil {
   public static Rotation2d getNearest180Rotation(Rotation2d angle) {
     return Rotation2d.fromDegrees(Math.round(angle.getDegrees() / 180) * 180);
   }
+
+  public static Rotation2d getNearest90or270Rotation(Rotation2d angle) {
+    return Rotation2d.fromDegrees(Math.round((angle.getDegrees() - 90.0) / 180.0) * 180.0 + 90.0);
+  }
 }
