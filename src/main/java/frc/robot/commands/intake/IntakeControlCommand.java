@@ -7,6 +7,7 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
 import frc.robot.subsystems.intake.roller.RollerConstants;
@@ -80,6 +81,7 @@ public class IntakeControlCommand extends Command {
         case INTAKING:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(RollerConstants.intakeRollerVoltage);
+          if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
 
         case AGITATING:
@@ -92,11 +94,13 @@ public class IntakeControlCommand extends Command {
         case DEPLOYED:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(0);
+          if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
 
         case STOWED:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
           intakeSubsystem.setIntakeRollerVoltage(0);
+          if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().stopIntake();
           break;
 
         default:
