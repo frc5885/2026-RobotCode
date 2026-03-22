@@ -14,9 +14,9 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED leds;
   private final AddressableLEDBuffer buffer;
 
-  public final LEDZone hopperLong;
-  public final LEDZone turret;
-  public final LEDZone hopperShort;
+  private final LEDZone hopperLong;
+  private final LEDZone turret;
+  private final LEDZone hopperShort;
 
   public static LEDSubsystem getInstance() {
     if (INSTANCE == null) INSTANCE = new LEDSubsystem();
@@ -69,8 +69,17 @@ public class LEDSubsystem extends SubsystemBase {
    * three zones -- interrupts their individual commands while active. When this command ends, each
    * zone reverts to its own default command.
    */
-  public Command fullStripPattern(LEDPattern pattern) {
+  public Command applyFullStripPattern(LEDPattern pattern) {
     return Commands.run(() -> pattern.applyTo(buffer), hopperLong, turret, hopperShort)
         .withName("FullStrip");
+  }
+
+  public Command applyTurretPattern(LEDPattern pattern) {
+    return turret.applyPattern(pattern);
+  }
+
+  public Command applyHopperPattern(LEDPattern pattern) {
+    return Commands.parallel(hopperLong.applyPattern(pattern), hopperShort.applyPattern(pattern))
+        .withName("Hopper");
   }
 }

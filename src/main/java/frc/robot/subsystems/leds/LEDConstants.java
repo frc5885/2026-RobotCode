@@ -4,10 +4,14 @@
 
 package frc.robot.subsystems.leds;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -23,8 +27,11 @@ public class LEDConstants {
   public static final int hopperShortLength = 11;
 
   public static final class States {
+    private static final Distance ledSpacing = Meters.of(1.0 / 60);
+    private static final LinearVelocity scrollSpeed = InchesPerSecond.of(6.0);
+
     public static final LEDPattern disabled =
-        LEDPattern.rainbow(255, 255).scrollAtRelativeSpeed(Percent.per(Second).of(25.0));
+        LEDPattern.rainbow(255, 255).scrollAtAbsoluteSpeed(scrollSpeed, ledSpacing);
     public static final LEDPattern intakeRunning =
         LEDPattern.solid(Color.kCyan).blink(Seconds.of(0.2));
     public static final LEDPattern cyanScrollingGradient =
