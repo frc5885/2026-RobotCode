@@ -25,6 +25,9 @@ public class IntakeControlCommand extends Command {
   private final Timer agitateTimer = new Timer();
   private boolean agitateIsTop = true;
 
+  // For shoot delay from non-agitating states
+  private final Timer shootDelayTimer = new Timer();
+
   public IntakeControlCommand(CommandXboxController controller) {
     this.controller = controller;
     addRequirements(intakeSubsystem);
@@ -54,14 +57,26 @@ public class IntakeControlCommand extends Command {
     }
     // agitate if not intaking and shooting
     else if (shootHeld) {
-      newState = IntakeState.AGITATING;
+      if (currentState == IntakeState.AGITATING || currentState == IntakeState.INTAKING) {
+        newState = IntakeState.AGITATING;
+      } else if (currentState == IntakeState.WAITING_TO_AGITATE) {
+        newState =
+            shootDelayTimer.hasElapsed(2.0)
+                ? IntakeState.AGITATING
+                : IntakeState.WAITING_TO_AGITATE;
+      } else if (currentState == IntakeState.DEPLOYED) {
+        newState = IntakeState.WAITING_TO_AGITATE;
+      } else {
+        newState = IntakeState.AGITATING;
+      }
     }
     // was intaking or already deployed: stay deployed
     else if (currentState == IntakeState.INTAKING || currentState == IntakeState.DEPLOYED) {
       newState = IntakeState.DEPLOYED;
     }
-    // was agitating (shooting done): auto-stow
-    else if (currentState == IntakeState.AGITATING) {
+    // was agitating or waiting to agitate (shooting done): auto-stow
+    else if (currentState == IntakeState.AGITATING
+        || currentState == IntakeState.WAITING_TO_AGITATE) {
       newState = IntakeState.STOWED;
     } else {
       newState = currentState;
@@ -77,11 +92,17 @@ public class IntakeControlCommand extends Command {
       // don't run periodically only on state change
       currentState = newState;
       agitateTimer.stop();
+      shootDelayTimer.stop();
       switch (currentState) {
         case INTAKING:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(RollerConstants.intakeRollerVoltage);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
+          break;
+
+        case WAITING_TO_AGITATE:
+          shootDelayTimer.reset();
+          shootDelayTimer.start();
           break;
 
         case AGITATING:
@@ -129,6 +150,7 @@ public class IntakeControlCommand extends Command {
   public void end(boolean interrupted) {
     intakeSubsystem.setIntakeRollerVoltage(0);
     agitateTimer.stop();
+    shootDelayTimer.stop();
   }
 
   // Returns true when the command should end.
@@ -140,6 +162,7 @@ public class IntakeControlCommand extends Command {
   public enum IntakeState {
     INITIAL,
     INTAKING,
+    WAITING_TO_AGITATE,
     AGITATING,
     STOWED,
     DEPLOYED,
