@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
+import frc.robot.subsystems.intake.roller.RollerConstants;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -22,9 +23,6 @@ public class IntakeControlCommand extends Command {
   // For timed agitation sequence
   private final Timer agitateTimer = new Timer();
   private boolean agitateIsTop = true;
-  private static final double agitateTimeSeconds = 0.5;
-  private static final double intakeRollerVoltage = 12.0;
-  private static final double agitateRollerVoltage = 6.0;
 
   public IntakeControlCommand(CommandXboxController controller) {
     this.controller = controller;
@@ -81,14 +79,14 @@ public class IntakeControlCommand extends Command {
       switch (currentState) {
         case INTAKING:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
-          intakeSubsystem.setIntakeRollerVoltage(intakeRollerVoltage);
+          intakeSubsystem.setIntakeRollerVoltage(RollerConstants.intakeRollerVoltage);
           break;
 
         case AGITATING:
           agitateTimer.reset();
           agitateTimer.start();
           agitateIsTop = true;
-          intakeSubsystem.setIntakeRollerVoltage(agitateRollerVoltage);
+          intakeSubsystem.setIntakeRollerVoltage(RollerConstants.agitateRollerVoltage);
           break;
 
         case DEPLOYED:
@@ -109,7 +107,7 @@ public class IntakeControlCommand extends Command {
     // the states are the same check if its agitating
     else {
       if (currentState == IntakeState.AGITATING) {
-        if (agitateTimer.hasElapsed(agitateTimeSeconds)) {
+        if (agitateTimer.hasElapsed(ExtensionConstants.agitateTimeSeconds)) {
           agitateIsTop = !agitateIsTop;
           agitateTimer.reset();
           agitateTimer.start();

@@ -16,4 +16,7 @@ public class RollerConstants {
   public static final double positionConversionFactor = 1 / gearRatio;
   // Motor RPM -> Intake RPM
   public static final double velocityConversionFactor = positionConversionFactor;
+
+  public static final double intakeRollerVoltage = 12.0;
+  public static final double agitateRollerVoltage = 6.0;
 }
