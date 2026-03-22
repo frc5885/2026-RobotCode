@@ -37,7 +37,7 @@
                           {
                             "type": "named",
                             "data": {
-                              "name": "ShootWithAgitate"
+                              "name": "Shoot"
                             }
                           }
                         ]
@@ -52,7 +52,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "ShootWithAgitate"
+                        "name": "Shoot"
                       }
                     }
                   ]

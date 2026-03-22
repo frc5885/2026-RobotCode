@@ -33,6 +33,12 @@
                             "data": {
                               "name": "PreSpinFlywheel"
                             }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Intake"
+                            }
                           }
                         ]
                       }
@@ -63,12 +69,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
                 }
               }
             ]
