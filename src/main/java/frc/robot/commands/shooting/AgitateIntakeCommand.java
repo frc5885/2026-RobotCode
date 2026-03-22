@@ -36,6 +36,10 @@ public class AgitateIntakeCommand extends SequentialCommandGroup {
     return this.repeatedly().alongWith(spinRollerCommand());
   }
 
+  public Command runRepeatedlyAndSpinRollerWithStartDelay(double delaySeconds) {
+    return Commands.waitSeconds(delaySeconds).andThen(this.runRepeatedlyAndSpinRoller());
+  }
+
   private static Command spinRollerCommand() {
     return new StartEndCommand(
         () -> IntakeSubsystem.getInstance().setIntakeRollerVoltage(6.0),

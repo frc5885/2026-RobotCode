@@ -58,6 +58,8 @@ public class RobotContainer {
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
     NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand(
+        "ShootWithAgitate", new ShootUntilHopperEmptyCommand().withAgitation(1.0));
     NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
