@@ -11,7 +11,7 @@
             "title": "Auto Choices",
             "x": 0.0,
             "y": 0.0,
-            "width": 512.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -95,7 +95,7 @@
             "title": "Shift Active",
             "x": 640.0,
             "y": 128.0,
-            "width": 640.0,
+            "width": 384.0,
             "height": 512.0,
             "type": "Boolean Box",
             "properties": {
@@ -126,8 +126,21 @@
             }
           },
           {
+            "title": "orangepi_Port_1181_Input_MJPEG_Server",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 896.0,
+            "height": 768.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/orangepi_Port_1181_Input_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
             "title": "ShootPreload",
-            "x": 512.0,
+            "x": 384.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -142,53 +155,10 @@
       }
     },
     {
-      "name": "Tuning",
+      "name": "Autonomous",
       "grid_layout": {
         "layouts": [],
-        "containers": [
-          {
-            "title": "HoodAngleDegrees",
-            "x": 640.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/Shooter/HoodAngleDegrees",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "FlywheelRPM",
-            "x": 896.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/Shooter/FlywheelRPM",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "TurretToTargetDistance",
-            "x": 640.0,
-            "y": 384.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/LaunchCalculator/TurretToTargetDistance",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          }
-        ]
+        "containers": []
       }
     }
   ]

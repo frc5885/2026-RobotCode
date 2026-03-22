@@ -217,7 +217,7 @@ public class LaunchCalculator {
         return launchHoodAngleMap.get(distance).getRadians();
       default:
         // Probably need to tune this
-        return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 45.0);
+        return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 47.0);
     }
   }
 
@@ -227,7 +227,7 @@ public class LaunchCalculator {
         return launchFlywheelSpeedMap.get(distance);
       default:
         // Probably need to tune this
-        return ((0.903 * Math.pow(distance, 2)) + (10.68 * distance) + 194.0) * 0.8;
+        return ((0.903 * Math.pow(distance, 2)) + (10.68 * distance) + 194.0) * 0.9;
     }
   }
 

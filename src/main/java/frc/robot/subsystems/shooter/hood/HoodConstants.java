@@ -30,6 +30,7 @@ public class HoodConstants {
   public static final double kv = 4.6706;
   public static final double ka = 0.12179;
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
+  public static final double passingToleranceRadians = Units.degreesToRadians(5.0);
   public static final double velocityToleranceRadiansPerSecond = Units.degreesToRadians(6.0);
 
   public static final double extraDuckDistance = Units.inchesToMeters(12.0);

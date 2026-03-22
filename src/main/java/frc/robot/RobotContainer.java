@@ -104,10 +104,10 @@ public class RobotContainer {
 
     controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
 
-    controller
-        .povLeft()
-        .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
-    controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
+    // controller
+    //     .povLeft()
+    //     .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
+    // controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
 
     // todo convert to state machine
     controller.b().whileTrue(new OuttakeCommand());

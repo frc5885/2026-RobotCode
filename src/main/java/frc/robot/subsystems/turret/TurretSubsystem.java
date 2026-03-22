@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.turret.LaunchCalculator.LaunchMode;
 import frc.robot.util.EqualsUtil;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -148,9 +149,12 @@ public class TurretSubsystem extends SubsystemBase {
               MathUtil.clamp(bestAngle, minLegalAngle, maxLegalAngle), robotRelativeGoalVelocity);
 
       setpoint = profile.calculate(Constants.dtSeconds, setpoint, goalState);
+      double positionTolerance =
+          LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+              ? TurretConstants.turretPositionToleranceRadians
+              : TurretConstants.turretPassingToleranceRadians;
       atGoal =
-          EqualsUtil.epsilonEquals(
-                  getPosition(), bestAngle, TurretConstants.turretPositionToleranceRadians)
+          EqualsUtil.epsilonEquals(getPosition(), bestAngle, positionTolerance)
               && EqualsUtil.epsilonEquals(
                   getVelocity(),
                   robotRelativeGoalVelocity,

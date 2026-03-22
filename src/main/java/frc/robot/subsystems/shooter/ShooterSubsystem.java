@@ -36,6 +36,8 @@ import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOSpark;
+import frc.robot.subsystems.turret.LaunchCalculator;
+import frc.robot.subsystems.turret.LaunchCalculator.LaunchMode;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.EqualsUtil;
@@ -104,6 +106,9 @@ public class ShooterSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Shooter/ShotCount")
   private int shotCounter = 0;
 
+  @AutoLogOutput(key = "Shooter/PassCount")
+  private int passCounter = 0;
+
   /** Creates a new Shooter. */
   private ShooterSubsystem(FlywheelIO flywheelIO, HoodIO hoodIO) {
     this.flywheelIO = flywheelIO;
@@ -117,7 +122,15 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodSysId = hoodSysIdSetup();
     flywheelSysId = flywheelSysIdSetup();
 
-    bpsTrigger.onTrue(new InstantCommand(() -> shotCounter += 1));
+    bpsTrigger.onTrue(
+        new InstantCommand(
+            () -> {
+              if (LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING) {
+                shotCounter += 1;
+              } else {
+                passCounter += 1;
+              }
+            }));
 
     AutoLogOutputManager.addObject(this);
   }
@@ -228,17 +241,23 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Returns debounced flywheel at setpoint */
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
+    double tolerance =
+        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+            ? FlywheelConstants.velocityToleranceRPM
+            : FlywheelConstants.passingToleranceRPM;
     return flywheelAtSetpointDebouncer.calculate(
-        EqualsUtil.epsilonEquals(
-            getFlywheelRPM(), flywheelTargetVelocity, FlywheelConstants.velocityToleranceRPM));
+        EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance));
   }
 
   /** Returns debounced hood at goal */
   @AutoLogOutput(key = "Shooter/HoodAtGoal")
   public boolean isHoodAtGoal() {
+    double tolerance =
+        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+            ? HoodConstants.positionToleranceRadians
+            : HoodConstants.passingToleranceRadians;
     return hoodAtSetpointDebouncer.calculate(
-        EqualsUtil.epsilonEquals(
-            getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians)
+        EqualsUtil.epsilonEquals(getHoodAngle(), hoodGoalState.position, tolerance)
         // && EqualsUtil.epsilonEquals(
         //     getHoodVelocity(),
         //     hoodGoalState.velocity,

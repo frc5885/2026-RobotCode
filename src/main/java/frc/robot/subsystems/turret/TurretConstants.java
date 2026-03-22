@@ -44,6 +44,7 @@ public class TurretConstants {
       new Transform3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, turretOffset));
 
   public static final double turretPositionToleranceRadians = Units.degreesToRadians(6.0);
+  public static final double turretPassingToleranceRadians = Units.degreesToRadians(10.0);
   public static final double turretVelocityToleranceRadiansPerSecond =
       Units.degreesToRadians(100.0);
 

@@ -15,7 +15,7 @@ public class WaitUntilHopperIsEmptyCommand extends Command {
   /** Creates a new WaitUntilHopperIsEmptyCommand. */
   private final VisionSubsystem visionSubsystem = VisionSubsystem.getInstance();
 
-  private final Debouncer visionDebouncer = new Debouncer(0.5);
+  private final Debouncer visionDebouncer = new Debouncer(0.3);
 
   public WaitUntilHopperIsEmptyCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
