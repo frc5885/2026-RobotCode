@@ -148,10 +148,10 @@ public class AssistedDriveCommand extends Command {
     }
     return Meters.of(FieldConstants.RightTrench.center.getY());
   }
-  
-    private Rotation2d getTrenchLockAngle() {
-      return GeometryUtil.getNearest180Rotation(driveSubsystem.getRotation());
-    }
+
+  private Rotation2d getTrenchLockAngle() {
+    return GeometryUtil.getNearest180Rotation(driveSubsystem.getRotation());
+  }
 
   private Distance getTowerX() {
     if (driveSubsystem.getPose().getX() < FieldConstants.fieldLength / 2) {
