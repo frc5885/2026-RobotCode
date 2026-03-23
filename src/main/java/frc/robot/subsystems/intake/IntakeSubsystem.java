@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -171,6 +172,11 @@ public class IntakeSubsystem extends SubsystemBase {
   public TrapezoidProfile.State getExtensionCurrentState() {
     return new TrapezoidProfile.State(
         extensionInputs.positionRadians, extensionInputs.velocityRadiansPerSecond);
+  }
+
+  /** Returns true if the extension is down (less than 45 degrees). */
+  public boolean isExtensionDown() {
+    return extensionInputs.positionRadians < Units.degreesToRadians(45);
   }
 
   /**
