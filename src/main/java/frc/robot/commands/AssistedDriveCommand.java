@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.controllers.ControllerConstants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.ControllerUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.GeometryUtil;
@@ -165,13 +166,41 @@ public class AssistedDriveCommand extends Command {
   }
 
   private Rotation2d getBumpLockAngle() {
-    for (int i = -135; i < 180; i += 90) {
-      if (Math.abs(MathUtil.inputModulus(driveSubsystem.getRotation().getDegrees() - i, -180, 180))
-          <= 45) {
-        return Rotation2d.fromDegrees(i);
-      }
+    // Angles where the robot's intake (front, 0°) faces in the ±X direction
+    Rotation2d[] intakeFirstAngles = {Rotation2d.fromDegrees(45), Rotation2d.fromDegrees(-45)};
+    // Angles where the robot's intake faces away from the ±X direction (intake trails)
+    Rotation2d[] intakeTrailingAngles = {Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)};
+
+    boolean isIntakeDown = IntakeSubsystem.getInstance().isExtensionDown();
+    if (!isIntakeDown) {
+      return GeometryUtil.getNearestRotation(
+          driveSubsystem.getRotation(),
+          intakeFirstAngles[0],
+          intakeFirstAngles[1],
+          intakeTrailingAngles[0],
+          intakeTrailingAngles[1]);
     }
-    return Rotation2d.kZero;
+
+    // Intake is down — only allow headings where the intake trails the direction of X travel,
+    // since we cannot drive over the bump intake-first when it is extended
+    double vx = driveSubsystem.getFieldRelativeChassisSpeeds().vxMetersPerSecond;
+    if (vx > 0) {
+      // Moving in +X: intake must face -X → 135° or -135°
+      return GeometryUtil.getNearestRotation(
+          driveSubsystem.getRotation(), intakeTrailingAngles[0], intakeTrailingAngles[1]);
+    } else if (vx < 0) {
+      // Moving in -X: intake must face +X → 45° or -45°
+      return GeometryUtil.getNearestRotation(
+          driveSubsystem.getRotation(), intakeFirstAngles[0], intakeFirstAngles[1]);
+    } else {
+      // No X motion; any heading is fine
+      return GeometryUtil.getNearestRotation(
+          driveSubsystem.getRotation(),
+          intakeFirstAngles[0],
+          intakeFirstAngles[1],
+          intakeTrailingAngles[0],
+          intakeTrailingAngles[1]);
+    }
   }
 
   private Command updateDriveMode(DriveMode driveMode) {
