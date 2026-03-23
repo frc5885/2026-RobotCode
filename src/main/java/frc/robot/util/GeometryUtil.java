@@ -23,6 +23,9 @@ public class GeometryUtil {
 
   /** Returns the candidate from {@code candidates} nearest to {@code angle}. */
   public static Rotation2d getNearestRotation(Rotation2d angle, Rotation2d... candidates) {
+    if (candidates == null || candidates.length == 0) {
+      throw new IllegalArgumentException("getNearestRotation requires at least one candidate");
+    }
     Rotation2d nearest = candidates[0];
     double minDist = Double.MAX_VALUE;
     for (Rotation2d candidate : candidates) {
