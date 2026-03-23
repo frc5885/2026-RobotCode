@@ -130,6 +130,68 @@ public class Zones {
     }
   }
 
+  public static interface PredictiveYZone extends Zone {
+    public Trigger willContain(Supplier<Pose2d> pose, Supplier<ChassisSpeeds> fieldSpeeds, Time dt);
+  }
+
+  public static class PredictiveYBaseZone extends BaseZone implements PredictiveYZone {
+    public PredictiveYBaseZone(double xMin, double xMax, double yMin, double yMax) {
+      super(xMin, xMax, yMin, yMax);
+    }
+
+    public PredictiveYBaseZone(BaseZone baseZone) {
+      super(baseZone.xMin, baseZone.xMax, baseZone.yMin, baseZone.yMax);
+    }
+
+    public PredictiveYBaseZone(Distance xMin, Distance xMax, Distance yMin, Distance yMax) {
+      super(xMin, xMax, yMin, yMax);
+    }
+
+    @Override
+    public Trigger willContain(
+        Supplier<Pose2d> pose, Supplier<ChassisSpeeds> fieldSpeeds, Time dt) {
+      return new Trigger(
+          () -> willContainPoint(pose.get().getTranslation(), fieldSpeeds.get(), dt));
+    }
+
+    protected boolean willContainPoint(Translation2d point, ChassisSpeeds fieldSpeeds, Time dt) {
+      return (point.getX() >= xMin && point.getX() <= xMax)
+          && ((point.getY() >= yMin && point.getY() <= yMax)
+              || (point.getY() < yMin
+                  && fieldSpeeds.vyMetersPerSecond * dt.in(Seconds) >= yMin - point.getY())
+              || (point.getY() > yMax
+                  && fieldSpeeds.vyMetersPerSecond * dt.in(Seconds) <= yMax - point.getY()));
+    }
+
+    @Override
+    public PredictiveYBaseZone mirroredX() {
+      return new PredictiveYBaseZone(super.mirroredX());
+    }
+
+    @Override
+    public PredictiveYBaseZone mirroredY() {
+      return new PredictiveYBaseZone(super.mirroredY());
+    }
+  }
+
+  public static class PredictiveYZoneCollection extends ZoneCollection implements PredictiveYZone {
+    public PredictiveYZoneCollection(PredictiveYZone... zones) {
+      super(zones);
+    }
+
+    @Override
+    public Trigger willContain(
+        Supplier<Pose2d> pose, Supplier<ChassisSpeeds> fieldSpeeds, Time dt) {
+      Trigger combined = new Trigger(() -> false);
+
+      for (Zone zone : zones) {
+        combined = combined.or(((PredictiveYZone) zone).willContain(pose, fieldSpeeds, dt));
+      }
+
+      return combined;
+    }
+  }
+
   public static class PredictiveXZoneCollection extends ZoneCollection implements PredictiveXZone {
     public PredictiveXZoneCollection(PredictiveXZone... zones) {
       super(zones);
@@ -202,6 +264,31 @@ public class Zones {
   public static final PredictiveXZoneCollection bumpZones =
       new PredictiveXZoneCollection(blueBottomBump, blueTopBump, redBottomBump, redTopBump);
 
+  private static final PredictiveYBaseZone blueTower =
+      new PredictiveYBaseZone(
+          0.0,
+          FieldConstants.Tower.depth,
+          FieldConstants.Tower.centerPoint.getY()
+              - FieldConstants.Tower.width / 2
+              - FieldConstants.Tower.yZoneExtraOffset,
+          FieldConstants.Tower.centerPoint.getY()
+              + FieldConstants.Tower.width / 2
+              + FieldConstants.Tower.yZoneExtraOffset);
+
+  private static final PredictiveYBaseZone redTower =
+      new PredictiveYBaseZone(
+          FieldConstants.fieldLength - FieldConstants.Tower.depth,
+          FieldConstants.fieldLength,
+          FieldConstants.Tower.oppCenterPoint.getY()
+              - FieldConstants.Tower.width / 2
+              - FieldConstants.Tower.yZoneExtraOffset,
+          FieldConstants.Tower.oppCenterPoint.getY()
+              + FieldConstants.Tower.width / 2
+              + FieldConstants.Tower.yZoneExtraOffset);
+
+  public static final PredictiveYZoneCollection towerZones =
+      new PredictiveYZoneCollection(blueTower, redTower);
+
   public static void logAllZones() {
     Logger.recordOutput("Zones/Trenches/Blue Bottom", blueBottomTrench.getCorners());
     Logger.recordOutput("Zones/Trenches/Blue Top", blueTopTrench.getCorners());
@@ -217,5 +304,8 @@ public class Zones {
     Logger.recordOutput("Zones/Bumps/Blue Top", blueTopBump.getCorners());
     Logger.recordOutput("Zones/Bumps/Red Bottom", redBottomBump.getCorners());
     Logger.recordOutput("Zones/Bumps/Red Top", redTopBump.getCorners());
+
+    Logger.recordOutput("Zones/Tower/Blue", blueTower.getCorners());
+    Logger.recordOutput("Zones/Tower/Red", redTower.getCorners());
   }
 }

@@ -5,6 +5,8 @@
 package frc.robot.subsystems.turret;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -16,12 +18,17 @@ public class TurretIOSim implements TurretIO {
   private double appliedVolts;
 
   private DCMotorSim turretSim;
+  private SimpleMotorFeedforward turretFF;
+  private PIDController turretPID;
 
   public TurretIOSim() {
     turretSim =
         new DCMotorSim(
             LinearSystemId.createDCMotorSystem(TurretConstants.kV, TurretConstants.kA),
             DCMotor.getFalcon500(1));
+    turretFF =
+        new SimpleMotorFeedforward(TurretConstants.kS, TurretConstants.kV, TurretConstants.kA);
+    turretPID = new PIDController(TurretConstants.kp, TurretConstants.ki, TurretConstants.kd);
   }
 
   @Override
@@ -37,6 +44,18 @@ public class TurretIOSim implements TurretIO {
   @Override
   public void setMotorVoltage(double volts) {
     appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    turretSim.setInput(appliedVolts);
+  }
+
+  @Override
+  public void setMotorGoalPositionVelocity(
+      double positionRadians, double velocityRadiansPerSecond) {
+    appliedVolts =
+        MathUtil.clamp(
+            turretFF.calculate(velocityRadiansPerSecond)
+                + turretPID.calculate(turretSim.getAngularPositionRad(), positionRadians),
+            -12.0,
+            12.0);
     turretSim.setInput(appliedVolts);
   }
 }

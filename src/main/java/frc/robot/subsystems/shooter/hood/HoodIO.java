@@ -13,6 +13,7 @@ public interface HoodIO {
   @AutoLog
   public static class HoodIOInputs {
     public boolean motorConnected = false;
+    public boolean isZeroed = false;
     public double positionRadians = 0.0;
     public double velocityRadiansPerSecond = 0.0;
     public double appliedVolts = 0.0;
@@ -24,6 +25,9 @@ public interface HoodIO {
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
+
+  /** Run the motor to the specified position with an arbitrary feedforward voltage. */
+  public default void setMotorPosition(double positionRads, double arbFFVolts) {}
 
   /**
    * Sets the brake mode of the motor.

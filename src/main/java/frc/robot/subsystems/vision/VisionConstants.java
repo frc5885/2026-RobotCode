@@ -23,6 +23,10 @@ public class VisionConstants {
   public static String camera1Name = "private";
   public static String camera2Name = "skipper";
   public static String camera3Name = "rico";
+  public static String camera4Name = "kingJulien";
+
+  // Index of the game piece detection camera
+  public static final int gamePieceCameraIndex = 4;
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
@@ -48,14 +52,15 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static double linearStdDevBaseline = 0.5; // Meters
+  public static double angularStdDevBaseline = Units.degreesToRadians(25.0); // Radians
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
+  // 1.0 = no change, 2.0 = 2x worse (trust 1/2 as much), 0.5 = 2x better (trust 2x more)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
+        0.7, // Camera 0 (we trust big K)
         1.0, // Camera 1
         1.0, // Camera 2
         1.0 // Camera 3

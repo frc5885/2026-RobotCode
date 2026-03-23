@@ -19,8 +19,11 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.shooter.flywheel.FlywheelConstants;
@@ -33,6 +36,8 @@ import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.shooter.hood.HoodIOSpark;
+import frc.robot.subsystems.turret.LaunchCalculator;
+import frc.robot.subsystems.turret.LaunchCalculator.LaunchMode;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import frc.robot.util.EqualsUtil;
@@ -81,7 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final SimpleMotorFeedforward hoodFF =
       new SimpleMotorFeedforward(HoodConstants.ks, HoodConstants.kv, HoodConstants.ka);
   private final Debouncer flywheelAtSetpointDebouncer = new Debouncer(0.25);
-  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.2);
+  private final Debouncer hoodAtSetpointDebouncer = new Debouncer(0.1);
 
   private TrapezoidProfile hoodProfile =
       new TrapezoidProfile(
@@ -95,6 +100,15 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean runHoodClosedLoop = false;
   private boolean runFlywheelClosedLoop = false;
 
+  private final DigitalInput bpsSensor = new DigitalInput(ShooterConstants.bpsSensorPort);
+  private final Trigger bpsTrigger = new Trigger(() -> !bpsSensor.get());
+
+  @AutoLogOutput(key = "Shooter/ShotCount")
+  private int shotCounter = 0;
+
+  @AutoLogOutput(key = "Shooter/PassCount")
+  private int passCounter = 0;
+
   /** Creates a new Shooter. */
   private ShooterSubsystem(FlywheelIO flywheelIO, HoodIO hoodIO) {
     this.flywheelIO = flywheelIO;
@@ -107,6 +121,16 @@ public class ShooterSubsystem extends SubsystemBase {
 
     hoodSysId = hoodSysIdSetup();
     flywheelSysId = flywheelSysIdSetup();
+
+    bpsTrigger.onTrue(
+        new InstantCommand(
+            () -> {
+              if (LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING) {
+                shotCounter += 1;
+              } else {
+                passCounter += 1;
+              }
+            }));
 
     AutoLogOutputManager.addObject(this);
   }
@@ -122,8 +146,8 @@ public class ShooterSubsystem extends SubsystemBase {
     flywheelRightMotorDisconnectedAlert.set(!flywheelInputs.rightMotorConnected);
     hoodMotorDisconnectedAlert.set(!hoodInputs.motorConnected);
 
-    if (runHoodClosedLoop) {
-      TrapezoidProfile.State current = getHoodCurrentState();
+    if (runHoodClosedLoop && hoodInputs.isZeroed) {
+      // TrapezoidProfile.State current = getHoodCurrentState();
       // TrapezoidProfile.State setpoint =
       //     hoodProfile.calculate(Constants.dtSeconds, hoodPrevSetpoint, hoodGoalState);
       // hoodPrevSetpoint = setpoint;
@@ -131,14 +155,15 @@ public class ShooterSubsystem extends SubsystemBase {
       // Profiled PID was bad, now only using regular PID to goal state and FF only for velocity
       // target from LaunchCalculator
       double ffVoltage = hoodFF.calculate(hoodGoalState.velocity);
-      double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
+      // double pidVoltage = hoodPID.calculate(current.position, hoodGoalState.position);
 
-      Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
-      Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
+      // Logger.recordOutput("Shooter/Hood/FFVoltage", ffVoltage);
+      // Logger.recordOutput("Shooter/Hood/PIDVoltage", pidVoltage);
       Logger.recordOutput("Shooter/Hood/SetpointPositionRadians", hoodGoalState.position);
       Logger.recordOutput("Shooter/Hood/SetpointVelocity", hoodGoalState.velocity);
 
-      setHoodVoltage(ffVoltage + pidVoltage);
+      // setHoodVoltage(ffVoltage + pidVoltage);
+      hoodIO.setMotorPosition(hoodGoalState.position, ffVoltage);
     }
 
     if (runFlywheelClosedLoop) {
@@ -216,17 +241,23 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Returns debounced flywheel at setpoint */
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
+    double tolerance =
+        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+            ? FlywheelConstants.velocityToleranceRPM
+            : FlywheelConstants.passingToleranceRPM;
     return flywheelAtSetpointDebouncer.calculate(
-        EqualsUtil.epsilonEquals(
-            getFlywheelRPM(), flywheelTargetVelocity, FlywheelConstants.velocityToleranceRPM));
+        EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance));
   }
 
   /** Returns debounced hood at goal */
   @AutoLogOutput(key = "Shooter/HoodAtGoal")
   public boolean isHoodAtGoal() {
+    double tolerance =
+        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+            ? HoodConstants.positionToleranceRadians
+            : HoodConstants.passingToleranceRadians;
     return hoodAtSetpointDebouncer.calculate(
-        EqualsUtil.epsilonEquals(
-            getHoodAngle(), hoodGoalState.position, HoodConstants.positionToleranceRadians)
+        EqualsUtil.epsilonEquals(getHoodAngle(), hoodGoalState.position, tolerance)
         // && EqualsUtil.epsilonEquals(
         //     getHoodVelocity(),
         //     hoodGoalState.velocity,

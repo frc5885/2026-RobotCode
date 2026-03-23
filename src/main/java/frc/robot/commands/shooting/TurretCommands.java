@@ -5,7 +5,9 @@
 package frc.robot.commands.shooting;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -37,5 +39,13 @@ public class TurretCommands {
    */
   public static Command setActiveLaunchingModeCommand() {
     return TurretSubsystem.getInstance().setActiveLaunchingModeCommand();
+  }
+
+  /** Tracks the target in teleop and points straight forward in test mode */
+  public static Command trackTargetInTeleopAndStraightForwardInTest() {
+    return new ConditionalCommand(
+        TurretCommands.runTrackTargetCommand(),
+        TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.kZero),
+        () -> !DriverStation.isTest());
   }
 }

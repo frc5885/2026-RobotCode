@@ -16,19 +16,19 @@ public class TurretConstants {
   public static final double startingAngleRadians = Units.degreesToRadians(0.0);
   public static final int canId = 30;
   public static final boolean motorInverted = true; // CCW positive
-  public static final int currentLimit = 20;
+  public static final int currentLimit = 40;
   // Motor Rotations -> Radians
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
-  public static final double kp = 5.0;
+  public static final double kp = 8.0;
   public static final double ki = 0.0;
-  public static final double kd = 0.0;
-  public static final double kS = 0.21262;
-  public static final double kV = 1.0343;
-  public static final double kA = 0.1046;
+  public static final double kd = 0.2;
+  public static final double kS = 0.17916;
+  public static final double kV = 1.1061;
+  public static final double kA = 0.017088;
   public static final double maxVelocityRadiansPerSecond = 9.8;
-  public static final double maxAccelerationRadiansPerSecondSquared = 44.0;
+  public static final double maxAccelerationRadiansPerSecondSquared = 70.0;
 
   public static final double turretOffset = Units.degreesToRadians(0.0); // facing front
   private static final double minOffsetAngle = Units.degreesToRadians(-213.0);
@@ -43,7 +43,8 @@ public class TurretConstants {
   public static final Transform3d robotToTurret =
       new Transform3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, turretOffset));
 
-  public static final double turretPositionToleranceRadians = Units.degreesToRadians(3.0);
+  public static final double turretPositionToleranceRadians = Units.degreesToRadians(6.0);
+  public static final double turretPassingToleranceRadians = Units.degreesToRadians(10.0);
   public static final double turretVelocityToleranceRadiansPerSecond =
       Units.degreesToRadians(100.0);
 

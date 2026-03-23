@@ -11,12 +11,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -29,11 +27,13 @@ import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.IntakeControlCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
-import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
+import frc.robot.subsystems.leds.LEDConstants;
+import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -60,6 +60,8 @@ public class RobotContainer {
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
     NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand(
+        "ShootWithAgitate", new ShootUntilHopperEmptyCommand().withAgitation(1.0));
     NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
@@ -76,11 +78,11 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
+    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -96,38 +98,19 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
     DefaultCommands.setDefaultTurretCommand(
-        new ConditionalCommand(
-            TurretCommands.runTrackTargetCommand(),
-            TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.fromDegrees(0.1)),
-            () -> !DriverStation.isTest()));
+        TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
+
+    DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
 
     controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
 
-    controller
-        .povLeft()
-        .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
-    controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
-    controller.leftTrigger(0.1).whileTrue(new IntakeCommand());
-    controller.leftBumper().onTrue(new RetractIntakeCommand());
+    // controller
+    //     .povLeft()
+    //     .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
+    // controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
 
-    controller.a().whileTrue(new AgitateIntakeCommand().runRepeatedlyAndSpinRoller());
+    // todo convert to state machine
     controller.b().whileTrue(new OuttakeCommand());
-
-    // controller
-    //     .a()
-    //     .whileTrue(
-    //         new StartEndCommand(
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(12.0),
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
-    //             IntakeSubsystem.getInstance()));
-
-    // controller
-    //     .b()
-    //     .whileTrue(
-    //         new StartEndCommand(
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(-12.0),
-    //             () -> IntakeSubsystem.getInstance().runExtensionOpenLoop(0),
-    //             IntakeSubsystem.getInstance()));
 
     // Operator Switches
     // operatorPanel
@@ -136,6 +119,15 @@ public class RobotContainer {
         .start()
         .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
         .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
+
+    controller
+        .povLeft()
+        .whileTrue(LEDSubsystem.getInstance().applyTurretPattern(LEDConstants.States.policeSirens));
+    controller
+        .povRight()
+        .whileTrue(
+            LEDSubsystem.getInstance()
+                .applyFullStripPattern(LEDConstants.States.cyanScrollingGradient));
   }
 
   /**

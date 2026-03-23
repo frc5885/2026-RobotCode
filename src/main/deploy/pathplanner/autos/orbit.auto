@@ -33,6 +33,12 @@
                             "data": {
                               "name": "PreSpinFlywheel"
                             }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Intake"
+                            }
                           }
                         ]
                       }
@@ -44,7 +50,7 @@
                           {
                             "type": "named",
                             "data": {
-                              "name": "Shoot"
+                              "name": "ShootWithAgitate"
                             }
                           },
                           {
@@ -63,12 +69,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
                 }
               }
             ]
@@ -102,7 +102,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "ShootWithAgitate"
           }
         }
       ]

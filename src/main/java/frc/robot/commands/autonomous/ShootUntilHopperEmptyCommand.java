@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import frc.robot.commands.shooting.AgitateIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -26,5 +27,10 @@ public class ShootUntilHopperEmptyCommand extends ParallelDeadlineGroup {
   public Command conditionalShootPreload() {
     return new ConditionalCommand(
         this, Commands.none(), () -> SmartDashboard.getBoolean("ShootPreload", false));
+  }
+
+  public Command withAgitation(double delaySeconds) {
+    return new ParallelDeadlineGroup(
+        this, new AgitateIntakeCommand().runRepeatedlyAndSpinRollerWithStartDelay(delaySeconds));
   }
 }

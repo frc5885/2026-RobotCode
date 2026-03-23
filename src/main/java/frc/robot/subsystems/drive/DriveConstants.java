@@ -26,7 +26,7 @@ public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.1; // Tuned on poseidon
   public static final double maxAccelerationMetersPerSec2 = 10.0;
   public static final double shootOnTheMoveSpeedMultiplier = 0.15;
-  public static final double passOnTheMoveSpeedMultiplier = 0.7;
+  public static final double passOnTheMoveSpeedMultiplier = 0.2;
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);
@@ -127,8 +127,8 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-  public static final PIDConstants pathplannerDrivePID = new PIDConstants(6.0, 0.0, 0.6);
-  public static final PIDConstants pathplannerTurnPID = new PIDConstants(6.0, 0.0, 1.0);
+  public static final PIDConstants pathplannerDrivePID = new PIDConstants(4.7, 0.0, 0.7);
+  public static final PIDConstants pathplannerTurnPID = new PIDConstants(3.0, 0.0, 1.1);
 
   public static final PathConstraints pathConstraints = new PathConstraints(4.1, 8.0, 8.8, 16.0);
 
@@ -146,10 +146,12 @@ public class DriveConstants {
   public static final double driveAssistRotationKd = 0.0;
 
   public static final double trenchAlignPositionTolerance = Units.inchesToMeters(4.0);
+  public static final double towerAlignPositionTolerance = Units.inchesToMeters(2.0);
   public static final double rotationAlignTolerance = Units.degreesToRadians(5.0);
 
   public static final double trenchAlignTimeSeconds = 0.5;
   public static final double bumpAlignTimeSeconds = 0.3;
+  public static final double towerAlignTimeSeconds = 0.5;
 
   public static final double fullRobotLength = robotLength + 2 * bumperWidth;
   public static final double fullRobotWidth = robotWidth + 2 * bumperWidth;

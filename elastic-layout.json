@@ -11,7 +11,7 @@
             "title": "Auto Choices",
             "x": 0.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -95,7 +95,7 @@
             "title": "Shift Active",
             "x": 640.0,
             "y": 128.0,
-            "width": 640.0,
+            "width": 384.0,
             "height": 512.0,
             "type": "Boolean Box",
             "properties": {
@@ -123,6 +123,32 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "orangepi_Port_1181_Input_MJPEG_Server",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 896.0,
+            "height": 768.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/orangepi_Port_1181_Input_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "ShootPreload",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/ShootPreload",
+              "period": 0.06,
+              "data_type": "boolean"
             }
           }
         ]

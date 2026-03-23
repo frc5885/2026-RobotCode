@@ -14,13 +14,16 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -48,6 +51,7 @@ public class TurretIOTalonFX implements TurretIO {
   private final StatusSignal<Voltage> appliedVolts;
   private final StatusSignal<Current> current;
   private final VoltageOut voltageRequest = new VoltageOut(0.0).withEnableFOC(false);
+  private final PositionVoltage positionRequest = new PositionVoltage(0).withEnableFOC(false);
 
   private final double timeoutSeconds = 0.25;
   private final double updateFrequency = 50.0; // Hz
@@ -71,7 +75,17 @@ public class TurretIOTalonFX implements TurretIO {
             .withVoltage(
                 new VoltageConfigs().withPeakForwardVoltage(12.0).withPeakReverseVoltage(-12.0))
             .withFeedback(
-                new FeedbackConfigs().withSensorToMechanismRatio(TurretConstants.gearRatio));
+                new FeedbackConfigs().withSensorToMechanismRatio(TurretConstants.gearRatio))
+            .withSlot0(
+                new Slot0Configs()
+                    // Multiply all but ks by 2*PI because TalonFX expects rotations and our
+                    // constants are in radians
+                    .withKP(TurretConstants.kp * 2 * Math.PI)
+                    .withKI(TurretConstants.ki * 2 * Math.PI)
+                    .withKD(TurretConstants.kd * 2 * Math.PI)
+                    .withKS(TurretConstants.kS)
+                    .withKV(TurretConstants.kV * 2 * Math.PI)
+                    .withKA(TurretConstants.kA * 2 * Math.PI));
 
     PhoenixUtil.tryUntilOk(5, () -> motor.getConfigurator().apply(turretConfig, timeoutSeconds));
 
@@ -136,6 +150,15 @@ public class TurretIOTalonFX implements TurretIO {
   @Override
   public void setMotorVoltage(double volts) {
     motor.setControl(voltageRequest.withOutput(volts));
+  }
+
+  @Override
+  public void setMotorGoalPositionVelocity(
+      double positionRadians, double velocityRadiansPerSecond) {
+    motor.setControl(
+        positionRequest
+            .withPosition(Units.radiansToRotations(positionRadians))
+            .withVelocity(Units.radiansToRotations(velocityRadiansPerSecond)));
   }
 
   @Override

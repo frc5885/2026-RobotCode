@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 
 public class DefaultCommands {
@@ -26,5 +27,12 @@ public class DefaultCommands {
    */
   public static void setDefaultTurretCommand(Command command) {
     TurretSubsystem.getInstance().setDefaultCommand(command);
+  }
+
+  /*
+   * Set up default intake command
+   */
+  public static void setDefaultIntakeCommand(Command command) {
+    IntakeSubsystem.getInstance().setDefaultCommand(command);
   }
 }

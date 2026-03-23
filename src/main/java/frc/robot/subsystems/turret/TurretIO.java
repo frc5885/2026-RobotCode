@@ -31,6 +31,10 @@ public interface TurretIO {
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
 
+  /** Run the motor to the specified position with a feedforward velocity. */
+  public default void setMotorGoalPositionVelocity(
+      double positionRadians, double velocityRadiansPerSecond) {}
+
   /**
    * Sets the brake mode of the motor.
    *

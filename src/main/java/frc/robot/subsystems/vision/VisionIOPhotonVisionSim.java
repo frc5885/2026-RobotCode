@@ -28,7 +28,7 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
    * @param robotToCamera The 3D position of the camera relative to the robot.
    */
   public VisionIOPhotonVisionSim(String name, Transform3d robotToCamera) {
-    super(name, robotToCamera);
+    super(name, robotToCamera, CameraType.APRIL_TAG);
 
     // Initialize vision sim
     if (visionSim == null) {

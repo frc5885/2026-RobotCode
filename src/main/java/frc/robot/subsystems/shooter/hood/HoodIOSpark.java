@@ -10,7 +10,10 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.LimitSwitchConfig.Behavior;
@@ -22,6 +25,7 @@ import java.util.function.DoubleSupplier;
 public class HoodIOSpark implements HoodIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
+  private final SparkClosedLoopController controller;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
   private boolean isEncoderZeroed = false;
 
@@ -30,6 +34,7 @@ public class HoodIOSpark implements HoodIO {
   public HoodIOSpark() {
     motor = new SparkMax(HoodConstants.canId, MotorType.kBrushless);
     encoder = motor.getEncoder();
+    controller = motor.getClosedLoopController();
 
     SparkMaxConfig hoodConfig = new SparkMaxConfig();
     hoodConfig
@@ -58,6 +63,8 @@ public class HoodIOSpark implements HoodIO {
         .forwardLimitSwitchPosition(HoodConstants.startingAngleRadians)
         .limitSwitchPositionSensor(FeedbackSensor.kPrimaryEncoder)
         .reverseLimitSwitchTriggerBehavior(Behavior.kKeepMovingMotor);
+    hoodConfig.closedLoop.feedForward.sva(HoodConstants.ks, HoodConstants.kv, HoodConstants.ka);
+    hoodConfig.closedLoop.pid(HoodConstants.kp, HoodConstants.ki, HoodConstants.kd);
     tryUntilOk(
         motor,
         5,
@@ -77,6 +84,7 @@ public class HoodIOSpark implements HoodIO {
         (values) -> inputs.appliedVolts = values[0] * values[1]);
     ifOk(motor, motor::getOutputCurrent, (value) -> inputs.currentAmps = value);
     inputs.motorConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
+    inputs.isZeroed = isEncoderZeroed;
 
     if (!isEncoderZeroed && inputs.motorConnected) {
       if (zeroEncoder() == REVLibError.kOk) {
@@ -118,5 +126,10 @@ public class HoodIOSpark implements HoodIO {
         () ->
             motor.configure(
                 config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+  }
+
+  @Override
+  public void setMotorPosition(double positionRads, double arbFFVolts) {
+    controller.setSetpoint(positionRads, ControlType.kPosition, ClosedLoopSlot.kSlot0, arbFFVolts);
   }
 }

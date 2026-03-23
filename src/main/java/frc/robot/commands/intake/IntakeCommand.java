@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
+import frc.robot.subsystems.intake.roller.RollerConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeCommand extends Command {
   private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
-  private static final double intakeRollerVoltage = 12.0;
   /** Creates a new IntakeCommand. */
   public IntakeCommand() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -32,7 +32,7 @@ public class IntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeRollerVoltage(intakeRollerVoltage);
+    intakeSubsystem.setIntakeRollerVoltage(RollerConstants.intakeRollerVoltage);
   }
 
   // Called once the command ends or is interrupted.
