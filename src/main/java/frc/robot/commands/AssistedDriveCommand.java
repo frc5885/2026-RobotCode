@@ -75,7 +75,7 @@ public class AssistedDriveCommand extends Command {
     this.driveLimiter = new SlewRateLimiter2d(DriveConstants.maxAccelerationMetersPerSec2);
 
     trenchYController.setTolerance(DriveConstants.trenchAlignPositionTolerance);
-    towerXController.setTolerance(DriveConstants.trenchAlignPositionTolerance);
+    towerXController.setTolerance(DriveConstants.towerAlignPositionTolerance);
     rotationController.setTolerance(DriveConstants.rotationAlignTolerance);
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 

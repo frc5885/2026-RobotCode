@@ -146,6 +146,7 @@ public class DriveConstants {
   public static final double driveAssistRotationKd = 0.0;
 
   public static final double trenchAlignPositionTolerance = Units.inchesToMeters(4.0);
+  public static final double towerAlignPositionTolerance = Units.inchesToMeters(2.0);
   public static final double rotationAlignTolerance = Units.degreesToRadians(5.0);
 
   public static final double trenchAlignTimeSeconds = 0.5;
