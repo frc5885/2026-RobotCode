@@ -39,7 +39,6 @@ public class WaitUntilHopperIsEmptyCommand extends Command {
     if (Constants.isSim()) {
       return IntakeSubsystem.getInstance().getSimHopperFuelCount() == 0;
     } else {
-      // Add logic for real robot here :)
       return visionDebouncer.calculate(visionSubsystem.getGamePieceCount() == 0);
     }
   }

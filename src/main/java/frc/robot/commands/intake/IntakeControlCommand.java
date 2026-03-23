@@ -27,6 +27,7 @@ public class IntakeControlCommand extends Command {
 
   // For shoot delay from non-agitating states
   private final Timer shootDelayTimer = new Timer();
+  private final double shootDelayTimeSeconds = 2.0;
 
   public IntakeControlCommand(CommandXboxController controller) {
     this.controller = controller;
@@ -38,6 +39,7 @@ public class IntakeControlCommand extends Command {
   public void initialize() {
     currentState = IntakeState.INITIAL;
     agitateTimer.stop();
+    shootDelayTimer.stop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -61,7 +63,7 @@ public class IntakeControlCommand extends Command {
         newState = IntakeState.AGITATING;
       } else if (currentState == IntakeState.WAITING_TO_AGITATE) {
         newState =
-            shootDelayTimer.hasElapsed(2.0)
+            shootDelayTimer.hasElapsed(shootDelayTimeSeconds)
                 ? IntakeState.AGITATING
                 : IntakeState.WAITING_TO_AGITATE;
       } else if (currentState == IntakeState.DEPLOYED) {
@@ -110,6 +112,7 @@ public class IntakeControlCommand extends Command {
           agitateTimer.start();
           agitateIsTop = true;
           intakeSubsystem.setIntakeRollerVoltage(RollerConstants.agitateRollerVoltage);
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.agitateTopAngle);
           break;
 
         case DEPLOYED:

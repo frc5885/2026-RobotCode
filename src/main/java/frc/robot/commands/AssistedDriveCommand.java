@@ -110,7 +110,7 @@ public class AssistedDriveCommand extends Command {
                     .willContain(
                         driveSubsystem::getPose,
                         driveSubsystem::getFieldRelativeChassisSpeeds,
-                        Seconds.of(DriveConstants.bumpAlignTimeSeconds))
+                        Seconds.of(DriveConstants.towerAlignTimeSeconds))
                     .debounce(0.1))
             .and(() -> !DriverStation.isTest());
 

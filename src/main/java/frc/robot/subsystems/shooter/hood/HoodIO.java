@@ -26,6 +26,7 @@ public interface HoodIO {
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
 
+  /** Run the motor to the specified position with an arbitrary feedforward voltage. */
   public default void setMotorPosition(double positionRads, double arbFFVolts) {}
 
   /**

@@ -150,6 +150,7 @@ public class DriveConstants {
 
   public static final double trenchAlignTimeSeconds = 0.5;
   public static final double bumpAlignTimeSeconds = 0.3;
+  public static final double towerAlignTimeSeconds = 0.5;
 
   public static final double fullRobotLength = robotLength + 2 * bumperWidth;
   public static final double fullRobotWidth = robotWidth + 2 * bumperWidth;

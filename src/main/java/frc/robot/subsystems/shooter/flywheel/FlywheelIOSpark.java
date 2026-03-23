@@ -20,7 +20,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class FlywheelIOSpark implements FlywheelIO {
   private final SparkFlex leftMotor;
@@ -98,7 +97,6 @@ public class FlywheelIOSpark implements FlywheelIO {
         (values) -> inputs.appliedVolts = values[0] * values[1]);
     ifOk(leftMotor, leftMotor::getOutputCurrent, (value) -> currents[0] = value);
     inputs.leftMotorConnected = leftMotorConnectedDebounce.calculate(!sparkStickyFault);
-    Logger.recordOutput("Shooter/Flywheel/AppliedOutput", leftMotor.getAppliedOutput());
 
     // Right motor
     sparkStickyFault = false;

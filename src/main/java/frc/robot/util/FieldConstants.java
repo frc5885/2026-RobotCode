@@ -235,6 +235,7 @@ public class FieldConstants {
     public static final double innerOpeningWidth = Units.inchesToMeters(32.250);
     public static final double frontFaceX = Units.inchesToMeters(43.51);
 
+    // Addtional offset for tower zone for drive assist
     public static final double yZoneExtraOffset = Units.inchesToMeters(12.0);
 
     public static final double uprightHeight = Units.inchesToMeters(72.1);

@@ -100,7 +100,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean runHoodClosedLoop = false;
   private boolean runFlywheelClosedLoop = false;
 
-  private final DigitalInput bpsSensor = new DigitalInput(0);
+  private final DigitalInput bpsSensor = new DigitalInput(ShooterContants.bpsSensorPort);
   private final Trigger bpsTrigger = new Trigger(() -> !bpsSensor.get());
 
   @AutoLogOutput(key = "Shooter/ShotCount")

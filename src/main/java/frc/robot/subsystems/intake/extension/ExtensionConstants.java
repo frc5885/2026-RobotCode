@@ -43,8 +43,8 @@ public class ExtensionConstants {
   // ^^^ SysID Constants
   public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
 
-  public static final double intakeStowedAngle = Units.degreesToRadians(116.0); // 2.025
-  public static final double intakeExtendedAngle = Units.degreesToRadians(7.5); // 0.209
+  public static final double intakeStowedAngle = Units.degreesToRadians(116.0);
+  public static final double intakeExtendedAngle = Units.degreesToRadians(7.5);
 
   public static final double agitateTopAngle = 1.32;
   public static final double agitateBottomAngle = 0.6;

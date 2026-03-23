@@ -23,6 +23,6 @@ public class LEDZone extends SubsystemBase {
 
   /** Runs a pattern on this zone until interrupted, then reverts to default. */
   public Command applyPattern(LEDPattern pattern) {
-    return run(() -> currentPattern = pattern).withName("LEDZone:" + getName());
+    return startRun(() -> currentPattern = pattern, () -> {}).withName("LEDZone:" + getName());
   }
 }
