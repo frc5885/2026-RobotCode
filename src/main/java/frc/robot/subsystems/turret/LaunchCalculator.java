@@ -256,10 +256,10 @@ public class LaunchCalculator {
   }
 
   public static double getMinTimeOfFlight() {
-    return 0.0;
+    return 1.4; // adjusted a bit higher to include bouncing into the hub
   }
 
   public static double getMaxTimeOfFlight() {
-    return 1.6;
+    return 1.8; // adjusted a bit higher to include bouncing into the hub
   }
 }

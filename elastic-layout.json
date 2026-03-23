@@ -35,9 +35,9 @@
           {
             "title": "Match Time",
             "x": 256.0,
-            "y": 384.0,
-            "width": 384.0,
-            "height": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
@@ -50,8 +50,8 @@
           },
           {
             "title": "Active First?",
-            "x": 256.0,
-            "y": 128.0,
+            "x": 128.0,
+            "y": 512.0,
             "width": 128.0,
             "height": 256.0,
             "type": "Boolean Box",
@@ -67,7 +67,7 @@
           },
           {
             "title": "Game State",
-            "x": 384.0,
+            "x": 256.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
@@ -80,10 +80,10 @@
           },
           {
             "title": "Remaining Shift Time",
-            "x": 384.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
+            "x": 256.0,
+            "y": 384.0,
+            "width": 768.0,
+            "height": 384.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Shifts/Remaining Shift Time",
@@ -93,10 +93,10 @@
           },
           {
             "title": "Shift Active",
-            "x": 640.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 512.0,
+            "x": 512.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 384.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Shifts/Shift Active",
@@ -112,8 +112,8 @@
             "title": "FMS Data Received?",
             "x": 0.0,
             "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
+            "width": 128.0,
+            "height": 256.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Shifts/FMS Data Received?",

@@ -38,7 +38,7 @@ public class HubShiftUtil {
   private static final double[] shiftEndTimes = {10.0, 35.0, 60.0, 85.0, 110.0, 140.0};
 
   private static final double minFuelCountDelay = 1.0;
-  private static final double maxFuelCountDelay = 2.0;
+  private static final double maxFuelCountDelay = 1.0;
   private static final double shiftEndFuelCountExtension = 3.0;
   private static final double minTimeOfFlight = LaunchCalculator.getMinTimeOfFlight();
   private static final double maxTimeOfFlight = LaunchCalculator.getMaxTimeOfFlight();
