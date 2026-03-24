@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
+import frc.robot.util.OverrideUtil;
 import java.util.Comparator;
 import java.util.TreeSet;
 
@@ -65,6 +66,9 @@ public class LEDSubsystem extends SubsystemBase {
 
     // Idle while enabled
     new Trigger(DriverStation::isEnabled).whileTrue(applyState(LEDState.IDLE));
+
+    // Manual mode
+    OverrideUtil.isManualModeTrigger().whileTrue(applyState(LEDState.MANUAL_MODE));
   }
 
   @Override
