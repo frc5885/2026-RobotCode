@@ -32,10 +32,13 @@ import frc.robot.commands.intake.IntakeControlCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
+import frc.robot.controllers.ControllerConstants;
 import frc.robot.controllers.OperatorPanel;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.util.HubShiftUtil;
+import frc.robot.util.OverrideUtil;
+import frc.robot.util.OverrideUtil.ShootingLocation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -47,8 +50,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final OperatorPanel operatorPanel = new OperatorPanel(1);
+  private final CommandXboxController controller =
+      new CommandXboxController(ControllerConstants.driverControllerPort);
+  private final CommandXboxController operatorController =
+      new CommandXboxController(ControllerConstants.operatorControllerPort);
+  private final OperatorPanel operatorPanel =
+      new OperatorPanel(ControllerConstants.operatorPanelPort);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -121,18 +128,34 @@ public class RobotContainer {
     // todo convert to state machine
     controller.b().whileTrue(new OuttakeCommand());
 
-    // Operator Switches
-    // operatorPanel
-    //     .getBrakeModeSwitch()
-    controller
-        .start()
-        .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
-        .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
-
+    // temp for testing
     controller
         .povLeft()
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.TEST_PATTERN).ignoringDisable(true));
+
+    // Operator Switches
+    operatorPanel
+        .getBrakeModeSwitch()
+        .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
+        .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
+    operatorPanel
+        .getManualModeSwitch()
+        .onTrue(OverrideUtil.setManualModeCommand(true).ignoringDisable(true))
+        .onFalse(OverrideUtil.setManualModeCommand(false).ignoringDisable(true));
+    operatorPanel
+        .getBogusCallSwitch()
+        .whileTrue(
+            LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
+    operatorController
+        .povUp()
+        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER));
+    operatorController
+        .povLeft()
+        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.OUTPOST_CORNER));
+    operatorController
+        .povRight()
+        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER));
   }
 
   /**

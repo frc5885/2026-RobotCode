@@ -7,4 +7,8 @@ package frc.robot.controllers;
 public class ControllerConstants {
   public static final double controllerDeadband = 0.1;
   public static final double controllerRumble = 0.3;
+
+  public static final int driverControllerPort = 0;
+  public static final int operatorControllerPort = 1;
+  public static final int operatorPanelPort = 2;
 }

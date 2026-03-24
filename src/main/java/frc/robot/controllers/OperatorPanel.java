@@ -48,4 +48,14 @@ public class OperatorPanel {
   public Trigger getBrakeModeSwitch() {
     return overrideSwitch(5);
   }
+
+  /** Returns the manual mode switch (4th switch from the left). */
+  public Trigger getManualModeSwitch() {
+    return overrideSwitch(4);
+  }
+
+  /** Returns the bogus call switch (7th switch from the left). */
+  public Trigger getBogusCallSwitch() {
+    return overrideSwitch(7);
+  }
 }
