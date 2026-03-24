@@ -11,8 +11,10 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
 
@@ -86,17 +88,53 @@ public class LEDConstants {
         LEDPattern.solid(Color.kRed)
             .blink(Seconds.of(0.1))
             .overlayOn(LEDPattern.solid(Color.kBlue));
+
+    private static final Frequency fireballSpeed = Percent.per(Second).of(100);
+
     private static final LEDPattern fireball =
-        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
-            .scrollAtRelativeSpeed(Percent.per(Second).of(100))
-            .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
-            .blink(Seconds.of(1.0))
+        LEDPattern.steps(Map.of(0, Color.kRed, 0.05, Color.kBlack))
+            .scrollAtRelativeSpeed(fireballSpeed)
             .overlayOn(
-                LEDPattern.gradient(
-                        LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
-                    .scrollAtRelativeSpeed(Percent.per(Second).of(100))
-                    .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
-                    .reversed());
+                (LEDPattern.gradient(
+                            GradientType.kDiscontinuous,
+                            Color.kBlack,
+                            Color.kBlack,
+                            Color.kBlack,
+                            Color.kBlack,
+                            Color.kMagenta,
+                            Color.kRed)
+                        .scrollAtRelativeSpeed(fireballSpeed)
+                        .blend(
+                            LEDPattern.gradient(
+                                    GradientType.kDiscontinuous,
+                                    Color.kBlack,
+                                    Color.kBlack,
+                                    Color.kBlack,
+                                    Color.kBlack,
+                                    Color.kMagenta,
+                                    Color.kRed)
+                                .scrollAtRelativeSpeed(fireballSpeed)))
+                    .blend(
+                        LEDPattern.gradient(
+                                GradientType.kDiscontinuous,
+                                Color.kBlack,
+                                Color.kBlack,
+                                Color.kBlack,
+                                Color.kBlack,
+                                Color.kBlack,
+                                Color.kRed)
+                            .scrollAtRelativeSpeed(fireballSpeed)
+                            .blend(
+                                LEDPattern.gradient(
+                                        GradientType.kDiscontinuous,
+                                        Color.kBlack,
+                                        Color.kBlack,
+                                        Color.kBlack,
+                                        Color.kMagenta,
+                                        Color.kMagenta,
+                                        Color.kRed)
+                                    .scrollAtRelativeSpeed(fireballSpeed))));
+
     private static final LEDPattern manualMode =
         LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.5), Seconds.of(1.5));
     private static final LEDPattern redBreathe =
