@@ -28,6 +28,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.ControllerUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.GeometryUtil;
+import frc.robot.util.OverrideUtil;
 import frc.robot.util.SlewRateLimiter2d;
 import frc.robot.util.Zones;
 import java.util.function.DoubleSupplier;
@@ -81,39 +82,37 @@ public class AssistedDriveCommand extends Command {
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
     Trigger notSprinting = ControllerUtil.sprintToggle(controller).negate();
+    Trigger noOverridesActive =
+        notSprinting
+            .and(() -> !DriverStation.isTest())
+            .and(OverrideUtil.isManualModeTrigger().negate());
 
     inTrenchZoneTrigger =
-        notSprinting
-            .and(
-                Zones.trenchZones
-                    .willContain(
-                        driveSubsystem::getPose,
-                        driveSubsystem::getFieldRelativeChassisSpeeds,
-                        Seconds.of(DriveConstants.trenchAlignTimeSeconds))
-                    .debounce(0.1))
-            .and(() -> !DriverStation.isTest());
+        noOverridesActive.and(
+            Zones.trenchZones
+                .willContain(
+                    driveSubsystem::getPose,
+                    driveSubsystem::getFieldRelativeChassisSpeeds,
+                    Seconds.of(DriveConstants.trenchAlignTimeSeconds))
+                .debounce(0.1));
 
     inBumpZoneTrigger =
-        notSprinting
-            .and(
-                Zones.bumpZones
-                    .willContain(
-                        driveSubsystem::getPose,
-                        driveSubsystem::getFieldRelativeChassisSpeeds,
-                        Seconds.of(DriveConstants.bumpAlignTimeSeconds))
-                    .debounce(0.1))
-            .and(() -> !DriverStation.isTest());
+        noOverridesActive.and(
+            Zones.bumpZones
+                .willContain(
+                    driveSubsystem::getPose,
+                    driveSubsystem::getFieldRelativeChassisSpeeds,
+                    Seconds.of(DriveConstants.bumpAlignTimeSeconds))
+                .debounce(0.1));
 
     inTowerZoneTrigger =
-        notSprinting
-            .and(
-                Zones.towerZones
-                    .willContain(
-                        driveSubsystem::getPose,
-                        driveSubsystem::getFieldRelativeChassisSpeeds,
-                        Seconds.of(DriveConstants.towerAlignTimeSeconds))
-                    .debounce(0.1))
-            .and(() -> !DriverStation.isTest());
+        noOverridesActive.and(
+            Zones.towerZones
+                .willContain(
+                    driveSubsystem::getPose,
+                    driveSubsystem::getFieldRelativeChassisSpeeds,
+                    Seconds.of(DriveConstants.towerAlignTimeSeconds))
+                .debounce(0.1));
 
     inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
     inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));

@@ -58,6 +58,14 @@ public class ControllerUtil {
     return new Trigger(isSprinting);
   }
 
+  /**
+   * Returns a {@link Command} that rumbles the controller while active.
+   *
+   * <p>Rumble starts when the command is scheduled and stops when it ends or is interrupted.
+   *
+   * @param controller the Xbox controller to rumble
+   * @return a Command that controls the controller's rumble
+   */
   public static Command rumble(CommandXboxController controller) {
     return new StartEndCommand(
         () -> {

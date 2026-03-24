@@ -88,7 +88,7 @@ public class RobotContainer {
 
     // Set up SysId routines
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
@@ -115,6 +115,7 @@ public class RobotContainer {
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
     DefaultCommands.setDefaultTurretCommand(
         TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
+    TurretCommands.registerManualModeOverride();
 
     DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
 
@@ -136,7 +137,7 @@ public class RobotContainer {
 
     // Operator Switches
     operatorPanel
-        .getBrakeModeSwitch()
+        .getCoastModeSwitch()
         .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
         .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
     operatorPanel
@@ -148,14 +149,20 @@ public class RobotContainer {
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
     operatorController
-        .povUp()
-        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER));
+        .povDown()
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER)
+                .ignoringDisable(true));
     operatorController
         .povLeft()
-        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.OUTPOST_CORNER));
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.OUTPOST_CORNER)
+                .ignoringDisable(true));
     operatorController
         .povRight()
-        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER));
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER)
+                .ignoringDisable(true));
   }
 
   /**

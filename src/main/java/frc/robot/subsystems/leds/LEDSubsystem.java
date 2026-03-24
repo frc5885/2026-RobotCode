@@ -113,6 +113,7 @@ public class LEDSubsystem extends SubsystemBase {
    * @param state The state to remove.
    */
   public void removeState(LEDState state) {
+    if (state == LEDState.DISABLED) return; // DISABLED must always remain in stack
     activeStates.remove(state);
   }
 
