@@ -103,6 +103,7 @@ public class LEDConstants {
         LEDPattern.solid(Color.kRed).breathe(Seconds.of(1.0));
     private static final LEDPattern greenBreathe =
         LEDPattern.solid(Color.kGreen).blink(Seconds.of(0.2));
-    private static final LEDPattern shiftChange = LEDPattern.solid(Color.kYellow);
+    private static final LEDPattern shiftChange =
+        LEDPattern.solid(Color.kYellow).blink(Seconds.of(0.05));
   }
 }

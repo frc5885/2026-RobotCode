@@ -22,6 +22,7 @@ import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
+import frc.robot.commands.ShiftChangeRumbleLEDCommand;
 import frc.robot.commands.SysIDCommands;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
@@ -34,6 +35,7 @@ import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
+import frc.robot.util.HubShiftUtil;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -86,6 +88,13 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Shift change pulse consumer
+    // This runs every time HubShiftUtil fires a pulse
+    HubShiftUtil.setShiftChangeConsumer(
+        (pulseDuration) -> {
+          new ShiftChangeRumbleLEDCommand(controller, pulseDuration).schedule();
+        });
   }
 
   /**
