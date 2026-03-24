@@ -136,7 +136,7 @@ public class RobotContainer {
 
     // Operator Switches
     operatorPanel
-        .getBrakeModeSwitch()
+        .getCoastModeSwitch()
         .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
         .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
     operatorPanel
@@ -149,13 +149,19 @@ public class RobotContainer {
             LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
     operatorController
         .povUp()
-        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER));
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER)
+                .ignoringDisable(true));
     operatorController
         .povLeft()
-        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.OUTPOST_CORNER));
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.OUTPOST_CORNER)
+                .ignoringDisable(true));
     operatorController
         .povRight()
-        .onTrue(OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER));
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER)
+                .ignoringDisable(true));
   }
 
   /**

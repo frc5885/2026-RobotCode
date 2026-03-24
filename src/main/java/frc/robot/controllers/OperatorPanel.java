@@ -44,14 +44,14 @@ public class OperatorPanel {
   public Trigger overrideSwitch(int index) {
     return new Trigger(getOverrideSwitch(index));
   }
-  /** Returns the brake mode switch (5th switch from the left). */
-  public Trigger getBrakeModeSwitch() {
-    return overrideSwitch(5);
+  /** Returns the coast mode switch (4th switch from the left). */
+  public Trigger getCoastModeSwitch() {
+    return overrideSwitch(4);
   }
 
-  /** Returns the manual mode switch (4th switch from the left). */
+  /** Returns the manual mode switch (3rd switch from the left). */
   public Trigger getManualModeSwitch() {
-    return overrideSwitch(4);
+    return overrideSwitch(3);
   }
 
   /** Returns the bogus call switch (7th switch from the left). */
