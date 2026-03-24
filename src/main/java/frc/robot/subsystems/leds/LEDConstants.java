@@ -31,8 +31,8 @@ public class LEDConstants {
     DISABLED(Patterns.rainbow, 0, false),
     IDLE(Patterns.fireball, 1, false),
     INTAKE_RUNNING(Patterns.intakeRunning, 5, false),
-    AIMING(Patterns.redBreathe, 10, false),
-    SHOOTING(Patterns.greenBreathe, 11, false),
+    AIMING(Patterns.cleanRed, 10, false),
+    SHOOTING(Patterns.cleanGreen, 11, false),
     MANUAL_MODE(Patterns.manualMode, 99, true),
     SHIFT_CHANGE(Patterns.shiftChange, 100, true),
     BOGUS_CALL(Patterns.policeSirens, 999, false),
@@ -105,5 +105,23 @@ public class LEDConstants {
         LEDPattern.solid(Color.kGreen).blink(Seconds.of(0.2));
     private static final LEDPattern shiftChange =
         LEDPattern.solid(Color.kYellow).blink(Seconds.of(0.05));
+
+    private static final LEDPattern cleanGreen =
+        LEDPattern.steps(Map.of(0.95, Color.kLimeGreen))
+            .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.95, Color.kLimeGreen))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
+                    .reversed())
+            .overlayOn(LEDPattern.solid(Color.kGreen).breathe(Seconds.of(1.0)));
+
+    private static final LEDPattern cleanRed =
+        LEDPattern.steps(Map.of(0.95, Color.kRed))
+            .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.95, Color.kRed))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
+                    .reversed())
+            .overlayOn(LEDPattern.solid(Color.kDarkRed).breathe(Seconds.of(1.0)));
   }
 }
