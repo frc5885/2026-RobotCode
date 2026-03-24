@@ -1,28 +1,25 @@
 package frc.robot.subsystems.leds;
 
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LEDZone extends SubsystemBase {
+/**
+ * Represents a physical segment of the LED strip. Currently unused by the state-stack model but
+ * preserved for future per-zone pattern overrides.
+ */
+public class LEDZone {
+  private final String name;
   private final AddressableLEDBufferView view;
-  private LEDPattern currentPattern;
 
-  public LEDZone(String name, AddressableLEDBufferView view, LEDPattern defaultPattern) {
-    setName(name);
+  public LEDZone(String name, AddressableLEDBufferView view) {
+    this.name = name;
     this.view = view;
-    this.currentPattern = defaultPattern;
-    setDefaultCommand(applyPattern(defaultPattern));
   }
 
-  @Override
-  public void periodic() {
-    currentPattern.applyTo(view);
+  public String getName() {
+    return name;
   }
 
-  /** Runs a pattern on this zone until interrupted, then reverts to default. */
-  public Command applyPattern(LEDPattern pattern) {
-    return startRun(() -> currentPattern = pattern, () -> {}).withName("LEDZone:" + getName());
+  public AddressableLEDBufferView getView() {
+    return view;
   }
 }

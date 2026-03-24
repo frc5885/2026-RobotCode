@@ -32,7 +32,7 @@ import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.OperatorPanel;
-import frc.robot.subsystems.leds.LEDConstants;
+import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -123,14 +123,7 @@ public class RobotContainer {
     controller
         .povLeft()
         .whileTrue(
-            LEDSubsystem.getInstance()
-                .applyFullStripPattern(LEDConstants.States.fireball)
-                .ignoringDisable(true));
-    controller
-        .povRight()
-        .whileTrue(
-            LEDSubsystem.getInstance()
-                .applyFullStripPattern(LEDConstants.States.cyanScrollingGradient));
+            LEDSubsystem.getInstance().applyState(LEDState.TEST_PATTERN).ignoringDisable(true));
   }
 
   /**

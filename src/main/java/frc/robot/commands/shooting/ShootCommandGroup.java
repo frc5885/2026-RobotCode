@@ -5,6 +5,8 @@
 package frc.robot.commands.shooting;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.subsystems.leds.LEDConstants.LEDState;
+import frc.robot.subsystems.leds.LEDSubsystem;
 
 public class ShootCommandGroup extends ParallelCommandGroup {
   /** Creates a new ShootCommandGroup. */
@@ -13,6 +15,7 @@ public class ShootCommandGroup extends ParallelCommandGroup {
         new SlowDriveSpeedCommand(),
         new AimHoodAndSpinFlywheelCommand(),
         TurretCommands.setActiveLaunchingModeCommand(),
-        new ShootIfReadyCommand());
+        new ShootIfReadyCommand(),
+        LEDSubsystem.getInstance().applyState(LEDState.AIMING));
   }
 }

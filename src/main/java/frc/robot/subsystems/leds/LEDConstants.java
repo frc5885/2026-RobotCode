@@ -27,18 +27,41 @@ public class LEDConstants {
   public static final int turretLength = 33;
   public static final int hopperShortLength = 11;
 
-  public static final class States {
+  public enum LEDState {
+    DISABLED(Patterns.rainbow, 0, false),
+    IDLE(Patterns.fireball, 1, false),
+    INTAKE_RUNNING(Patterns.intakeRunning, 5, false),
+    AIMING(Patterns.redBreathe, 10, false),
+    SHOOTING(Patterns.greenBreathe, 11, false),
+    MANUAL_MODE(Patterns.manualMode, 99, true),
+    SHIFT_CHANGE(Patterns.shiftChange, 100, true),
+    BOGUS_CALL(Patterns.policeSirens, 999, false),
+
+    TEST_PATTERN(Patterns.eric, 1000, false);
+
+    public final LEDPattern pattern;
+    public final int priority;
+    public final boolean isOverlay;
+
+    LEDState(LEDPattern pattern, int priority, boolean isOverlay) {
+      this.pattern = pattern;
+      this.priority = priority;
+      this.isOverlay = isOverlay;
+    }
+  }
+
+  private static final class Patterns {
     private static final Distance ledSpacing = Meters.of(1.0 / 60);
     private static final LinearVelocity scrollSpeed = InchesPerSecond.of(6.0);
 
-    public static final LEDPattern disabled =
+    private static final LEDPattern rainbow =
         LEDPattern.rainbow(255, 255).scrollAtAbsoluteSpeed(scrollSpeed, ledSpacing);
-    public static final LEDPattern intakeRunning =
+    private static final LEDPattern intakeRunning =
         LEDPattern.solid(Color.kCyan).blink(Seconds.of(0.2));
-    public static final LEDPattern cyanScrollingGradient =
+    private static final LEDPattern cyanScrollingGradient =
         LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kCyan, Color.kBlack)
             .scrollAtRelativeSpeed(Percent.per(Second).of(100.0));
-    public static final LEDPattern eric =
+    private static final LEDPattern eric =
         LEDPattern.steps(Map.of(0.95, Color.kLightBlue))
             .scrollAtRelativeSpeed(Percent.per(Second).of(200.0))
             .overlayOn(
@@ -59,11 +82,11 @@ public class LEDConstants {
                 LEDPattern.steps(Map.of(0.90, Color.kAntiqueWhite))
                     .scrollAtRelativeSpeed(Percent.per(Second).of(175.0))
                     .reversed());
-    public static final LEDPattern policeSirens =
+    private static final LEDPattern policeSirens =
         LEDPattern.solid(Color.kRed)
             .blink(Seconds.of(0.1))
             .overlayOn(LEDPattern.solid(Color.kBlue));
-    public static final LEDPattern fireball =
+    private static final LEDPattern fireball =
         LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
             .scrollAtRelativeSpeed(Percent.per(Second).of(100))
             .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
@@ -74,5 +97,12 @@ public class LEDConstants {
                     .scrollAtRelativeSpeed(Percent.per(Second).of(100))
                     .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
                     .reversed());
+    private static final LEDPattern manualMode =
+        LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.5), Seconds.of(1.5));
+    private static final LEDPattern redBreathe =
+        LEDPattern.solid(Color.kRed).breathe(Seconds.of(1.0));
+    private static final LEDPattern greenBreathe =
+        LEDPattern.solid(Color.kGreen).blink(Seconds.of(0.2));
+    private static final LEDPattern shiftChange = LEDPattern.solid(Color.kYellow);
   }
 }
