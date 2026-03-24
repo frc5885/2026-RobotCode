@@ -119,7 +119,7 @@ public class LaunchCalculator {
     // Calculate estimated pose while accounting for phase delay
     Pose2d estimatedPose;
     if (OverrideUtil.isManualMode()) {
-      estimatedPose = OverrideUtil.getShootingLocation().pose;
+      estimatedPose = OverrideUtil.getShootingLocation().getPose();
     } else {
       estimatedPose = DriveSubsystem.getInstance().getPose();
     }

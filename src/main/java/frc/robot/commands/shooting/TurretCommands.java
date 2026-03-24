@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.OverrideUtil;
 import java.util.function.DoubleSupplier;
@@ -63,9 +64,11 @@ public class TurretCommands {
             runRobotRelativeFixedCommand(
                 () -> {
                   // Aim at the hub based on the current shooting location (intake pointed forward)
-                  Pose2d robotPose = OverrideUtil.getShootingLocation().pose;
+                  Pose2d robotPose = OverrideUtil.getShootingLocation().getPose();
                   Translation2d hubTranslation = FieldConstants.getTurretTarget(robotPose);
-                  return hubTranslation.minus(robotPose.getTranslation()).getAngle();
+                  Rotation2d angle = hubTranslation.minus(robotPose.getTranslation()).getAngle();
+                  // If on red, need to flip here because robot relative angle is flipped
+                  return AllianceFlipUtil.apply(angle);
                 }));
   }
 }

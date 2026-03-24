@@ -149,7 +149,7 @@ public class RobotContainer {
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
     operatorController
-        .povUp()
+        .povDown()
         .onTrue(
             OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER)
                 .ignoringDisable(true));
