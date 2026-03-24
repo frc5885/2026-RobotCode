@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
+import java.util.Map;
 
 public class LEDConstants {
   public static final int ledPort = 4;
@@ -37,9 +38,45 @@ public class LEDConstants {
     public static final LEDPattern cyanScrollingGradient =
         LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kCyan, Color.kBlack)
             .scrollAtRelativeSpeed(Percent.per(Second).of(100.0));
+    public static final LEDPattern eric =
+        LEDPattern.steps(Map.of(0.95, Color.kLightBlue))
+            .scrollAtRelativeSpeed(Percent.per(Second).of(200.0))
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.95, Color.kLightBlue))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(200.0))
+                    .reversed())
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.80, Color.kCadetBlue))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(150.0)))
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.80, Color.kCadetBlue))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(150.0))
+                    .reversed())
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.90, Color.kAntiqueWhite))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(175.0)))
+            .overlayOn(
+                LEDPattern.steps(Map.of(0.90, Color.kAntiqueWhite))
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(175.0))
+                    .reversed());
     public static final LEDPattern policeSirens =
         LEDPattern.solid(Color.kRed)
             .blink(Seconds.of(0.1))
             .overlayOn(LEDPattern.solid(Color.kBlue));
+    public static final LEDPattern fireball =
+        LEDPattern.gradient(
+                LEDPattern.GradientType.kContinuous, Color.kRed, Color.kMagenta, Color.kBlue)
+            .scrollAtRelativeSpeed(Percent.per(Second).of(80))
+            .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
+            .blink(Seconds.of(0.8))
+            .overlayOn(
+                LEDPattern.gradient(
+                        LEDPattern.GradientType.kContinuous,
+                        Color.kRed,
+                        Color.kMagenta,
+                        Color.kBlue)
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(80))
+                    .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0))))
+            .reversed();
   }
 }

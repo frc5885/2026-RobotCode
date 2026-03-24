@@ -122,7 +122,10 @@ public class RobotContainer {
 
     controller
         .povLeft()
-        .whileTrue(LEDSubsystem.getInstance().applyTurretPattern(LEDConstants.States.policeSirens));
+        .whileTrue(
+            LEDSubsystem.getInstance()
+                .applyFullStripPattern(LEDConstants.States.fireball)
+                .ignoringDisable(true));
     controller
         .povRight()
         .whileTrue(
