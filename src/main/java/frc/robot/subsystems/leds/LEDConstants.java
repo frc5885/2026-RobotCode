@@ -64,19 +64,15 @@ public class LEDConstants {
             .blink(Seconds.of(0.1))
             .overlayOn(LEDPattern.solid(Color.kBlue));
     public static final LEDPattern fireball =
-        LEDPattern.gradient(
-                LEDPattern.GradientType.kContinuous, Color.kRed, Color.kMagenta, Color.kBlue)
-            .scrollAtRelativeSpeed(Percent.per(Second).of(80))
+        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
+            .scrollAtRelativeSpeed(Percent.per(Second).of(100))
             .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
-            .blink(Seconds.of(0.8))
+            .blink(Seconds.of(1.0))
             .overlayOn(
                 LEDPattern.gradient(
-                        LEDPattern.GradientType.kContinuous,
-                        Color.kRed,
-                        Color.kMagenta,
-                        Color.kBlue)
-                    .scrollAtRelativeSpeed(Percent.per(Second).of(80))
-                    .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0))))
-            .reversed();
+                        LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(100))
+                    .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
+                    .reversed());
   }
 }
