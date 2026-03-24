@@ -145,13 +145,13 @@ public class LEDConstants {
         LEDPattern.solid(Color.kYellow).blink(Seconds.of(0.05));
 
     private static final LEDPattern cleanGreen =
-        LEDPattern.steps(Map.of(0.95, Color.kLimeGreen))
+        LEDPattern.steps(Map.of(0.95, Color.kGreen))
             .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
             .overlayOn(
-                LEDPattern.steps(Map.of(0.95, Color.kLimeGreen))
+                LEDPattern.steps(Map.of(0.95, Color.kGreen))
                     .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
                     .reversed())
-            .overlayOn(LEDPattern.solid(Color.kGreen).breathe(Seconds.of(1.0)));
+            .overlayOn(LEDPattern.solid(Color.kDarkGreen).breathe(Seconds.of(1.0)));
 
     private static final LEDPattern cleanRed =
         LEDPattern.steps(Map.of(0.95, Color.kRed))
@@ -161,5 +161,17 @@ public class LEDConstants {
                     .scrollAtRelativeSpeed(Percent.per(Second).of(100.0))
                     .reversed())
             .overlayOn(LEDPattern.solid(Color.kDarkRed).breathe(Seconds.of(1.0)));
+
+    private static final LEDPattern auto =
+        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
+            .scrollAtRelativeSpeed(Percent.per(Second).of(100))
+            .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
+            .blink(Seconds.of(1.0))
+            .overlayOn(
+                LEDPattern.gradient(
+                        LEDPattern.GradientType.kContinuous, Color.kMagenta, Color.kBlue)
+                    .scrollAtRelativeSpeed(Percent.per(Second).of(100))
+                    .overlayOn(LEDPattern.solid(Color.kBlue).atBrightness(Percent.of(2.0)))
+                    .reversed());
   }
 }
