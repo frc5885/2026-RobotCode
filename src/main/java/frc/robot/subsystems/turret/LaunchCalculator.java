@@ -250,11 +250,11 @@ public class LaunchCalculator {
 
   private boolean checkIfValid(double distance) {
     switch (launchMode) {
-      case SHOOTING:
-        return distance >= minDistance && distance <= maxDistance;
-      default:
+      case PASSING:
         // Passing is always valid
         return true;
+      default: // SHOOTING or MANUAL_SHOOTING
+        return distance >= minDistance && distance <= maxDistance;
     }
   }
 

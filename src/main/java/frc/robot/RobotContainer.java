@@ -88,7 +88,7 @@ public class RobotContainer {
 
     // Set up SysId routines
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);

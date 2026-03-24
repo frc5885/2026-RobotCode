@@ -44,17 +44,17 @@ public class OperatorPanel {
   public Trigger overrideSwitch(int index) {
     return new Trigger(getOverrideSwitch(index));
   }
-  /** Returns the coast mode switch (4th switch from the left). */
+  /** Returns the coast mode switch (5th switch from the left). */
   public Trigger getCoastModeSwitch() {
     return overrideSwitch(4);
   }
 
-  /** Returns the manual mode switch (3rd switch from the left). */
+  /** Returns the manual mode switch (4th switch from the left). */
   public Trigger getManualModeSwitch() {
     return overrideSwitch(3);
   }
 
-  /** Returns the bogus call switch (7th switch from the left). */
+  /** Returns the bogus call switch (8th switch from the left). */
   public Trigger getBogusCallSwitch() {
     return overrideSwitch(7);
   }

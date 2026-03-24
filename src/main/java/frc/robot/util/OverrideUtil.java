@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.Logger;
 public class OverrideUtil {
   private static boolean manualMode = false;
   private static ShootingLocation shootingLocation = ShootingLocation.TOWER_FRONT_CENTER;
+  private static final Trigger manualModeTrigger = new Trigger(() -> manualMode);
 
   static {
     Logger.recordOutput("Overrides/ManualMode", manualMode);
@@ -30,7 +31,7 @@ public class OverrideUtil {
   }
 
   public static Trigger isManualModeTrigger() {
-    return new Trigger(() -> manualMode);
+    return manualModeTrigger;
   }
 
   public static void setShootingLocation(ShootingLocation shootingLocation) {

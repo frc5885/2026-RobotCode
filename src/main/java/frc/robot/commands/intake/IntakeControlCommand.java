@@ -164,6 +164,7 @@ public class IntakeControlCommand extends Command {
     intakeSubsystem.setIntakeRollerVoltage(0);
     agitateTimer.stop();
     shootDelayTimer.stop();
+    currentState = IntakeState.INITIAL;
   }
 
   // Returns true when the command should end.
