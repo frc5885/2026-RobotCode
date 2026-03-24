@@ -115,6 +115,7 @@ public class RobotContainer {
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
     DefaultCommands.setDefaultTurretCommand(
         TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
+    TurretCommands.registerManualModeOverride();
 
     DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
 

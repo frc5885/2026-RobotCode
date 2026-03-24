@@ -4,11 +4,15 @@
 
 package frc.robot.commands.shooting;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.util.FieldConstants;
+import frc.robot.util.OverrideUtil;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -47,5 +51,21 @@ public class TurretCommands {
         TurretCommands.runTrackTargetCommand(),
         TurretCommands.runRobotRelativeFixedCommand(() -> Rotation2d.kZero),
         () -> !DriverStation.isTest());
+  }
+
+  /**
+   * Registers a manual mode override for the turret. When manual mode is enabled, the turret will
+   * aim at the currently selected shooting location (intake pointed forward)
+   */
+  public static void registerManualModeOverride() {
+    OverrideUtil.isManualModeTrigger()
+        .whileTrue(
+            runRobotRelativeFixedCommand(
+                () -> {
+                  // Aim at the hub based on the current shooting location (intake pointed forward)
+                  Pose2d robotPose = OverrideUtil.getShootingLocation().pose;
+                  Translation2d hubTranslation = FieldConstants.getTurretTarget(robotPose);
+                  return hubTranslation.minus(robotPose.getTranslation()).getAngle();
+                }));
   }
 }
