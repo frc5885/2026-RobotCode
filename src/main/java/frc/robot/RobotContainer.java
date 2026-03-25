@@ -23,7 +23,6 @@ import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
 import frc.robot.commands.ShiftChangeRumbleLEDCommand;
-import frc.robot.commands.SysIDCommands;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;

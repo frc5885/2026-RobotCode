@@ -31,8 +31,8 @@ public class LEDConstants {
 
   public enum LEDState {
     DISABLED(Patterns.rainbow, 0, false),
-    AUTO(Patterns.auto, 1, false),
-    IDLE(Patterns.fireball, 2, false),
+    IDLE(Patterns.fireball, 1, false),
+    AUTO(Patterns.auto, 2, false),
     INTAKE_RUNNING(Patterns.intakeRunning, 5, false),
     AIMING(Patterns.cleanRed, 10, false),
     SHOOTING(Patterns.cleanGreen, 11, false),

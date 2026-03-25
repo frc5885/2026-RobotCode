@@ -67,6 +67,9 @@ public class LEDSubsystem extends SubsystemBase {
     // Idle while enabled
     new Trigger(DriverStation::isEnabled).whileTrue(applyState(LEDState.IDLE));
 
+    // Autonomous
+    new Trigger(DriverStation::isAutonomousEnabled).whileTrue(applyState(LEDState.AUTO));
+
     // Manual mode
     OverrideUtil.isManualModeTrigger().whileTrue(applyState(LEDState.MANUAL_MODE));
   }
