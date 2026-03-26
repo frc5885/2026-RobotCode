@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -24,6 +25,7 @@ import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
 import frc.robot.commands.ShiftChangeRumbleLEDCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
+import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeControlCommand;
@@ -81,6 +83,12 @@ public class RobotContainer {
     SmartDashboard.putBoolean("ShootPreload", false);
     NamedCommands.registerCommand(
         "ConditionalShootPreload", new ShootCommandGroup().conditionalShootPreload());
+
+    NamedCommands.registerCommand(
+        "ShootWithAgitationStopAndWaitCommand",
+        new ParallelDeadlineGroup(
+                new ShootUntilHopperEmptyCommand().withAgitation(0.0), new StopDrivingCommand())
+            .withTimeout(0.5));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
