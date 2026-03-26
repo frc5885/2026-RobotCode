@@ -147,11 +147,13 @@ public class DriveConstants {
 
   public static final double trenchAlignPositionTolerance = Units.inchesToMeters(4.0);
   public static final double towerAlignPositionTolerance = Units.inchesToMeters(2.0);
+  public static final double hubAlignPositionTolerance = Units.inchesToMeters(4.0);
   public static final double rotationAlignTolerance = Units.degreesToRadians(5.0);
 
   public static final double trenchAlignTimeSeconds = 0.5;
   public static final double bumpAlignTimeSeconds = 0.6;
   public static final double towerAlignTimeSeconds = 0.5;
+  public static final double hubDropAreaTimeSeconds = 0.5;
 
   public static final double fullRobotLength = robotLength + 2 * bumperWidth;
   public static final double fullRobotWidth = robotWidth + 2 * bumperWidth;

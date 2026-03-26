@@ -289,6 +289,23 @@ public class Zones {
   public static final PredictiveYZoneCollection towerZones =
       new PredictiveYZoneCollection(blueTower, redTower);
 
+  private static final PredictiveYBaseZone blueHubDropArea =
+      new PredictiveYBaseZone(
+          FieldConstants.Hub.farRightCorner.getX(),
+          FieldConstants.Hub.farRightCorner.getX() + FieldConstants.Hub.width,
+          FieldConstants.Hub.nearRightCorner.getY(),
+          FieldConstants.Hub.nearLeftCorner.getY());
+
+  private static final PredictiveYBaseZone redHubDropArea =
+      new PredictiveYBaseZone(
+          FieldConstants.Hub.oppNearRightCorner.getX() - FieldConstants.Hub.width,
+          FieldConstants.Hub.oppNearRightCorner.getX(),
+          FieldConstants.Hub.oppFarRightCorner.getY(),
+          FieldConstants.Hub.oppFarLeftCorner.getY());
+
+  public static final PredictiveYZoneCollection hubDropAreas =
+      new PredictiveYZoneCollection(blueHubDropArea, redHubDropArea);
+
   public static void logAllZones() {
     Logger.recordOutput("Zones/Trenches/Blue Bottom", blueBottomTrench.getCorners());
     Logger.recordOutput("Zones/Trenches/Blue Top", blueTopTrench.getCorners());
@@ -307,5 +324,8 @@ public class Zones {
 
     Logger.recordOutput("Zones/Tower/Blue", blueTower.getCorners());
     Logger.recordOutput("Zones/Tower/Red", redTower.getCorners());
+
+    Logger.recordOutput("Zones/Hub/Blue", blueHubDropArea.getCorners());
+    Logger.recordOutput("Zones/Hub/Red", redHubDropArea.getCorners());
   }
 }
