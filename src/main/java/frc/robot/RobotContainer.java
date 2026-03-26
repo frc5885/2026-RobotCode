@@ -24,11 +24,9 @@ import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
 import frc.robot.commands.ShiftChangeRumbleLEDCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
-import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeControlCommand;
-import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.ControllerConstants;
@@ -67,10 +65,12 @@ public class RobotContainer {
     // Init all named commands
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
-    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand("Shoot", new ShootCommandGroup());
+    NamedCommands.registerCommand("ShootWithAgitate", new ShootCommandGroup().withAgitation(1.0));
+    NamedCommands.registerCommand("ContinuousShoot", new ShootCommandGroup());
     NamedCommands.registerCommand(
-        "ShootWithAgitate", new ShootUntilHopperEmptyCommand().withAgitation(1.0));
-    NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
+        "ContinuousShootWithAgitate", new ShootCommandGroup().withAgitation(1.0));
+
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
     NamedCommands.registerCommand(
@@ -80,7 +80,7 @@ public class RobotContainer {
 
     SmartDashboard.putBoolean("ShootPreload", false);
     NamedCommands.registerCommand(
-        "ConditionalShootPreload", new ShootUntilHopperEmptyCommand().conditionalShootPreload());
+        "ConditionalShootPreload", new ShootCommandGroup().conditionalShootPreload());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

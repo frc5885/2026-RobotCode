@@ -3,7 +3,7 @@ package frc.robot.subsystems.hopper;
 import edu.wpi.first.math.geometry.Translation3d;
 
 public class HopperConstants {
-  public static final int hopperCapacity = 30;
+  public static final int hopperCapacity = 22;
 
   // Hopper bowl center position (robot-relative, meters)
   public static final Translation3d robotRelativeHopperCenter =

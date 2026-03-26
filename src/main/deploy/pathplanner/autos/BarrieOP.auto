@@ -59,28 +59,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "ShootWithAgitate"
+                  "pathName": "OP.3"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "OP.3"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Stop"
-                      }
-                    }
-                  ]
+                  "name": "ContinuousShootWithAgitate"
                 }
               }
             ]
@@ -120,7 +107,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootWithAgitate"
+            "name": "ContinuousShootWithAgitate"
           }
         }
       ]

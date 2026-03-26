@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "michaelDepot.0"
+            "pathName": "OP_Depot_Quick.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "michaelDepot.1"
+                  "pathName": "OP_Depot_Quick.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "michaelDepot.2"
+                  "pathName": "OP_Depot_Quick.2"
                 }
               },
               {
@@ -61,13 +61,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "michaelDepot.3"
+                  "pathName": "OP_Depot_Quick.3"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ShootWithAgitate"
+                  "name": "ContinuousShootWithAgitate"
                 }
               }
             ]
@@ -80,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "michaelDepot.4"
+                  "pathName": "OP_Depot_Quick.4"
                 }
               },
               {
@@ -92,7 +92,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "ContinuousShoot"
                 }
               }
             ]
@@ -101,7 +101,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootWithAgitate"
+            "name": "ContinuousShootWithAgitate"
           }
         }
       ]
