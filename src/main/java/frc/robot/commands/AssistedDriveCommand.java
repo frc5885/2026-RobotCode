@@ -104,15 +104,6 @@ public class AssistedDriveCommand extends Command {
                     Seconds.of(DriveConstants.trenchAlignTimeSeconds))
                 .debounce(0.1));
 
-    inBumpZoneTrigger =
-        noOverridesActive.and(
-            Zones.bumpZones
-                .willContain(
-                    driveSubsystem::getPose,
-                    driveSubsystem::getFieldRelativeChassisSpeeds,
-                    Seconds.of(DriveConstants.bumpAlignTimeSeconds))
-                .debounce(0.1));
-
     inTowerZoneTrigger =
         noOverridesActive.and(
             Zones.towerZones
@@ -130,6 +121,18 @@ public class AssistedDriveCommand extends Command {
                     driveSubsystem::getFieldRelativeChassisSpeeds,
                     Seconds.of(DriveConstants.hubDropAreaTimeSeconds))
                 .debounce(0.1));
+
+    inBumpZoneTrigger =
+        noOverridesActive
+            .and(
+                Zones.bumpZones
+                    .willContain(
+                        driveSubsystem::getPose,
+                        driveSubsystem::getFieldRelativeChassisSpeeds,
+                        Seconds.of(DriveConstants.bumpAlignTimeSeconds))
+                    .debounce(0.1))
+            // negate hub area trigger so that hub and bump don't fight each other
+            .and(inHubDropAreaTrigger.negate());
 
     inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
     inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
