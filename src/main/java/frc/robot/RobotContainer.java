@@ -29,6 +29,7 @@ import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.IntakeControlCommand;
+import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.ControllerConstants;
@@ -67,7 +68,8 @@ public class RobotContainer {
     // Init all named commands
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
-    NamedCommands.registerCommand("Shoot", new ShootCommandGroup());
+    NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
+    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
     NamedCommands.registerCommand("ShootWithAgitate", new ShootCommandGroup().withAgitation(1.0));
     NamedCommands.registerCommand("ContinuousShoot", new ShootCommandGroup());
     NamedCommands.registerCommand(

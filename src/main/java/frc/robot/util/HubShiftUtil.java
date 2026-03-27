@@ -95,6 +95,7 @@ public class HubShiftUtil {
   private static final Set<Integer> firedPulses = new HashSet<>();
   private static final double[] countdownOffsets = {5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
   private static final double[] pulseDurations = {0.2, 0.2, 0.2, 0.2, 0.2, 1.0};
+  private static List<Double> cachedTransitionEdges = List.of();
 
   public static void setShiftChangeConsumer(Consumer<Double> consumer) {
     shiftChangeConsumer = consumer;
@@ -140,6 +141,15 @@ public class HubShiftUtil {
   public static void initialize() {
     shiftTimer.restart();
     firedPulses.clear();
+    boolean[] schedule = getSchedule();
+    double[] shiftedStarts = schedule[1] ? shiftedStartsActive : shiftedStartsInactive;
+    List<Double> edges = new ArrayList<>();
+    for (int i = 1; i < schedule.length; i++) {
+      if (schedule[i] != schedule[i - 1]) {
+        edges.add(shiftedStarts[i]);
+      }
+    }
+    cachedTransitionEdges = edges;
   }
 
   private static boolean[] getSchedule() {
@@ -216,26 +226,12 @@ public class HubShiftUtil {
     // }
   }
 
-  /** Returns the shifted shift boundary times where active status changes, skipping auto. */
-  private static List<Double> getTransitionEdgeTimes(boolean[] schedule) {
-    double[] shiftedStarts = schedule[1] ? shiftedStartsActive : shiftedStartsInactive;
-    List<Double> edges = new ArrayList<>();
-    // Start at i=1 to skip the AUTO→TRANSITION boundary but include TRANSITION→SHIFT1
-    for (int i = 1; i < schedule.length; i++) {
-      if (schedule[i] != schedule[i - 1]) {
-        edges.add(shiftedStarts[i]);
-      }
-    }
-    return edges;
-  }
-
   /** Checks for upcoming shift transitions and fires the pulse consumer. */
   private static void updateShiftChangePulses() {
     if (shiftChangeConsumer == null || !DriverStation.isTeleopEnabled()) return;
 
     double currentTime = shiftTimer.get();
-    boolean[] schedule = getSchedule();
-    List<Double> edges = getTransitionEdgeTimes(schedule);
+    List<Double> edges = cachedTransitionEdges;
 
     for (int edgeIdx = 0; edgeIdx < edges.size(); edgeIdx++) {
       double edgeTime = edges.get(edgeIdx);
