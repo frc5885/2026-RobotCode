@@ -22,6 +22,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
+import frc.robot.util.OverrideUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class LaunchCalculator {
@@ -116,7 +117,12 @@ public class LaunchCalculator {
     }
 
     // Calculate estimated pose while accounting for phase delay
-    Pose2d estimatedPose = DriveSubsystem.getInstance().getPose();
+    Pose2d estimatedPose;
+    if (OverrideUtil.isManualMode()) {
+      estimatedPose = OverrideUtil.getShootingLocation().getPose();
+    } else {
+      estimatedPose = DriveSubsystem.getInstance().getPose();
+    }
 
     ChassisSpeeds robotRelativeVelocity = DriveSubsystem.getInstance().getChassisSpeeds();
     estimatedPose =
@@ -126,7 +132,10 @@ public class LaunchCalculator {
                 robotRelativeVelocity.vyMetersPerSecond * phaseDelay,
                 robotRelativeVelocity.omegaRadiansPerSecond * phaseDelay));
 
-    if (AllianceFlipUtil.applyX(estimatedPose.getX()) <= FieldConstants.LinesVertical.hubCenter) {
+    if (OverrideUtil.isManualMode()) {
+      launchMode = LaunchMode.MANUAL_SHOOTING;
+    } else if (AllianceFlipUtil.applyX(estimatedPose.getX())
+        <= FieldConstants.LinesVertical.hubCenter) {
       launchMode = LaunchMode.SHOOTING;
     } else {
       launchMode = LaunchMode.PASSING;
@@ -208,46 +217,44 @@ public class LaunchCalculator {
 
   public enum LaunchMode {
     SHOOTING,
-    PASSING
+    PASSING,
+    MANUAL_SHOOTING
   }
 
   private double getHoodAngle(double distance) {
     switch (launchMode) {
-      case SHOOTING:
-        return launchHoodAngleMap.get(distance).getRadians();
-      default:
-        // Probably need to tune this
+      case PASSING:
         return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 47.0);
+      default: // SHOOTING or MANUAL_SHOOTING
+        return launchHoodAngleMap.get(distance).getRadians();
     }
   }
 
   private double getFlywheelSpeed(double distance) {
     switch (launchMode) {
-      case SHOOTING:
-        return launchFlywheelSpeedMap.get(distance);
-      default:
-        // Probably need to tune this
+      case PASSING:
         return ((0.903 * Math.pow(distance, 2)) + (10.68 * distance) + 194.0) * 0.9;
+      default: // SHOOTING or MANUAL_SHOOTING
+        return launchFlywheelSpeedMap.get(distance);
     }
   }
 
   private double getTimeOfFlight(double distance) {
     switch (launchMode) {
-      case SHOOTING:
-        return timeOfFlightMap.get(distance);
-      default:
-        // Probably need to tune this
+      case PASSING:
         return ((0.043856 * distance) + 0.93);
+      default: // SHOOTING or MANUAL_SHOOTING
+        return timeOfFlightMap.get(distance);
     }
   }
 
   private boolean checkIfValid(double distance) {
     switch (launchMode) {
-      case SHOOTING:
-        return distance >= minDistance && distance <= maxDistance;
-      default:
+      case PASSING:
         // Passing is always valid
         return true;
+      default: // SHOOTING or MANUAL_SHOOTING
+        return distance >= minDistance && distance <= maxDistance;
     }
   }
 
@@ -256,10 +263,10 @@ public class LaunchCalculator {
   }
 
   public static double getMinTimeOfFlight() {
-    return 0.0;
+    return timeOfFlightMap.get(minDistance);
   }
 
   public static double getMaxTimeOfFlight() {
-    return 1.6;
+    return timeOfFlightMap.get(maxDistance);
   }
 }

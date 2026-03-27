@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
@@ -22,7 +23,7 @@ import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
-import frc.robot.commands.SysIDCommands;
+import frc.robot.commands.ShiftChangeRumbleLEDCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
@@ -31,9 +32,13 @@ import frc.robot.commands.intake.IntakeControlCommand;
 import frc.robot.commands.intake.RetractIntakeCommand;
 import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
+import frc.robot.controllers.ControllerConstants;
 import frc.robot.controllers.OperatorPanel;
-import frc.robot.subsystems.leds.LEDConstants;
+import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
+import frc.robot.util.HubShiftUtil;
+import frc.robot.util.OverrideUtil;
+import frc.robot.util.OverrideUtil.ShootingLocation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -45,8 +50,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final OperatorPanel operatorPanel = new OperatorPanel(1);
+  private final CommandXboxController controller =
+      new CommandXboxController(ControllerConstants.driverControllerPort);
+  private final CommandXboxController operatorController =
+      new CommandXboxController(ControllerConstants.operatorControllerPort);
+  private final OperatorPanel operatorPanel =
+      new OperatorPanel(ControllerConstants.operatorPanelPort);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -59,10 +68,13 @@ public class RobotContainer {
     // Init all named commands
     // must be before the set up auto routines
     NamedCommands.registerCommand("Intake", new IntakeCommand());
-    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
-    NamedCommands.registerCommand(
-        "ShootWithAgitate", new ShootUntilHopperEmptyCommand().withAgitation(1.0));
     NamedCommands.registerCommand("RetractIntake", new RetractIntakeCommand());
+    NamedCommands.registerCommand("Shoot", new ShootUntilHopperEmptyCommand());
+    NamedCommands.registerCommand("ShootWithAgitate", new ShootCommandGroup().withAgitation(1.0));
+    NamedCommands.registerCommand("ContinuousShoot", new ShootCommandGroup());
+    NamedCommands.registerCommand(
+        "ContinuousShootWithAgitate", new ShootCommandGroup().withAgitation(1.0));
+
     NamedCommands.registerCommand("PreSpinFlywheel", new PreSpinFlywheelCommand());
     NamedCommands.registerCommand("Stop", new StopDrivingCommand());
     NamedCommands.registerCommand(
@@ -72,20 +84,33 @@ public class RobotContainer {
 
     SmartDashboard.putBoolean("ShootPreload", false);
     NamedCommands.registerCommand(
-        "ConditionalShootPreload", new ShootUntilHopperEmptyCommand().conditionalShootPreload());
+        "ConditionalShootPreload", new ShootCommandGroup().conditionalShootPreload());
+
+    NamedCommands.registerCommand(
+        "ShootWithAgitationStopAndWaitCommand",
+        new ParallelDeadlineGroup(
+                new ShootUntilHopperEmptyCommand().withAgitation(0.0), new StopDrivingCommand())
+            .withTimeout(0.5));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
     // SysIDCommands.addDriveSysIdToAutoChooser(autoChooser);
-    SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
+    // SysIDCommands.addTurretSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addHoodSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addFlywheelSysIdToAutoChooser(autoChooser);
     // SysIDCommands.addExtensionSysIdToAutoChooser(autoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Shift change pulse consumer
+    // This runs every time HubShiftUtil fires a pulse
+    HubShiftUtil.setShiftChangeConsumer(
+        (pulseDuration) -> {
+          new ShiftChangeRumbleLEDCommand(controller, pulseDuration).schedule();
+        });
   }
 
   /**
@@ -99,6 +124,7 @@ public class RobotContainer {
     DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
     DefaultCommands.setDefaultTurretCommand(
         TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
+    TurretCommands.registerManualModeOverride();
 
     DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
 
@@ -109,25 +135,42 @@ public class RobotContainer {
     //     .whileTrue(new DriveToPoseCommand(() -> new Pose2d(1.5, 5, new Rotation2d())));
     // controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
 
-    // todo convert to state machine
     controller.b().whileTrue(new OuttakeCommand());
 
-    // Operator Switches
-    // operatorPanel
-    //     .getBrakeModeSwitch()
-    controller
-        .start()
-        .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
-        .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
-
+    // temp for testing
     controller
         .povLeft()
-        .whileTrue(LEDSubsystem.getInstance().applyTurretPattern(LEDConstants.States.policeSirens));
-    controller
-        .povRight()
         .whileTrue(
-            LEDSubsystem.getInstance()
-                .applyFullStripPattern(LEDConstants.States.cyanScrollingGradient));
+            LEDSubsystem.getInstance().applyState(LEDState.TEST_PATTERN).ignoringDisable(true));
+
+    // Operator Switches
+    operatorPanel
+        .getCoastModeSwitch()
+        .onTrue(new SetBrakeModeCommand(false).ignoringDisable(true))
+        .onFalse(new SetBrakeModeCommand(true).ignoringDisable(true));
+    operatorPanel
+        .getManualModeSwitch()
+        .onTrue(OverrideUtil.setManualModeCommand(true).ignoringDisable(true))
+        .onFalse(OverrideUtil.setManualModeCommand(false).ignoringDisable(true));
+    operatorPanel
+        .getBogusCallSwitch()
+        .whileTrue(
+            LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
+    operatorController
+        .povDown()
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.TOWER_FRONT_CENTER)
+                .ignoringDisable(true));
+    operatorController
+        .povLeft()
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.OUTPOST_CORNER)
+                .ignoringDisable(true));
+    operatorController
+        .povRight()
+        .onTrue(
+            OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER)
+                .ignoringDisable(true));
   }
 
   /**

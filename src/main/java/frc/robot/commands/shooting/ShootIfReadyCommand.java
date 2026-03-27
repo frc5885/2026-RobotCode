@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.hopper.HopperSubsystem;
+import frc.robot.subsystems.leds.LEDConstants.LEDState;
+import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.shooter.ShooterSubsystem;
 import frc.robot.subsystems.turret.LaunchCalculator;
 import frc.robot.subsystems.turret.TurretSubsystem;
@@ -56,12 +58,18 @@ public class ShootIfReadyCommand extends Command {
       hopperSubsystem.setKickerVoltage(kickerVoltage);
       hopperSubsystem.setSpindexerVoltage(spindexerVoltage);
 
+      // LEDs
+      LEDSubsystem.getInstance().addState(LEDState.SHOOTING);
+
       if (Constants.isSim()) {
         SimShotVisualizer.launchFuelWithRateLimit();
       }
     } else {
       hopperSubsystem.setKickerVoltage(0.0);
       hopperSubsystem.setSpindexerVoltage(0.0);
+
+      // LEDs
+      LEDSubsystem.getInstance().removeState(LEDState.SHOOTING);
     }
   }
 
@@ -70,6 +78,9 @@ public class ShootIfReadyCommand extends Command {
   public void end(boolean interrupted) {
     hopperSubsystem.setKickerVoltage(0.0);
     hopperSubsystem.setSpindexerVoltage(0.0);
+
+    // LEDs
+    LEDSubsystem.getInstance().removeState(LEDState.SHOOTING);
   }
 
   // Returns true when the command should end.

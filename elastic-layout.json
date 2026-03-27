@@ -35,9 +35,9 @@
           {
             "title": "Match Time",
             "x": 256.0,
-            "y": 384.0,
-            "width": 384.0,
-            "height": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
@@ -51,9 +51,9 @@
           {
             "title": "Active First?",
             "x": 256.0,
-            "y": 128.0,
+            "y": 384.0,
             "width": 128.0,
-            "height": 256.0,
+            "height": 128.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Shifts/Active First?",
@@ -67,7 +67,7 @@
           },
           {
             "title": "Game State",
-            "x": 384.0,
+            "x": 256.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
@@ -81,9 +81,9 @@
           {
             "title": "Remaining Shift Time",
             "x": 384.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
+            "y": 384.0,
+            "width": 640.0,
+            "height": 384.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Shifts/Remaining Shift Time",
@@ -93,10 +93,10 @@
           },
           {
             "title": "Shift Active",
-            "x": 640.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 512.0,
+            "x": 512.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 384.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Shifts/Shift Active",
@@ -110,10 +110,10 @@
           },
           {
             "title": "FMS Data Received?",
-            "x": 0.0,
+            "x": 256.0,
             "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
+            "width": 128.0,
+            "height": 256.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Shifts/FMS Data Received?",
@@ -126,7 +126,7 @@
             }
           },
           {
-            "title": "orangepi_Port_1181_Input_MJPEG_Server",
+            "title": "King Julien",
             "x": 1024.0,
             "y": 0.0,
             "width": 896.0,
@@ -150,15 +150,88 @@
               "period": 0.06,
               "data_type": "boolean"
             }
+          },
+          {
+            "title": "ManualMode",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Overrides/ManualMode",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Manual Shooting Location",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Overrides/ShootingLocation",
+              "period": 0.06,
+              "data_type": "string"
+            }
           }
         ]
       }
     },
     {
-      "name": "Autonomous",
+      "name": "Shooter Tuning",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "TurretToTargetDistance",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/LaunchCalculator/TurretToTargetDistance",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "HoodAngleDegrees",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Shooter/HoodAngleDegrees",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "FlywheelRPM",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/Shooter/FlywheelRPM",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          }
+        ]
       }
     }
   ]

@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP.0"
+            "pathName": "OP_Depot_Quick.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP.1"
+                  "pathName": "OP_Depot_Quick.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP.2"
+                  "pathName": "OP_Depot_Quick.2"
                 }
               },
               {
@@ -59,37 +59,18 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "ShootWithAgitate"
+                  "pathName": "OP_Depot_Quick.3"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "OP.3"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Stop"
-                      }
-                    }
-                  ]
+                  "name": "ContinuousShootWithAgitate"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "OP.4"
           }
         },
         {
@@ -99,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP.5"
+                  "pathName": "OP_Depot_Quick.4"
                 }
               },
               {
@@ -107,20 +88,20 @@
                 "data": {
                   "name": "Intake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ContinuousShoot"
+                }
               }
             ]
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "OP.6"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "ShootWithAgitate"
+            "name": "ContinuousShootWithAgitate"
           }
         }
       ]

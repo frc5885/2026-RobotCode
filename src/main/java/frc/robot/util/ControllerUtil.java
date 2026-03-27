@@ -4,8 +4,12 @@
 
 package frc.robot.util;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.controllers.ControllerConstants;
 import java.util.function.BooleanSupplier;
 
 /** Utility class for controller inputs. */
@@ -52,5 +56,23 @@ public class ControllerUtil {
         };
 
     return new Trigger(isSprinting);
+  }
+
+  /**
+   * Returns a {@link Command} that rumbles the controller while active.
+   *
+   * <p>Rumble starts when the command is scheduled and stops when it ends or is interrupted.
+   *
+   * @param controller the Xbox controller to rumble
+   * @return a Command that controls the controller's rumble
+   */
+  public static Command rumble(CommandXboxController controller) {
+    return new StartEndCommand(
+        () -> {
+          controller.setRumble(RumbleType.kBothRumble, ControllerConstants.controllerRumble);
+        },
+        () -> {
+          controller.setRumble(RumbleType.kBothRumble, 0);
+        });
   }
 }

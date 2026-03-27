@@ -3,10 +3,16 @@ package frc.robot.subsystems.leds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.leds.LEDConstants.LEDState;
+import frc.robot.util.OverrideUtil;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 public class LEDSubsystem extends SubsystemBase {
   private static LEDSubsystem INSTANCE = null;
@@ -14,9 +20,14 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED leds;
   private final AddressableLEDBuffer buffer;
 
+  // Zones kept for future per-zone use
   private final LEDZone hopperLong;
   private final LEDZone turret;
   private final LEDZone hopperShort;
+
+  private final TreeSet<LEDState> activeStates =
+      new TreeSet<>(
+          Comparator.comparingInt((LEDState s) -> s.priority).thenComparingInt(Enum::ordinal));
 
   public static LEDSubsystem getInstance() {
     if (INSTANCE == null) INSTANCE = new LEDSubsystem();
@@ -31,19 +42,14 @@ public class LEDSubsystem extends SubsystemBase {
     leds.setColorOrder(ColorOrder.kRGB);
     leds.start();
 
-    hopperLong =
-        new LEDZone(
-            "HopperLong",
-            buffer.createView(0, LEDConstants.hopperLongLength - 1),
-            LEDConstants.States.disabled);
+    hopperLong = new LEDZone("HopperLong", buffer.createView(0, LEDConstants.hopperLongLength - 1));
 
     turret =
         new LEDZone(
             "Turret",
             buffer.createView(
                 LEDConstants.hopperLongLength,
-                LEDConstants.hopperLongLength + LEDConstants.turretLength - 1),
-            LEDConstants.States.disabled);
+                LEDConstants.hopperLongLength + LEDConstants.turretLength - 1));
 
     hopperShort =
         new LEDZone(
@@ -53,33 +59,80 @@ public class LEDSubsystem extends SubsystemBase {
                 LEDConstants.hopperLongLength
                     + LEDConstants.turretLength
                     + LEDConstants.hopperShortLength
-                    - 1),
-            LEDConstants.States.disabled);
+                    - 1));
+
+    // DISABLED is always in the stack
+    activeStates.add(LEDState.DISABLED);
+
+    // Idle while enabled
+    new Trigger(DriverStation::isEnabled).whileTrue(applyState(LEDState.IDLE));
+
+    // Autonomous
+    new Trigger(DriverStation::isAutonomousEnabled).whileTrue(applyState(LEDState.AUTO));
+
+    // Manual mode
+    OverrideUtil.isManualModeTrigger().whileTrue(applyState(LEDState.MANUAL_MODE));
   }
 
   @Override
   public void periodic() {
-    // Zones write to buffer views in their own periodics;
-    // this flushes the final buffer state to hardware each tick.
+    composePattern().applyTo(buffer);
     leds.setData(buffer);
   }
 
+  private LEDPattern composePattern() {
+    LEDPattern composite = null;
+    for (LEDState state : activeStates) {
+      if (composite == null) {
+        composite = state.pattern;
+      } else if (state.isOverlay) {
+        composite = state.pattern.overlayOn(composite);
+      } else {
+        composite = state.pattern;
+      }
+    }
+    return composite != null ? composite : LEDConstants.LEDState.DISABLED.pattern;
+  }
+
   /**
-   * Applies a pattern across the entire physical strip as one continuous surface. Requires all
-   * three zones -- interrupts their individual commands while active. When this command ends, each
-   * zone reverts to its own default command.
+   * Returns a command that adds the state to the stack on start and removes it on end. This command
+   * requires NO subsystem, so multiple can run simultaneously.
    */
-  public Command applyFullStripPattern(LEDPattern pattern) {
-    return Commands.run(() -> pattern.applyTo(buffer), hopperLong, turret, hopperShort)
-        .withName("FullStrip");
+  public Command applyState(LEDState state) {
+    return Commands.startEnd(() -> activeStates.add(state), () -> activeStates.remove(state))
+        .withName("LEDState:" + state.name())
+        .ignoringDisable(true);
   }
 
-  public Command applyTurretPattern(LEDPattern pattern) {
-    return turret.applyPattern(pattern);
+  /**
+   * Adds a state to the stack. Must explicitly remove the state when done. It is preferred to use
+   * applyState (Command) instead.
+   *
+   * @param state The state to add.
+   */
+  public void addState(LEDState state) {
+    activeStates.add(state);
   }
 
-  public Command applyHopperPattern(LEDPattern pattern) {
-    return Commands.parallel(hopperLong.applyPattern(pattern), hopperShort.applyPattern(pattern))
-        .withName("Hopper");
+  /**
+   * Removes a state from the stack.
+   *
+   * @param state The state to remove.
+   */
+  public void removeState(LEDState state) {
+    if (state == LEDState.DISABLED) return; // DISABLED must always remain in stack
+    activeStates.remove(state);
+  }
+
+  public LEDZone getHopperLong() {
+    return hopperLong;
+  }
+
+  public LEDZone getTurret() {
+    return turret;
+  }
+
+  public LEDZone getHopperShort() {
+    return hopperShort;
   }
 }

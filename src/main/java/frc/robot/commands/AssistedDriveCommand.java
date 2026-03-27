@@ -28,6 +28,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.util.ControllerUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.GeometryUtil;
+import frc.robot.util.OverrideUtil;
 import frc.robot.util.SlewRateLimiter2d;
 import frc.robot.util.Zones;
 import java.util.function.DoubleSupplier;
@@ -49,6 +50,8 @@ public class AssistedDriveCommand extends Command {
 
   @AutoLogOutput private final Trigger inTowerZoneTrigger;
 
+  @AutoLogOutput private final Trigger inHubDropAreaTrigger;
+
   private final PIDController trenchYController =
       new PIDController(
           DriveConstants.driveAssistTranslationKp,
@@ -56,6 +59,11 @@ public class AssistedDriveCommand extends Command {
           DriveConstants.driveAssistTranslationKd);
 
   private final PIDController towerXController =
+      new PIDController(
+          DriveConstants.driveAssistTranslationKp,
+          DriveConstants.driveAssistTranslationKi,
+          DriveConstants.driveAssistTranslationKd);
+  private final PIDController hubXController =
       new PIDController(
           DriveConstants.driveAssistTranslationKp,
           DriveConstants.driveAssistTranslationKi,
@@ -77,24 +85,45 @@ public class AssistedDriveCommand extends Command {
 
     trenchYController.setTolerance(DriveConstants.trenchAlignPositionTolerance);
     towerXController.setTolerance(DriveConstants.towerAlignPositionTolerance);
+    hubXController.setTolerance(DriveConstants.hubAlignPositionTolerance);
     rotationController.setTolerance(DriveConstants.rotationAlignTolerance);
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
     Trigger notSprinting = ControllerUtil.sprintToggle(controller).negate();
+    Trigger noOverridesActive =
+        notSprinting
+            .and(() -> !DriverStation.isTest())
+            .and(OverrideUtil.isManualModeTrigger().negate());
 
     inTrenchZoneTrigger =
-        notSprinting
-            .and(
-                Zones.trenchZones
-                    .willContain(
-                        driveSubsystem::getPose,
-                        driveSubsystem::getFieldRelativeChassisSpeeds,
-                        Seconds.of(DriveConstants.trenchAlignTimeSeconds))
-                    .debounce(0.1))
-            .and(() -> !DriverStation.isTest());
+        noOverridesActive.and(
+            Zones.trenchZones
+                .willContain(
+                    driveSubsystem::getPose,
+                    driveSubsystem::getFieldRelativeChassisSpeeds,
+                    Seconds.of(DriveConstants.trenchAlignTimeSeconds))
+                .debounce(0.1));
+
+    inTowerZoneTrigger =
+        noOverridesActive.and(
+            Zones.towerZones
+                .willContain(
+                    driveSubsystem::getPose,
+                    driveSubsystem::getFieldRelativeChassisSpeeds,
+                    Seconds.of(DriveConstants.towerAlignTimeSeconds))
+                .debounce(0.1));
+
+    inHubDropAreaTrigger =
+        noOverridesActive.and(
+            Zones.hubDropAreas
+                .willContain(
+                    driveSubsystem::getPose,
+                    driveSubsystem::getFieldRelativeChassisSpeeds,
+                    Seconds.of(DriveConstants.hubDropAreaTimeSeconds))
+                .debounce(0.1));
 
     inBumpZoneTrigger =
-        notSprinting
+        noOverridesActive
             .and(
                 Zones.bumpZones
                     .willContain(
@@ -102,25 +131,17 @@ public class AssistedDriveCommand extends Command {
                         driveSubsystem::getFieldRelativeChassisSpeeds,
                         Seconds.of(DriveConstants.bumpAlignTimeSeconds))
                     .debounce(0.1))
-            .and(() -> !DriverStation.isTest());
-
-    inTowerZoneTrigger =
-        notSprinting
-            .and(
-                Zones.towerZones
-                    .willContain(
-                        driveSubsystem::getPose,
-                        driveSubsystem::getFieldRelativeChassisSpeeds,
-                        Seconds.of(DriveConstants.towerAlignTimeSeconds))
-                    .debounce(0.1))
-            .and(() -> !DriverStation.isTest());
+            // negate hub area trigger so that hub and bump don't fight each other
+            .and(inHubDropAreaTrigger.negate());
 
     inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
     inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
     inTowerZoneTrigger.onTrue(updateDriveMode(DriveMode.TOWER_LOCK));
+    inHubDropAreaTrigger.onTrue(updateDriveMode(DriveMode.HUB_LOCK));
     inTrenchZoneTrigger
         .or(inBumpZoneTrigger)
         .or(inTowerZoneTrigger)
+        .or(inHubDropAreaTrigger)
         .onFalse(updateDriveMode(DriveMode.NORMAL));
 
     addRequirements(driveSubsystem);
@@ -161,7 +182,18 @@ public class AssistedDriveCommand extends Command {
     return Meters.of(FieldConstants.fieldLength - FieldConstants.Tower.depth / 2);
   }
 
+  private Distance getHubX() {
+    if (driveSubsystem.getPose().getX() < FieldConstants.fieldLength / 2) {
+      return Meters.of(FieldConstants.LinesVertical.hubCenter + FieldConstants.Hub.width);
+    }
+    return Meters.of(FieldConstants.LinesVertical.oppHubCenter - FieldConstants.Hub.width);
+  }
+
   private Rotation2d getTowerLockAngle() {
+    return GeometryUtil.getNearest90or270Rotation(driveSubsystem.getRotation());
+  }
+
+  private Rotation2d getHubLockAngle() {
     return GeometryUtil.getNearest90or270Rotation(driveSubsystem.getRotation());
   }
 
@@ -210,6 +242,7 @@ public class AssistedDriveCommand extends Command {
           rotationController.reset();
           trenchYController.reset();
           towerXController.reset();
+          hubXController.reset();
         });
   }
 
@@ -317,6 +350,33 @@ public class AssistedDriveCommand extends Command {
                 MetersPerSecond.of(linearVelocity.getY()),
                 RadiansPerSecond.of(rotSpeedToSideways)));
         break;
+
+      case HUB_LOCK:
+        hubXController.setSetpoint(getHubX().in(Meters));
+        double xHubVel =
+            MathUtil.clamp(
+                hubXController.calculate(driveSubsystem.getPose().getX()),
+                -driveSubsystem.getMaxLinearSpeedMetersPerSec(),
+                driveSubsystem.getMaxLinearSpeedMetersPerSec());
+        if (hubXController.atSetpoint()) {
+          xHubVel = 0;
+        }
+        rotationController.setSetpoint(getHubLockAngle().getRadians());
+        double rotSpeedToSidewaysHub =
+            MathUtil.clamp(
+                rotationController.calculate(driveSubsystem.getRotation().getRadians()),
+                -driveSubsystem.getMaxAngularSpeedRadPerSec(),
+                driveSubsystem.getMaxAngularSpeedRadPerSec());
+        if (rotationController.atSetpoint()) {
+          rotSpeedToSidewaysHub = 0;
+        }
+        driveSubsystem.runVelocityFieldRelative(
+            new ChassisSpeeds(
+                MetersPerSecond.of(xHubVel),
+                MetersPerSecond.of(linearVelocity.getY()),
+                RadiansPerSecond.of(rotSpeedToSidewaysHub)));
+
+        break;
     }
   }
 
@@ -334,6 +394,7 @@ public class AssistedDriveCommand extends Command {
     NORMAL,
     TRENCH_LOCK,
     BUMP_LOCK,
-    TOWER_LOCK
+    TOWER_LOCK,
+    HUB_LOCK
   }
 }

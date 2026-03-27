@@ -7,10 +7,13 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.extension.ExtensionConstants;
 import frc.robot.subsystems.intake.roller.RollerConstants;
+import frc.robot.subsystems.leds.LEDConstants.LEDState;
+import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -29,9 +32,16 @@ public class IntakeControlCommand extends Command {
   private final Timer shootDelayTimer = new Timer();
   private final double shootDelayTimeSeconds = 2.0;
 
+  // LED Control
+  private final Trigger intakeRunningTrigger =
+      new Trigger(() -> currentState == IntakeState.INTAKING);
+
   public IntakeControlCommand(CommandXboxController controller) {
     this.controller = controller;
     addRequirements(intakeSubsystem);
+
+    // Display intake LED state while intaking
+    intakeRunningTrigger.whileTrue(LEDSubsystem.getInstance().applyState(LEDState.INTAKE_RUNNING));
   }
 
   // Called when the command is initially scheduled.
@@ -154,6 +164,7 @@ public class IntakeControlCommand extends Command {
     intakeSubsystem.setIntakeRollerVoltage(0);
     agitateTimer.stop();
     shootDelayTimer.stop();
+    currentState = IntakeState.INITIAL;
   }
 
   // Returns true when the command should end.

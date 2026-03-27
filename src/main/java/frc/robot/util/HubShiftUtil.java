@@ -12,7 +12,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.turret.LaunchCalculator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -85,6 +90,17 @@ public class HubShiftUtil {
     140.0
   };
 
+  // Shift change pulse state
+  private static Consumer<Double> shiftChangeConsumer = null;
+  private static final Set<Integer> firedPulses = new HashSet<>();
+  private static final double[] countdownOffsets = {5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
+  private static final double[] pulseDurations = {0.2, 0.2, 0.2, 0.2, 0.2, 1.0};
+  private static List<Double> cachedTransitionEdges = List.of();
+
+  public static void setShiftChangeConsumer(Consumer<Double> consumer) {
+    shiftChangeConsumer = consumer;
+  }
+
   // Will add allieance win override if needed
   // @Setter private static Supplier<Optional<Boolean>> allianceWinOverride = () ->
   // Optional.empty();
@@ -124,6 +140,16 @@ public class HubShiftUtil {
   /** Starts the timer at the begining of teleop. */
   public static void initialize() {
     shiftTimer.restart();
+    firedPulses.clear();
+    boolean[] schedule = getSchedule();
+    double[] shiftedStarts = schedule[1] ? shiftedStartsActive : shiftedStartsInactive;
+    List<Double> edges = new ArrayList<>();
+    for (int i = 1; i < schedule.length; i++) {
+      if (schedule[i] != schedule[i - 1]) {
+        edges.add(shiftedStarts[i]);
+      }
+    }
+    cachedTransitionEdges = edges;
   }
 
   private static boolean[] getSchedule() {
@@ -200,6 +226,29 @@ public class HubShiftUtil {
     // }
   }
 
+  /** Checks for upcoming shift transitions and fires the pulse consumer. */
+  private static void updateShiftChangePulses() {
+    if (shiftChangeConsumer == null || !DriverStation.isTeleopEnabled()) return;
+
+    double currentTime = shiftTimer.get();
+    List<Double> edges = cachedTransitionEdges;
+
+    for (int edgeIdx = 0; edgeIdx < edges.size(); edgeIdx++) {
+      double edgeTime = edges.get(edgeIdx);
+      for (int pulseIdx = 0; pulseIdx < countdownOffsets.length; pulseIdx++) {
+        double pulseTime = edgeTime - countdownOffsets[pulseIdx];
+        int pulseKey = edgeIdx * 10 + pulseIdx;
+
+        if (!firedPulses.contains(pulseKey)
+            && currentTime >= pulseTime
+            && currentTime < pulseTime + 1.0) {
+          firedPulses.add(pulseKey);
+          shiftChangeConsumer.accept(pulseDurations[pulseIdx]);
+        }
+      }
+    }
+  }
+
   public static void updateDashboardOutputs() {
     // Publish match time
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
@@ -219,5 +268,8 @@ public class HubShiftUtil {
         DriverStation.getAlliance().orElse(Alliance.Blue) == HubShiftUtil.getFirstActiveAlliance());
     SmartDashboard.putBoolean(
         "Shifts/FMS Data Received?", DriverStation.getGameSpecificMessage().length() > 0);
+
+    // Check for shift change pulses
+    updateShiftChangePulses();
   }
 }
