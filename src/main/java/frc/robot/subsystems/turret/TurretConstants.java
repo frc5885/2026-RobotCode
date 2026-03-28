@@ -31,8 +31,8 @@ public class TurretConstants {
   public static final double maxAccelerationRadiansPerSecondSquared = 70.0;
 
   public static final double turretOffset = Units.degreesToRadians(0.0); // facing front
-  private static final double minOffsetAngle = Units.degreesToRadians(-213.0);
-  private static final double maxOffsetAngle = Units.degreesToRadians(180.0);
+  private static final double minOffsetAngle = Units.degreesToRadians(-228.0);
+  private static final double maxOffsetAngle = Units.degreesToRadians(195.0);
   public static final double minAngle = minOffsetAngle + turretOffset;
   public static final double maxAngle = maxOffsetAngle + turretOffset;
   public static final double trackOverlapMargin = Units.degreesToRadians(10);
@@ -44,7 +44,7 @@ public class TurretConstants {
       new Transform3d(-0.16, 0.16, 0.38, new Rotation3d(0.0, 0.0, turretOffset));
 
   public static final double turretPositionToleranceRadians = Units.degreesToRadians(6.0);
-  public static final double turretPassingToleranceRadians = Units.degreesToRadians(10.0);
+  public static final double turretPassingToleranceRadians = Units.degreesToRadians(8.0);
   public static final double turretVelocityToleranceRadiansPerSecond =
       Units.degreesToRadians(100.0);
 
@@ -55,6 +55,6 @@ public class TurretConstants {
   public static final int bigGearTeeth = 145;
 
   // keep the negative sign
-  public static final double absoluteEncoder1OffsetRotations = -0.5545;
-  public static final double absoluteEncoder2OffsetRotations = -0.3626;
+  public static final double absoluteEncoder1OffsetRotations = -0.6076;
+  public static final double absoluteEncoder2OffsetRotations = -0.3667;
 }

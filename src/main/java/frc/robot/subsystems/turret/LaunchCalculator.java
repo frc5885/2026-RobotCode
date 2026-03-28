@@ -87,19 +87,20 @@ public class LaunchCalculator {
     launchHoodAngleMap.put(6.085, Rotation2d.fromDegrees(64.0));
     launchHoodAngleMap.put(6.317, Rotation2d.fromDegrees(62.0));
 
-    launchFlywheelSpeedMap.put(1.142, Units.rotationsPerMinuteToRadiansPerSecond(1800));
-    launchFlywheelSpeedMap.put(1.532, Units.rotationsPerMinuteToRadiansPerSecond(2056));
-    launchFlywheelSpeedMap.put(1.835, Units.rotationsPerMinuteToRadiansPerSecond(2056));
-    launchFlywheelSpeedMap.put(2.506, Units.rotationsPerMinuteToRadiansPerSecond(2100));
-    launchFlywheelSpeedMap.put(3.299, Units.rotationsPerMinuteToRadiansPerSecond(2200));
-    launchFlywheelSpeedMap.put(3.716, Units.rotationsPerMinuteToRadiansPerSecond(2350));
-    launchFlywheelSpeedMap.put(4.100, Units.rotationsPerMinuteToRadiansPerSecond(2400));
-    launchFlywheelSpeedMap.put(4.484, Units.rotationsPerMinuteToRadiansPerSecond(2400));
-    launchFlywheelSpeedMap.put(4.906, Units.rotationsPerMinuteToRadiansPerSecond(2500));
-    launchFlywheelSpeedMap.put(5.269, Units.rotationsPerMinuteToRadiansPerSecond(2550));
-    launchFlywheelSpeedMap.put(5.706, Units.rotationsPerMinuteToRadiansPerSecond(2650));
-    launchFlywheelSpeedMap.put(6.085, Units.rotationsPerMinuteToRadiansPerSecond(2800));
-    launchFlywheelSpeedMap.put(6.317, Units.rotationsPerMinuteToRadiansPerSecond(2800));
+    double rpmOffset = -20;
+    launchFlywheelSpeedMap.put(1.142, Units.rotationsPerMinuteToRadiansPerSecond(1800 + rpmOffset));
+    launchFlywheelSpeedMap.put(1.532, Units.rotationsPerMinuteToRadiansPerSecond(2056 + rpmOffset));
+    launchFlywheelSpeedMap.put(1.835, Units.rotationsPerMinuteToRadiansPerSecond(2056 + rpmOffset));
+    launchFlywheelSpeedMap.put(2.506, Units.rotationsPerMinuteToRadiansPerSecond(2100 + rpmOffset));
+    launchFlywheelSpeedMap.put(3.299, Units.rotationsPerMinuteToRadiansPerSecond(2200 + rpmOffset));
+    launchFlywheelSpeedMap.put(3.716, Units.rotationsPerMinuteToRadiansPerSecond(2350 + rpmOffset));
+    launchFlywheelSpeedMap.put(4.100, Units.rotationsPerMinuteToRadiansPerSecond(2400 + rpmOffset));
+    launchFlywheelSpeedMap.put(4.484, Units.rotationsPerMinuteToRadiansPerSecond(2400 + rpmOffset));
+    launchFlywheelSpeedMap.put(4.906, Units.rotationsPerMinuteToRadiansPerSecond(2500 + rpmOffset));
+    launchFlywheelSpeedMap.put(5.269, Units.rotationsPerMinuteToRadiansPerSecond(2550 + rpmOffset));
+    launchFlywheelSpeedMap.put(5.706, Units.rotationsPerMinuteToRadiansPerSecond(2650 + rpmOffset));
+    launchFlywheelSpeedMap.put(6.085, Units.rotationsPerMinuteToRadiansPerSecond(2800 + rpmOffset));
+    launchFlywheelSpeedMap.put(6.317, Units.rotationsPerMinuteToRadiansPerSecond(2800 + rpmOffset));
 
     timeOfFlightMap.put(1.364, 1.042);
     timeOfFlightMap.put(2.288, 1.096);

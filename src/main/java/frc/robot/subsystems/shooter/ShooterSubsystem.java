@@ -20,6 +20,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -243,6 +244,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean isFlywheelAtSetpoint() {
     double tolerance =
         LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+                || DriverStation.isAutonomous()
             ? FlywheelConstants.velocityToleranceRPM
             : FlywheelConstants.passingToleranceRPM;
     return flywheelAtSetpointDebouncer.calculate(
@@ -254,6 +256,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public boolean isHoodAtGoal() {
     double tolerance =
         LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+                || DriverStation.isAutonomous()
             ? HoodConstants.positionToleranceRadians
             : HoodConstants.passingToleranceRadians;
     return hoodAtSetpointDebouncer.calculate(
