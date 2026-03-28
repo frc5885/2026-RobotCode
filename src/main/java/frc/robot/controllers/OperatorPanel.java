@@ -58,4 +58,9 @@ public class OperatorPanel {
   public Trigger getBogusCallSwitch() {
     return overrideSwitch(7);
   }
+
+  /** Returns the fast drive speed switch (3trd switch from the left). */
+  public Trigger getFastDriveSpeedSwitch() {
+    return overrideSwitch(2);
+  }
 }

@@ -156,6 +156,7 @@ public class RobotContainer {
         .getBogusCallSwitch()
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
+    operatorPanel.getFastDriveSpeedSwitch().whileTrue(AssistedDriveCommand.turboMode());
     operatorController
         .povDown()
         .onTrue(

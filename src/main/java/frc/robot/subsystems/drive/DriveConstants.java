@@ -27,6 +27,7 @@ public class DriveConstants {
   public static final double maxAccelerationMetersPerSec2 = 10.0;
   public static final double shootOnTheMoveSpeedMultiplier = 0.15;
   public static final double passOnTheMoveSpeedMultiplier = 0.2;
+  public static final double teleopMaxSpeed = 3.0;
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);

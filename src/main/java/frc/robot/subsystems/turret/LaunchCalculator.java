@@ -87,7 +87,7 @@ public class LaunchCalculator {
     launchHoodAngleMap.put(6.085, Rotation2d.fromDegrees(64.0));
     launchHoodAngleMap.put(6.317, Rotation2d.fromDegrees(62.0));
 
-    double rpmOffset = -20;
+    double rpmOffset = -15.0;
     launchFlywheelSpeedMap.put(1.142, Units.rotationsPerMinuteToRadiansPerSecond(1800 + rpmOffset));
     launchFlywheelSpeedMap.put(1.532, Units.rotationsPerMinuteToRadiansPerSecond(2056 + rpmOffset));
     launchFlywheelSpeedMap.put(1.835, Units.rotationsPerMinuteToRadiansPerSecond(2056 + rpmOffset));
@@ -99,8 +99,8 @@ public class LaunchCalculator {
     launchFlywheelSpeedMap.put(4.906, Units.rotationsPerMinuteToRadiansPerSecond(2500 + rpmOffset));
     launchFlywheelSpeedMap.put(5.269, Units.rotationsPerMinuteToRadiansPerSecond(2550 + rpmOffset));
     launchFlywheelSpeedMap.put(5.706, Units.rotationsPerMinuteToRadiansPerSecond(2650 + rpmOffset));
-    launchFlywheelSpeedMap.put(6.085, Units.rotationsPerMinuteToRadiansPerSecond(2800 + rpmOffset));
-    launchFlywheelSpeedMap.put(6.317, Units.rotationsPerMinuteToRadiansPerSecond(2800 + rpmOffset));
+    launchFlywheelSpeedMap.put(6.085, Units.rotationsPerMinuteToRadiansPerSecond(2700 + rpmOffset));
+    launchFlywheelSpeedMap.put(6.317, Units.rotationsPerMinuteToRadiansPerSecond(2750 + rpmOffset));
 
     timeOfFlightMap.put(1.364, 1.042);
     timeOfFlightMap.put(2.288, 1.096);
@@ -225,7 +225,7 @@ public class LaunchCalculator {
   private double getHoodAngle(double distance) {
     switch (launchMode) {
       case PASSING:
-        return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 47.0);
+        return Math.toRadians((0.178 * Math.pow(distance - 13.34, 2)) + 49.0);
       default: // SHOOTING or MANUAL_SHOOTING
         return launchHoodAngleMap.get(distance).getRadians();
     }

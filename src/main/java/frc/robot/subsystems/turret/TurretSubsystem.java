@@ -151,10 +151,11 @@ public class TurretSubsystem extends SubsystemBase {
 
       setpoint = profile.calculate(Constants.dtSeconds, setpoint, goalState);
       double positionTolerance =
-          LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+          LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.PASSING
                   || DriverStation.isAutonomous()
-              ? TurretConstants.turretPositionToleranceRadians
-              : TurretConstants.turretPassingToleranceRadians;
+              ? TurretConstants.turretPassingToleranceRadians
+              // else shooting
+              : TurretConstants.turretPositionToleranceRadians;
       atGoal =
           EqualsUtil.epsilonEquals(getPosition(), bestAngle, positionTolerance)
               && EqualsUtil.epsilonEquals(

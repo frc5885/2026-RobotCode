@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.controllers.ControllerConstants;
@@ -75,6 +76,9 @@ public class AssistedDriveCommand extends Command {
           DriveConstants.driveAssistRotationKd);
 
   @AutoLogOutput private DriveMode currentDriveMode = DriveMode.NORMAL;
+
+  // should implement this better
+  private static double maxDriveSpeed = DriveConstants.teleopMaxSpeed;
 
   /** Creates a new TeleopDrive. */
   public AssistedDriveCommand(CommandXboxController controller) {
@@ -265,7 +269,9 @@ public class AssistedDriveCommand extends Command {
   public void execute() {
     Translation2d linearVelocity =
         getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-    linearVelocity = linearVelocity.times(driveSubsystem.getMaxLinearSpeedMetersPerSec());
+    linearVelocity =
+        linearVelocity.times(
+            Math.min(driveSubsystem.getMaxLinearSpeedMetersPerSec(), maxDriveSpeed));
     linearVelocity = driveLimiter.calculate(linearVelocity);
 
     double omega =
@@ -396,5 +402,16 @@ public class AssistedDriveCommand extends Command {
     BUMP_LOCK,
     TOWER_LOCK,
     HUB_LOCK
+  }
+
+  /**
+   * Command that boosts the max drive speed back to theoretical max while scheduled
+   *
+   * @return the command
+   */
+  public static Command turboMode() {
+    return new StartEndCommand(
+        () -> maxDriveSpeed = DriveConstants.maxSpeedMetersPerSec,
+        () -> maxDriveSpeed = DriveConstants.teleopMaxSpeed);
   }
 }

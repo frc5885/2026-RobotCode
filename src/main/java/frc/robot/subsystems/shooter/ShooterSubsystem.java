@@ -243,10 +243,11 @@ public class ShooterSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
     double tolerance =
-        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.PASSING
                 || DriverStation.isAutonomous()
-            ? FlywheelConstants.velocityToleranceRPM
-            : FlywheelConstants.passingToleranceRPM;
+            ? FlywheelConstants.passingToleranceRPM
+            // else shooting
+            : FlywheelConstants.velocityToleranceRPM;
     return flywheelAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance));
   }
@@ -255,10 +256,11 @@ public class ShooterSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Shooter/HoodAtGoal")
   public boolean isHoodAtGoal() {
     double tolerance =
-        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.SHOOTING
+        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.PASSING
                 || DriverStation.isAutonomous()
-            ? HoodConstants.positionToleranceRadians
-            : HoodConstants.passingToleranceRadians;
+            ? HoodConstants.passingToleranceRadians
+            // else shooting
+            : HoodConstants.positionToleranceRadians;
     return hoodAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(getHoodAngle(), hoodGoalState.position, tolerance)
         // && EqualsUtil.epsilonEquals(
