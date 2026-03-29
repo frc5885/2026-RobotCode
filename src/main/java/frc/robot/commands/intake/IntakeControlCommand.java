@@ -134,7 +134,6 @@ public class IntakeControlCommand extends Command {
         case DEPLOYED:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(0);
-          // unrelated but shouldn't this be stop intake?
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
 
@@ -164,8 +163,10 @@ public class IntakeControlCommand extends Command {
                 ? ExtensionConstants.agitateTopAngle
                 : ExtensionConstants.agitateBottomAngle);
       } else if (currentState == IntakeState.STOWED) {
-        if (retractTimer.hasElapsed(retractStallSeconds)
-            && !intakeSubsystem.isExtensionAtSetPoint()) {
+        if (intakeSubsystem.isExtensionAtSetPoint()) {
+          // Successfully retracted, disarm the stall timeout
+          retractTimer.stop();
+        } else if (retractTimer.hasElapsed(retractStallSeconds)) {
           // If we've been trying to retract for a while and haven't succeeded, go to deployed.
           // Must call entry actions directly since mutating currentState here bypasses the
           // state-transition block, so the switch case won't run on the next cycle.
