@@ -32,6 +32,10 @@ public class IntakeControlCommand extends Command {
   private final Timer shootDelayTimer = new Timer();
   private final double shootDelayTimeSeconds = 2.0;
 
+  // For intake retract timeout
+  private final Timer retractTimer = new Timer();
+  private final double retractStallSeconds = 2.0;
+
   // LED Control
   private final Trigger intakeRunningTrigger =
       new Trigger(() -> currentState == IntakeState.INTAKING);
@@ -50,6 +54,7 @@ public class IntakeControlCommand extends Command {
     currentState = IntakeState.INITIAL;
     agitateTimer.stop();
     shootDelayTimer.stop();
+    retractTimer.stop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -105,6 +110,7 @@ public class IntakeControlCommand extends Command {
       currentState = newState;
       agitateTimer.stop();
       shootDelayTimer.stop();
+      retractTimer.stop();
       switch (currentState) {
         case INTAKING:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
@@ -128,10 +134,13 @@ public class IntakeControlCommand extends Command {
         case DEPLOYED:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(0);
+          // unrelated but shouldn't this be stop intake?
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
 
         case STOWED:
+          retractTimer.reset();
+          retractTimer.start();
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
           intakeSubsystem.setIntakeRollerVoltage(0);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().stopIntake();
@@ -154,6 +163,17 @@ public class IntakeControlCommand extends Command {
             agitateIsTop
                 ? ExtensionConstants.agitateTopAngle
                 : ExtensionConstants.agitateBottomAngle);
+      } else if (currentState == IntakeState.STOWED) {
+        if (retractTimer.hasElapsed(retractStallSeconds)
+            && !intakeSubsystem.isExtensionAtSetPoint()) {
+          // If we've been trying to retract for a while and haven't succeeded, go to deployed.
+          // Must call entry actions directly since mutating currentState here bypasses the
+          // state-transition block, so the switch case won't run on the next cycle.
+          currentState = IntakeState.DEPLOYED;
+          retractTimer.stop();
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
+          intakeSubsystem.setIntakeRollerVoltage(0);
+        }
       }
     }
   }
@@ -164,6 +184,7 @@ public class IntakeControlCommand extends Command {
     intakeSubsystem.setIntakeRollerVoltage(0);
     agitateTimer.stop();
     shootDelayTimer.stop();
+    retractTimer.stop();
     currentState = IntakeState.INITIAL;
   }
 
