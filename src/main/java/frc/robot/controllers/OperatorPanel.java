@@ -59,7 +59,7 @@ public class OperatorPanel {
     return overrideSwitch(7);
   }
 
-  /** Returns the fast drive speed switch (3trd switch from the left). */
+  /** Returns the fast drive speed switch (3rd switch from the left). */
   public Trigger getFastDriveSpeedSwitch() {
     return overrideSwitch(2);
   }
