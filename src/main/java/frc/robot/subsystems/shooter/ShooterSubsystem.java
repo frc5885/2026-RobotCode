@@ -20,7 +20,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -243,10 +242,8 @@ public class ShooterSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Shooter/FlywheelAtSetpoint")
   public boolean isFlywheelAtSetpoint() {
     double tolerance =
-        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.PASSING
-                || DriverStation.isAutonomous()
+        LaunchCalculator.getInstance().isLooseToleranceMode()
             ? FlywheelConstants.passingToleranceRPM
-            // else shooting
             : FlywheelConstants.velocityToleranceRPM;
     return flywheelAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance));
@@ -256,10 +253,8 @@ public class ShooterSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Shooter/HoodAtGoal")
   public boolean isHoodAtGoal() {
     double tolerance =
-        LaunchCalculator.getInstance().getLaunchMode() == LaunchMode.PASSING
-                || DriverStation.isAutonomous()
+        LaunchCalculator.getInstance().isLooseToleranceMode()
             ? HoodConstants.passingToleranceRadians
-            // else shooting
             : HoodConstants.positionToleranceRadians;
     return hoodAtSetpointDebouncer.calculate(
         EqualsUtil.epsilonEquals(getHoodAngle(), hoodGoalState.position, tolerance)

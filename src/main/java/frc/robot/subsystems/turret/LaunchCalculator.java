@@ -18,6 +18,7 @@ import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.AllianceFlipUtil;
@@ -261,6 +262,11 @@ public class LaunchCalculator {
 
   public LaunchMode getLaunchMode() {
     return launchMode;
+  }
+
+  /** Returns true when loose (passing/auto) tolerances should be used. */
+  public boolean isLooseToleranceMode() {
+    return launchMode == LaunchMode.PASSING || DriverStation.isAutonomous();
   }
 
   public static double getMinTimeOfFlight() {
