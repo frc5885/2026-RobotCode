@@ -34,6 +34,7 @@ import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.ControllerConstants;
 import frc.robot.controllers.OperatorPanel;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.util.HubShiftUtil;
@@ -156,6 +157,7 @@ public class RobotContainer {
         .getBogusCallSwitch()
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
+    operatorPanel.getFastDriveSpeedSwitch().whileTrue(DriveSubsystem.getInstance().turboMode());
     operatorController
         .povDown()
         .onTrue(

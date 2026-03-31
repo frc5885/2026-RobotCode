@@ -33,7 +33,10 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -105,7 +108,18 @@ public class DriveSubsystem extends SubsystemBase {
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
-  private static double driveSpeedMultiplier = 1.0;
+  /**
+   * When true, linear speed cap is raised from teleopMaxSpeed to maxSpeedMetersPerSec. Toggled by
+   * the operator panel's fast-drive-speed switch. Does not affect angular speed.
+   */
+  private static boolean turboEnabled = false;
+
+  /**
+   * Multiplier applied during shooting/passing to slow the robot down while aiming. Applied to both
+   * linear and angular speed, always relative to the true max (maxSpeedMetersPerSec = 4.1). Set by
+   * SlowDriveSpeedCommand; 1.0 means no reduction.
+   */
+  private static double actionSpeedMultiplier = 1.0;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
@@ -118,6 +132,8 @@ public class DriveSubsystem extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+
+  private final Field2d fieldVisualization = new Field2d();
 
   private DriveSubsystem(
       GyroIO gyroIO,
@@ -169,6 +185,9 @@ public class DriveSubsystem extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    // Configure field visualization
+    SmartDashboard.putData("Field", fieldVisualization);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -230,6 +249,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // Update field visualization
+    fieldVisualization.setRobotPose(getPose());
   }
 
   /**
@@ -390,24 +412,45 @@ public class DriveSubsystem extends SubsystemBase {
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
-  /** Returns the maximum linear speed in meters per sec. */
+  /**
+   * Returns the effective max linear speed in meters per sec. When an action multiplier is active
+   * (shooting/passing), speed is based on the true max. Otherwise, returns either teleopMaxSpeed or
+   * maxSpeedMetersPerSec depending on turbo mode.
+   */
   public double getMaxLinearSpeedMetersPerSec() {
-    return maxSpeedMetersPerSec * driveSpeedMultiplier;
-  }
-
-  /** Returns the maximum angular speed in radians per sec. */
-  public double getMaxAngularSpeedRadPerSec() {
-    return maxSpeedMetersPerSec * driveSpeedMultiplier / driveBaseRadius;
+    double baseSpeed = turboEnabled ? maxSpeedMetersPerSec : teleopMaxSpeed;
+    return (actionSpeedMultiplier < 1.0) ? maxSpeedMetersPerSec * actionSpeedMultiplier : baseSpeed;
   }
 
   /**
-   * Sets a multiplier [0.0, 1.0] on the max drive speed
-   *
-   * @param multiplier
+   * Returns the effective max angular speed in radians per sec. Only affected by the action
+   * multiplier (shooting/passing), not the turbo toggle.
    */
-  public void setDriveSpeedMultiplier(double multiplier) {
-    double clampedMultiplier = MathUtil.clamp(multiplier, 0.0, 1.0);
-    driveSpeedMultiplier = clampedMultiplier;
+  public double getMaxAngularSpeedRadPerSec() {
+    return maxSpeedMetersPerSec * actionSpeedMultiplier / driveBaseRadius;
+  }
+
+  /**
+   * Sets the action speed multiplier used during shooting/passing. Applied relative to the true max
+   * speed (maxSpeedMetersPerSec), not the teleop cap.
+   *
+   * @param multiplier value in [0.0, 1.0]
+   */
+  public void setActionSpeedMultiplier(double multiplier) {
+    actionSpeedMultiplier = MathUtil.clamp(multiplier, 0.0, 1.0);
+  }
+
+  /** Resets the action speed multiplier to 1.0 (full speed). Called when shooting/passing ends. */
+  public void resetActionSpeedMultiplier() {
+    actionSpeedMultiplier = 1.0;
+  }
+
+  /**
+   * Returns a command that enables turbo mode (full linear speed) while scheduled, and restores the
+   * teleop speed cap when it ends. Bound to the operator panel fast-drive-speed switch.
+   */
+  public Command turboMode() {
+    return new StartEndCommand(() -> turboEnabled = true, () -> turboEnabled = false);
   }
 
   /** Returns the maple sim drivetrain. */

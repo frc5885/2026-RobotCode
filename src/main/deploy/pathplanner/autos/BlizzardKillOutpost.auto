@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.0"
+            "pathName": "Blizzard_kill_outpost.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.1"
+                  "pathName": "Blizzard_kill_outpost.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.2"
+                  "pathName": "Blizzard_kill_outpost.2"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.3"
+                  "pathName": "Blizzard_kill_outpost.3"
                 }
               },
               {
@@ -84,13 +84,13 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "OP_Depot_No_Depot.4"
+                        "pathName": "Blizzard_kill_outpost.4"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "OP_Depot_No_Depot.5"
+                        "pathName": "Blizzard_kill_outpost.5"
                       }
                     }
                   ]
@@ -108,7 +108,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.6"
+            "pathName": "Blizzard_kill_outpost.6"
           }
         },
         {

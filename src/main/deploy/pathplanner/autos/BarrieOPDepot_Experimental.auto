@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.0"
+            "pathName": "OP_Depot_2.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.1"
+                  "pathName": "OP_Depot_2.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.2"
+                  "pathName": "OP_Depot_2.2"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.3"
+                  "pathName": "OP_Depot_2.3"
                 }
               },
               {
@@ -78,22 +78,9 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "path",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "OP_Depot_No_Depot.4"
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "OP_Depot_No_Depot.5"
-                      }
-                    }
-                  ]
+                  "pathName": "OP_Depot_2.4"
                 }
               },
               {
@@ -101,14 +88,14 @@
                 "data": {
                   "name": "Intake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ContinuousShoot"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "OP_Depot_No_Depot.6"
           }
         },
         {
