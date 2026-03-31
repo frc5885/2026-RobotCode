@@ -201,6 +201,10 @@ public class TurretSubsystem extends SubsystemBase {
     return inputs.velocityRadiansPerSecond;
   }
 
+  public double getTurretErrorRadians() {
+    return Math.abs(getPosition() - setpoint.position);
+  }
+
   /** Run the turret in tracking mode. Tracks the result of the launch calculator */
   public Command runTrackTargetCommand() {
     return run(

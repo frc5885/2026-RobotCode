@@ -282,6 +282,14 @@ public class ShooterSubsystem extends SubsystemBase {
         hoodInputs.positionRadians, hoodInputs.velocityRadiansPerSecond);
   }
 
+  public double getHoodErrorRadians() {
+    return Math.abs(hoodGoalState.position - hoodInputs.positionRadians);
+  }
+
+  public double getFlywheelErrorRPM() {
+    return Math.abs(flywheelTargetVelocity - flywheelInputs.velocityRPM);
+  }
+
   private void visualizationUpdate() {
     // Log Pose3d
     Logger.recordOutput(
