@@ -23,11 +23,15 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = 4.1; // Tuned on poseidon
+  public static final double maxSpeedMetersPerSec = 4.1; // Tuned on poseidon, actual max speed
   public static final double maxAccelerationMetersPerSec2 = 10.0;
+
+  // Multiplies the max speed when the robot is shooting/passing and moving at the same time
   public static final double shootOnTheMoveSpeedMultiplier = 0.15;
   public static final double passOnTheMoveSpeedMultiplier = 0.2;
+  // Reduced max speed in teleop when not shooting/passing, to make it easier to control the robot
   public static final double teleopMaxSpeed = 3.0;
+
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
   public static final double wheelBase = Units.inchesToMeters(24.25);

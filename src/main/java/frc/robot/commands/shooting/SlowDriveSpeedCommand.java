@@ -23,9 +23,9 @@ public class SlowDriveSpeedCommand extends Command {
   @Override
   public void initialize() {
     if (LaunchCalculator.getInstance().getLaunchMode() == LaunchCalculator.LaunchMode.SHOOTING) {
-      driveSubsystem.setDriveSpeedMultiplier(DriveConstants.shootOnTheMoveSpeedMultiplier);
+      driveSubsystem.setActionSpeedMultiplier(DriveConstants.shootOnTheMoveSpeedMultiplier);
     } else {
-      driveSubsystem.setDriveSpeedMultiplier(DriveConstants.passOnTheMoveSpeedMultiplier);
+      driveSubsystem.setActionSpeedMultiplier(DriveConstants.passOnTheMoveSpeedMultiplier);
     }
   }
 
@@ -36,7 +36,7 @@ public class SlowDriveSpeedCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    driveSubsystem.setDriveSpeedMultiplier(1.0);
+    driveSubsystem.resetActionSpeedMultiplier();
   }
 
   // Returns true when the command should end.
