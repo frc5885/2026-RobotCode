@@ -29,10 +29,17 @@ import org.littletonrobotics.junction.Logger;
 public class LaunchCalculator {
   private static volatile LaunchCalculator instance;
 
-  private final LinearFilter turretAngleFilter =
+  private final LinearFilter turretVelocityFilter =
       LinearFilter.movingAverage((int) (0.1 / Constants.dtSeconds));
-  private final LinearFilter hoodAngleFilter =
+  private final LinearFilter hoodVelocityFilter =
       LinearFilter.movingAverage((int) (0.1 / Constants.dtSeconds));
+
+  private final LinearFilter turretPositionSetpointFilter =
+      LinearFilter.singlePoleIIR(0.1, Constants.dtSeconds);
+  private final LinearFilter hoodPositionSetpointFilter =
+      LinearFilter.singlePoleIIR(0.1, Constants.dtSeconds);
+  private final LinearFilter flywheelVelocitySetpointFilter =
+      LinearFilter.singlePoleIIR(0.1, Constants.dtSeconds);
 
   private Rotation2d lastTurretAngle;
   private double lastHoodAngle = Double.NaN;
@@ -183,18 +190,22 @@ public class LaunchCalculator {
     }
 
     // Calculate parameters accounted for imparted velocity
-    turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
-    hoodAngle = getHoodAngle(lookaheadTurretToTargetDistance);
+    turretAngle =
+        new Rotation2d(
+            turretPositionSetpointFilter.calculate(
+                target.minus(lookaheadPose.getTranslation()).getAngle().getRadians()));
+    hoodAngle = hoodPositionSetpointFilter.calculate(getHoodAngle(lookaheadTurretToTargetDistance));
     if (lastTurretAngle == null) lastTurretAngle = turretAngle;
     if (Double.isNaN(lastHoodAngle)) lastHoodAngle = hoodAngle;
     turretVelocity =
-        turretAngleFilter.calculate(
+        turretVelocityFilter.calculate(
             turretAngle.minus(lastTurretAngle).getRadians() / Constants.dtSeconds);
-    hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.dtSeconds);
+    hoodVelocity = hoodVelocityFilter.calculate((hoodAngle - lastHoodAngle) / Constants.dtSeconds);
     lastTurretAngle = turretAngle;
     lastHoodAngle = hoodAngle;
     boolean isValid = checkIfValid(lookaheadTurretToTargetDistance);
-    double flywheelSpeed = getFlywheelSpeed(lookaheadTurretToTargetDistance);
+    double flywheelSpeed =
+        flywheelVelocitySetpointFilter.calculate(getFlywheelSpeed(lookaheadTurretToTargetDistance));
     latestParameters =
         new LaunchingParameters(
             isValid, turretAngle, turretVelocity, hoodAngle, hoodVelocity, flywheelSpeed);

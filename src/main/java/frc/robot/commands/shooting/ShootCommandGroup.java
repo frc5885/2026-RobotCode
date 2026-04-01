@@ -40,9 +40,9 @@ public class ShootCommandGroup extends ParallelCommandGroup {
   }
 
   public Command logErrors() {
-    double[] hoodErrorDegrees = new double[1];
-    double[] flywheelErrorRPM = new double[1];
-    double[] turretErrorDegrees = new double[1];
+    double[] hoodErrorDegrees = {0.0};
+    double[] flywheelErrorRPM = {0.0};
+    double[] turretErrorDegrees = {0.0};
     ShooterSubsystem shooter = ShooterSubsystem.getInstance();
     TurretSubsystem turret = TurretSubsystem.getInstance();
     return Commands.runEnd(
@@ -55,9 +55,9 @@ public class ShootCommandGroup extends ParallelCommandGroup {
           Logger.recordOutput("ShotTuning/AbsTurretErrorDegrees", turretErrorDegrees[0]);
         },
         () -> {
-          hoodErrorDegrees[0] = Double.NaN;
-          flywheelErrorRPM[0] = Double.NaN;
-          turretErrorDegrees[0] = Double.NaN;
+          hoodErrorDegrees[0] = 0.0;
+          flywheelErrorRPM[0] = 0.0;
+          turretErrorDegrees[0] = 0.0;
           Logger.recordOutput("ShotTuning/AbsHoodErrorDegrees", hoodErrorDegrees[0]);
           Logger.recordOutput("ShotTuning/AbsFlywheelErrorRPM", flywheelErrorRPM[0]);
           Logger.recordOutput("ShotTuning/AbsTurretErrorDegrees", turretErrorDegrees[0]);

@@ -21,9 +21,9 @@ public class TurretConstants {
   public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
   // Motor RPM -> Radians per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
-  public static final double kp = 8.0;
+  public static final double kp = 24.0;
   public static final double ki = 0.0;
-  public static final double kd = 0.2;
+  public static final double kd = 0.0;
   public static final double kS = 0.17916;
   public static final double kV = 1.1061;
   public static final double kA = 0.017088;
