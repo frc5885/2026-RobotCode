@@ -190,10 +190,9 @@ public class LaunchCalculator {
     }
 
     // Calculate parameters accounted for imparted velocity
-    turretAngle =
-        new Rotation2d(
-            turretPositionSetpointFilter.calculate(
-                target.minus(lookaheadPose.getTranslation()).getAngle().getRadians()));
+    double ta = target.minus(lookaheadPose.getTranslation()).getAngle().getRadians();
+    turretAngle = new Rotation2d(turretPositionSetpointFilter.calculate(ta));
+    Logger.recordOutput("ShotTuning/RawTurretAngleGoalRadians", ta);
     hoodAngle = hoodPositionSetpointFilter.calculate(getHoodAngle(lookaheadTurretToTargetDistance));
     if (lastTurretAngle == null) lastTurretAngle = turretAngle;
     if (Double.isNaN(lastHoodAngle)) lastHoodAngle = hoodAngle;
