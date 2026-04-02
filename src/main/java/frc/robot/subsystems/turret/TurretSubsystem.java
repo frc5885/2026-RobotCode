@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -61,7 +62,7 @@ public class TurretSubsystem extends SubsystemBase {
   private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
   private final SysIdRoutine sysId;
   private boolean runClosedLoop = false;
-  private final Debouncer atGoalDebouncer = new Debouncer(0.1);
+  private final Debouncer atGoalDebouncer = new Debouncer(0.2, DebounceType.kBoth);
 
   // Stuff for tracking
   @AutoLogOutput(key = "Turret/LaunchState")

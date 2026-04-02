@@ -35,7 +35,7 @@ public class LaunchCalculator {
       LinearFilter.movingAverage((int) (0.1 / Constants.dtSeconds));
 
   private final LinearFilter turretPositionSetpointFilter =
-      LinearFilter.singlePoleIIR(0.1, Constants.dtSeconds);
+      LinearFilter.singlePoleIIR(1e-6, Constants.dtSeconds);
   private final LinearFilter hoodPositionSetpointFilter =
       LinearFilter.singlePoleIIR(0.1, Constants.dtSeconds);
   private final LinearFilter flywheelVelocitySetpointFilter =
@@ -191,9 +191,11 @@ public class LaunchCalculator {
 
     // Calculate parameters accounted for imparted velocity
     double ta = target.minus(lookaheadPose.getTranslation()).getAngle().getRadians();
-    turretAngle = new Rotation2d(turretPositionSetpointFilter.calculate(ta));
+    turretAngle = new Rotation2d(ta); // new Rotation2d(turretPositionSetpointFilter.calculate(ta));
     Logger.recordOutput("ShotTuning/RawTurretAngleGoalRadians", ta);
-    hoodAngle = hoodPositionSetpointFilter.calculate(getHoodAngle(lookaheadTurretToTargetDistance));
+    hoodAngle = getHoodAngle(lookaheadTurretToTargetDistance);
+    // hoodAngle =
+    // hoodPositionSetpointFilter.calculate(getHoodAngle(lookaheadTurretToTargetDistance));
     if (lastTurretAngle == null) lastTurretAngle = turretAngle;
     if (Double.isNaN(lastHoodAngle)) lastHoodAngle = hoodAngle;
     turretVelocity =
@@ -203,8 +205,8 @@ public class LaunchCalculator {
     lastTurretAngle = turretAngle;
     lastHoodAngle = hoodAngle;
     boolean isValid = checkIfValid(lookaheadTurretToTargetDistance);
-    double flywheelSpeed =
-        flywheelVelocitySetpointFilter.calculate(getFlywheelSpeed(lookaheadTurretToTargetDistance));
+    double flywheelSpeed = getFlywheelSpeed(lookaheadTurretToTargetDistance);
+    // flywheelVelocitySetpointFilter.calculate(getFlywheelSpeed(lookaheadTurretToTargetDistance));
     latestParameters =
         new LaunchingParameters(
             isValid, turretAngle, turretVelocity, hoodAngle, hoodVelocity, flywheelSpeed);
