@@ -7,16 +7,21 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
 import frc.robot.commands.DriveToClimbPoseSequentialCommand;
@@ -34,12 +39,16 @@ import frc.robot.commands.shooting.ShootCommandGroup;
 import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.ControllerConstants;
 import frc.robot.controllers.OperatorPanel;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
+import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.HubShiftUtil;
 import frc.robot.util.OverrideUtil;
 import frc.robot.util.OverrideUtil.ShootingLocation;
+import frc.robot.util.Zones;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -60,6 +69,56 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  @AutoLogOutput
+  public static final Trigger inTrenchDuckZoneTrigger =
+      Zones.trenchDuckZones
+          .willContain(
+              () ->
+                  DriveSubsystem.getInstance()
+                      .getPose()
+                      .transformBy(
+                          new Transform2d(
+                              TurretConstants.robotToTurret.getTranslation().toTranslation2d(),
+                              TurretConstants.robotToTurret.getRotation().toRotation2d())),
+              () ->
+                  new ChassisSpeeds(
+                      DriveSubsystem.getInstance().getFieldRelativeChassisSpeeds().vxMetersPerSecond
+                          + DriveSubsystem.getInstance()
+                                  .getFieldRelativeChassisSpeeds()
+                                  .omegaRadiansPerSecond
+                              * (-TurretConstants.robotToTurret.getX()
+                                      * Math.sin(
+                                          DriveSubsystem.getInstance()
+                                              .getPose()
+                                              .getRotation()
+                                              .getRadians())
+                                  - TurretConstants.robotToTurret.getY()
+                                      * Math.cos(
+                                          DriveSubsystem.getInstance()
+                                              .getPose()
+                                              .getRotation()
+                                              .getRadians())),
+                      DriveSubsystem.getInstance().getFieldRelativeChassisSpeeds().vyMetersPerSecond
+                          + DriveSubsystem.getInstance()
+                                  .getFieldRelativeChassisSpeeds()
+                                  .omegaRadiansPerSecond
+                              * (TurretConstants.robotToTurret.getX()
+                                      * Math.cos(
+                                          DriveSubsystem.getInstance()
+                                              .getPose()
+                                              .getRotation()
+                                              .getRadians())
+                                  - TurretConstants.robotToTurret.getY()
+                                      * Math.sin(
+                                          DriveSubsystem.getInstance()
+                                              .getPose()
+                                              .getRotation()
+                                              .getRadians())),
+                      0),
+              Seconds.of(DriveConstants.trenchDuckTimeSeconds))
+          .debounce(0.1)
+          .and(OverrideUtil.isManualModeTrigger().negate());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -129,7 +188,10 @@ public class RobotContainer {
 
     DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
 
-    controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
+    controller
+        .rightTrigger(0.1)
+        .and(inTrenchDuckZoneTrigger.negate())
+        .whileTrue(new ShootCommandGroup());
 
     // controller
     //     .povLeft()
