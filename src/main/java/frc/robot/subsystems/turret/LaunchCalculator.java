@@ -271,6 +271,13 @@ public class LaunchCalculator {
             TurretConstants.robotToTurret.getRotation().toRotation2d()));
   }
 
+  /**
+   * Returns the field-relative linear velocity of the turret, accounting for both the robot's
+   * translational velocity and the contribution from the robot's rotational velocity at the
+   * turret's offset from the robot center.
+   *
+   * <p>Only returns the linear velocity components ({@code vx}/{@code vy}), no {@code omega}
+   */
   public static ChassisSpeeds getFieldRelativeTurretVelocity(
       Pose2d robotPose, ChassisSpeeds robotVelocity) {
     double robotAngle = robotPose.getRotation().getRadians();
