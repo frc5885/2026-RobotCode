@@ -13,7 +13,6 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.turret.LaunchCalculator;
 import frc.robot.util.OverrideUtil;
 import frc.robot.util.Zones;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /** Utility class to define a trigger for being in the trench duck zone. */
