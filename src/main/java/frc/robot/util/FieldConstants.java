@@ -286,8 +286,8 @@ public class FieldConstants {
     public static final double height = Units.inchesToMeters(1.125);
     public static final double distanceFromCenterY = Units.inchesToMeters(75.93);
 
-    public static final double xZoneExtraOffset = Units.inchesToMeters(6.0);
-    public static final double yZoneExtraOffset = Units.inchesToMeters(6.0);
+    public static final double xZoneExtraOffset = Units.inchesToMeters(12.0);
+    public static final double yZoneExtraOffset = Units.inchesToMeters(12.0);
 
     // Relevant reference points on alliance side
     public static final Translation3d depotCenter =
