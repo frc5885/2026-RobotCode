@@ -42,6 +42,7 @@ import frc.robot.controllers.ControllerConstants;
 import frc.robot.controllers.OperatorPanel;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.extension.ExtensionConstants;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.turret.TurretConstants;
@@ -74,7 +75,13 @@ public class RobotContainer {
   @AutoLogOutput
   public static final Trigger inDepotZoneTrigger =
       Zones.depotZones.willContain(
-          () -> DriveSubsystem.getInstance().getPose(),
+          () ->
+              DriveSubsystem.getInstance()
+                  .getPose()
+                  .transformBy(
+                      new Transform2d(
+                          ExtensionConstants.robotToIntake.getTranslation().toTranslation2d(),
+                          ExtensionConstants.robotToIntake.getRotation().toRotation2d())),
           () -> DriveSubsystem.getInstance().getFieldRelativeChassisSpeeds(),
           Seconds.of(DriveConstants.depotTimeSeconds));
 

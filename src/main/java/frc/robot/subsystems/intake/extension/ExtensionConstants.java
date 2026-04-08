@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.intake.extension;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 
 public class ExtensionConstants {
@@ -53,4 +55,11 @@ public class ExtensionConstants {
   public static final double agitateTimeSeconds = 0.5;
 
   public static final double intakeExtensionLengthMeters = Units.inchesToMeters(12.0);
+
+  public static final Transform3d robotToIntake =
+      new Transform3d(
+          intakeExtensionLengthMeters + Units.inchesToMeters(27.5 / 2.0),
+          0.0,
+          0.0,
+          new Rotation3d(0.0, 0.0, Units.degreesToRadians(0.0)));
 }
