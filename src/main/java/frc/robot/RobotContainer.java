@@ -24,6 +24,7 @@ import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.OuttakeCommand;
 import frc.robot.commands.SetBrakeModeCommand;
 import frc.robot.commands.ShiftChangeRumbleLEDCommand;
+import frc.robot.commands.TrenchDuckCommand;
 import frc.robot.commands.autonomous.PreSpinFlywheelCommand;
 import frc.robot.commands.autonomous.ShootUntilHopperEmptyCommand;
 import frc.robot.commands.autonomous.StopDrivingCommand;
@@ -129,7 +130,10 @@ public class RobotContainer {
 
     DefaultCommands.setDefaultIntakeCommand(new IntakeControlCommand(controller));
 
-    controller.rightTrigger(0.1).whileTrue(new ShootCommandGroup());
+    controller
+        .rightTrigger(0.1)
+        .and(TrenchDuckCommand.inTrenchDuckZoneTrigger().negate())
+        .whileTrue(new ShootCommandGroup());
 
     // controller
     //     .povLeft()

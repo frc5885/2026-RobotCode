@@ -146,26 +146,13 @@ public class LaunchCalculator {
     // Calculate distance from turret to target
     Translation2d target = FieldConstants.getTurretTarget(estimatedPose);
     Logger.recordOutput("LaunchCalculator/Target", target);
-    Pose2d turretPosition =
-        estimatedPose.transformBy(
-            new Transform2d(
-                TurretConstants.robotToTurret.getTranslation().toTranslation2d(),
-                TurretConstants.robotToTurret.getRotation().toRotation2d()));
+    Pose2d turretPosition = getTurretPosition(estimatedPose);
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
     // Calculate field relative turret velocity
     ChassisSpeeds robotVelocity = DriveSubsystem.getInstance().getFieldRelativeChassisSpeeds();
-    double robotAngle = estimatedPose.getRotation().getRadians();
-    double turretVelocityX =
-        robotVelocity.vxMetersPerSecond
-            + robotVelocity.omegaRadiansPerSecond
-                * (-TurretConstants.robotToTurret.getX() * Math.sin(robotAngle)
-                    - TurretConstants.robotToTurret.getY() * Math.cos(robotAngle));
-    double turretVelocityY =
-        robotVelocity.vyMetersPerSecond
-            + robotVelocity.omegaRadiansPerSecond
-                * (TurretConstants.robotToTurret.getX() * Math.cos(robotAngle)
-                    - TurretConstants.robotToTurret.getY() * Math.sin(robotAngle));
+    ChassisSpeeds fieldRelativeTurretVelocity =
+        getFieldRelativeTurretVelocity(estimatedPose, robotVelocity);
 
     // Account for imparted velocity by robot (turret) to offset
     double timeOfFlight;
@@ -173,8 +160,8 @@ public class LaunchCalculator {
     double lookaheadTurretToTargetDistance = turretToTargetDistance;
     for (int i = 0; i < 20; i++) {
       timeOfFlight = getTimeOfFlight(lookaheadTurretToTargetDistance);
-      double offsetX = turretVelocityX * timeOfFlight;
-      double offsetY = turretVelocityY * timeOfFlight;
+      double offsetX = fieldRelativeTurretVelocity.vxMetersPerSecond * timeOfFlight;
+      double offsetY = fieldRelativeTurretVelocity.vyMetersPerSecond * timeOfFlight;
       lookaheadPose =
           new Pose2d(
               turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
@@ -275,5 +262,35 @@ public class LaunchCalculator {
 
   public static double getMaxTimeOfFlight() {
     return timeOfFlightMap.get(maxDistance);
+  }
+
+  public static Pose2d getTurretPosition(Pose2d robotPose) {
+    return robotPose.transformBy(
+        new Transform2d(
+            TurretConstants.robotToTurret.getTranslation().toTranslation2d(),
+            TurretConstants.robotToTurret.getRotation().toRotation2d()));
+  }
+
+  /**
+   * Returns the field-relative linear velocity of the turret, accounting for both the robot's
+   * translational velocity and the contribution from the robot's rotational velocity at the
+   * turret's offset from the robot center.
+   *
+   * <p>Only returns the linear velocity components ({@code vx}/{@code vy}), no {@code omega}
+   */
+  public static ChassisSpeeds getFieldRelativeTurretVelocity(
+      Pose2d robotPose, ChassisSpeeds robotVelocity) {
+    double robotAngle = robotPose.getRotation().getRadians();
+    double turretVelocityX =
+        robotVelocity.vxMetersPerSecond
+            + robotVelocity.omegaRadiansPerSecond
+                * (-TurretConstants.robotToTurret.getX() * Math.sin(robotAngle)
+                    - TurretConstants.robotToTurret.getY() * Math.cos(robotAngle));
+    double turretVelocityY =
+        robotVelocity.vyMetersPerSecond
+            + robotVelocity.omegaRadiansPerSecond
+                * (TurretConstants.robotToTurret.getX() * Math.cos(robotAngle)
+                    - TurretConstants.robotToTurret.getY() * Math.sin(robotAngle));
+    return new ChassisSpeeds(turretVelocityX, turretVelocityY, 0.0);
   }
 }
