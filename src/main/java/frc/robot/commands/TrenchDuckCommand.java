@@ -39,10 +39,12 @@ public class TrenchDuckCommand {
                 Seconds.of(DriveConstants.trenchDuckTimeSeconds))
             .debounce(0.1);
 
+    Trigger fullTrigger = noOverridesActive.and(inZone);
+
     // Workaround to log the value the trigger, AutoLogOutput doesn't work in here
     return new Trigger(
         () -> {
-          boolean result = noOverridesActive.and(inZone).getAsBoolean();
+          boolean result = fullTrigger.getAsBoolean();
           Logger.recordOutput("Shooter/InTrenchDuckZone", result);
           return result;
         });
