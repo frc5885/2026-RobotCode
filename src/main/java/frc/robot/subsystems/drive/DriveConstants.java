@@ -157,7 +157,6 @@ public class DriveConstants {
 
   public static final double trenchAlignTimeSeconds = 0.5;
   public static final double trenchDuckTimeSeconds = 0.5;
-  public static final double depotTimeSeconds = 0.5;
   public static final double bumpAlignTimeSeconds = 0.6;
   public static final double towerAlignTimeSeconds = 0.5;
   public static final double hubDropAreaTimeSeconds = 0.5;

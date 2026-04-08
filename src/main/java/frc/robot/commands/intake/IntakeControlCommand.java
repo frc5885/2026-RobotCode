@@ -22,9 +22,7 @@ public class IntakeControlCommand extends Command {
   private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
   private final CommandXboxController controller;
-  private static boolean inDepotZone = false;
   private IntakeState currentState = IntakeState.INITIAL;
-  private DepotState depotState = DepotState.OUT;
 
   // For timed agitation sequence
   private final Timer agitateTimer = new Timer();
@@ -109,13 +107,7 @@ public class IntakeControlCommand extends Command {
       shootDelayTimer.stop();
       switch (currentState) {
         case INTAKING:
-          if (inDepotZone) {
-            intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedDepotAngle);
-            depotState = DepotState.IN;
-          } else {
-            intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
-            depotState = DepotState.OUT;
-          }
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(RollerConstants.intakeRollerVoltage);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
@@ -134,13 +126,7 @@ public class IntakeControlCommand extends Command {
           break;
 
         case DEPLOYED:
-          if (inDepotZone) {
-            intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedDepotAngle);
-            depotState = DepotState.IN;
-          } else {
-            intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
-            depotState = DepotState.OUT;
-          }
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
           intakeSubsystem.setIntakeRollerVoltage(0);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
@@ -168,14 +154,6 @@ public class IntakeControlCommand extends Command {
             agitateIsTop
                 ? ExtensionConstants.agitateTopAngle
                 : ExtensionConstants.agitateBottomAngle);
-      } else if (currentState == IntakeState.DEPLOYED || currentState == IntakeState.INTAKING) {
-        if (inDepotZone && depotState == DepotState.OUT) {
-          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedDepotAngle);
-          depotState = DepotState.IN;
-        } else if (!inDepotZone && depotState == DepotState.IN) {
-          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
-          depotState = DepotState.OUT;
-        }
       }
     }
   }
@@ -195,10 +173,6 @@ public class IntakeControlCommand extends Command {
     return false;
   }
 
-  public static void setInDepotZone(boolean value) {
-    inDepotZone = value;
-  }
-
   public enum IntakeState {
     INITIAL,
     INTAKING,
@@ -207,10 +181,5 @@ public class IntakeControlCommand extends Command {
     STOWED,
     DEPLOYED,
     OUTAKING
-  }
-
-  public enum DepotState {
-    IN,
-    OUT
   }
 }

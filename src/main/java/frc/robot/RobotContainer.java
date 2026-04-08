@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -162,10 +161,6 @@ public class RobotContainer {
         .povLeft()
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.TEST_PATTERN).ignoringDisable(true));
-
-    inDepotZoneTrigger
-        .onTrue(new InstantCommand(() -> IntakeControlCommand.setInDepotZone(true)))
-        .onFalse(new InstantCommand(() -> IntakeControlCommand.setInDepotZone(false)));
 
     // Operator Switches
     operatorPanel
