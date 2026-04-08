@@ -326,6 +326,9 @@ public class Zones {
               - FieldConstants.Depot.rightCorner.getY()
               + FieldConstants.Depot.yZoneExtraOffset);
 
+  public static final PredictiveYZoneCollection depotZones =
+      new PredictiveYZoneCollection(blueDepotZone, redDepotZone);
+
   public static void logAllZones() {
     Logger.recordOutput("Zones/Trenches/Blue Bottom", blueBottomTrench.getCorners());
     Logger.recordOutput("Zones/Trenches/Blue Top", blueTopTrench.getCorners());

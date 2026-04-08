@@ -46,6 +46,8 @@ public class ExtensionConstants {
   public static final double intakeStowedAngle = Units.degreesToRadians(116.0);
   public static final double intakeExtendedAngle = Units.degreesToRadians(7.5);
 
+  public static final double intakeExtendedDepotAngle = Units.degreesToRadians(20.0);
+
   public static final double agitateTopAngle = 1.32;
   public static final double agitateBottomAngle = 0.6;
   public static final double agitateTimeSeconds = 0.5;
