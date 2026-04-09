@@ -8,7 +8,7 @@ public class SpindexerConstants {
   public static final double gearRatio = 20.0 / 1.0;
   public static final double momentOfInertia = 0.01; // kg*m^2
   public static final int canId = 50;
-  public static final boolean motorInverted = false;
+  public static final boolean motorInverted = true;
   public static final int currentLimit = 30;
   // Motor Rotations -> Spindexer Rotations
   public static final double positionConversionFactor = 1 / gearRatio;
