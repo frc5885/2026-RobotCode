@@ -82,9 +82,22 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "deadline",
                       "data": {
-                        "pathName": "OP.4"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "OP.4"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "ContinuousShoot"
+                            }
+                          }
+                        ]
                       }
                     },
                     {

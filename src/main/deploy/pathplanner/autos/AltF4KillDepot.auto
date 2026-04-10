@@ -82,9 +82,22 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "deadline",
                       "data": {
-                        "pathName": "AltKill_depot.4"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "AltKill_depot.4"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "ContinuousShoot"
+                            }
+                          }
+                        ]
                       }
                     },
                     {

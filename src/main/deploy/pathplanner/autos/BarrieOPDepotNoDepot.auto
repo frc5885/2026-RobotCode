@@ -82,9 +82,22 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "deadline",
                       "data": {
-                        "pathName": "OP_Depot_No_Depot.4"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "OP_Depot_No_Depot.4"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "ContinuousShoot"
+                            }
+                          }
+                        ]
                       }
                     },
                     {
