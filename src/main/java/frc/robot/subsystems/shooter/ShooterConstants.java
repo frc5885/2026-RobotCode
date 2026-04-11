@@ -1,5 +1,5 @@
 package frc.robot.subsystems.shooter;
 
 public class ShooterConstants {
-  public static final int bpsSensorPort = 5;
+  public static final int bpsSensorPort = 4;
 }

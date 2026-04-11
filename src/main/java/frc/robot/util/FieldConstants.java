@@ -349,9 +349,9 @@ public class FieldConstants {
     Pose2d flippedRobotPose = AllianceFlipUtil.apply(robotPose);
 
     // Define target positions using Translation2d for the targeting point
-    Translation2d targetRight = new Translation2d(fieldLength / 8, fieldWidth / 7);
+    Translation2d targetRight = new Translation2d(fieldLength / 8, fieldWidth / 4);
 
-    Translation2d targetLeft = new Translation2d(fieldLength / 8, fieldWidth - fieldWidth / 7);
+    Translation2d targetLeft = new Translation2d(fieldLength / 8, fieldWidth - fieldWidth / 4);
 
     Translation2d targetHub = new Translation2d(LinesVertical.hubCenter, LinesHorizontal.center);
 

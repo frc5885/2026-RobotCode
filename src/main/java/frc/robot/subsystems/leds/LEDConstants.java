@@ -19,15 +19,15 @@ import edu.wpi.first.wpilibj.util.Color;
 import java.util.Map;
 
 public class LEDConstants {
-  public static final int ledPort = 4;
+  public static final int ledPort = 5;
   // 41 leds for hopper (starting by climber)
   // 33 leds for turret
   // 11 leds for rest of hopper
   // 85 total
-  public static final int length = 73;
-  public static final int hopperLongLength = 29;
-  public static final int turretLength = 33;
-  public static final int hopperShortLength = 11;
+  public static final int hopperLongLength = 27;
+  public static final int turretLength = 32;
+  public static final int hopperShortLength = 1;
+  public static final int length = hopperLongLength + turretLength + hopperShortLength;
 
   public enum LEDState {
     DISABLED(Patterns.rainbow, 0, false),
