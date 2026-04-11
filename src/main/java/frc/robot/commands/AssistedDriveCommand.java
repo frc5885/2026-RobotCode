@@ -104,14 +104,14 @@ public class AssistedDriveCommand extends Command {
                     Seconds.of(DriveConstants.trenchAlignTimeSeconds))
                 .debounce(0.1));
 
-    inTowerZoneTrigger =
-        noOverridesActive.and(
-            Zones.towerZones
-                .willContain(
-                    driveSubsystem::getPose,
-                    driveSubsystem::getFieldRelativeChassisSpeeds,
-                    Seconds.of(DriveConstants.towerAlignTimeSeconds))
-                .debounce(0.1));
+    inTowerZoneTrigger = new Trigger(() -> false);
+    // noOverridesActive.and(
+    //     Zones.towerZones
+    //         .willContain(
+    //             driveSubsystem::getPose,
+    //             driveSubsystem::getFieldRelativeChassisSpeeds,
+    //             Seconds.of(DriveConstants.towerAlignTimeSeconds))
+    //         .debounce(0.1));
 
     inHubDropAreaTrigger =
         noOverridesActive.and(
