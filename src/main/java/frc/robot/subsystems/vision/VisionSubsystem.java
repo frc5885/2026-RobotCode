@@ -9,7 +9,6 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -190,11 +189,6 @@ public class VisionSubsystem extends SubsystemBase {
                         > maxSingleTagDistance) // Single tag too far
                 || Math.abs(observation.pose().getZ())
                     > maxZError // Must have realistic Z coordinate
-                || Math.abs(
-                        MathUtil.angleModulus(
-                            observation.pose().getRotation().toRotation2d().getRadians()
-                                - DriveSubsystem.getInstance().getRotation().getRadians()))
-                    > maxHeadingDifference // Vision heading disagrees with gyro
 
                 // Must be within the field boundaries
                 || observation.pose().getX() < 0.0
