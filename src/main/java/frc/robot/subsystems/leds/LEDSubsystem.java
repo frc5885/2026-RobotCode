@@ -39,7 +39,7 @@ public class LEDSubsystem extends SubsystemBase {
     buffer = new AddressableLEDBuffer(LEDConstants.length);
 
     leds.setLength(LEDConstants.length);
-    leds.setColorOrder(ColorOrder.kRGB);
+    leds.setColorOrder(ColorOrder.kBRG);
     leds.start();
 
     hopperLong = new LEDZone("HopperLong", buffer.createView(0, LEDConstants.hopperLongLength - 1));

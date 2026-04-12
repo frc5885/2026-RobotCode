@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.0"
+            "pathName": "Windsor_Left.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.1"
+                  "pathName": "Windsor_Left.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.2"
+                  "pathName": "Windsor_Left.2"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.3"
+                  "pathName": "Windsor_Left.3"
                 }
               },
               {
@@ -88,7 +88,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "OP_Depot_No_Depot.4"
+                              "pathName": "Windsor_Left.4"
                             }
                           },
                           {
@@ -103,7 +103,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "OP_Depot_No_Depot.5"
+                        "pathName": "Windsor_Left.5"
                       }
                     }
                   ]
@@ -121,13 +121,39 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.6"
+            "pathName": "Windsor_Left.6"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ContinuousShootWithAgitate"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Windsor_Left.3"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Stop"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ContinuousShootWithAgitate"
+                }
+              }
+            ]
           }
         }
       ]

@@ -246,8 +246,9 @@ public class ShooterSubsystem extends SubsystemBase {
         LaunchCalculator.getInstance().isLooseToleranceMode()
             ? FlywheelConstants.passingToleranceRPM
             : FlywheelConstants.velocityToleranceRPM;
-    return flywheelAtSetpointDebouncer.calculate(
-        EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance));
+    // return flywheelAtSetpointDebouncer.calculate(
+    //     EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance));
+    return EqualsUtil.epsilonEquals(getFlywheelRPM(), flywheelTargetVelocity, tolerance);
   }
 
   /** Returns debounced hood at goal */

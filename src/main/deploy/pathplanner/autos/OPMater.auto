@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.0"
+            "pathName": "OP_Mater.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.1"
+                  "pathName": "OP_Mater.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.2"
+                  "pathName": "OP_Mater.2"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_No_Depot.3"
+                  "pathName": "OP_Mater.3"
                 }
               },
               {
@@ -88,7 +88,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "OP_Depot_No_Depot.4"
+                              "pathName": "OP_Mater.4"
                             }
                           },
                           {
@@ -103,7 +103,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "OP_Depot_No_Depot.5"
+                        "pathName": "OP_Mater.5"
                       }
                     }
                   ]
@@ -121,7 +121,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_No_Depot.6"
+            "pathName": "OP_Mater.6"
           }
         },
         {

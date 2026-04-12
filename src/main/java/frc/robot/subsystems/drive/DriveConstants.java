@@ -27,8 +27,8 @@ public class DriveConstants {
   public static final double maxAccelerationMetersPerSec2 = 10.0;
 
   // Multiplies the max speed when the robot is shooting/passing and moving at the same time
-  public static final double shootOnTheMoveSpeedMultiplier = 0.25;
-  public static final double passOnTheMoveSpeedMultiplier = 0.4;
+  public static final double shootOnTheMoveSpeedMultiplier = 0.20;
+  public static final double passOnTheMoveSpeedMultiplier = 0.33;
   // Reduced max speed in teleop when not shooting/passing, to make it easier to control the robot
   public static final double teleopMaxSpeed = 3.0;
 
