@@ -24,8 +24,8 @@ public class LEDConstants {
   // 33 leds for turret
   // 11 leds for rest of hopper
   // 85 total
-  public static final int length = 85;
-  public static final int hopperLongLength = 41;
+  public static final int length = 73;
+  public static final int hopperLongLength = 29;
   public static final int turretLength = 33;
   public static final int hopperShortLength = 11;
 

@@ -14,9 +14,8 @@ public class ExtensionConstants {
       Units.degreesToRadians(
           117.17); // 90 degrees is defined as the forward linkage perpendicular to chassis
 
-  // desired starting angle from offset is like 2.025 rad i think
-  // absolute encoder came undone and i did some monkey stuff to get it back
-  public static final double absoluteEncoderOffset = 4.536 - 0.96;
+  // first number is position when down all the way, 2nd number is real angle when down all the way
+  public static final double absoluteEncoderOffset = 1.924 - 0.157;
   public static final double armLengthMeters = 0.2;
   public static final int leftCanId = 40;
   public static final int rightCanId = 41;
