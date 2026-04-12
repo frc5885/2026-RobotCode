@@ -184,9 +184,6 @@ public class VisionSubsystem extends SubsystemBase {
             observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
                     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
-                || (observation.tagCount() == 1
-                    && observation.averageTagDistance()
-                        > maxSingleTagDistance) // Single tag too far
                 || Math.abs(observation.pose().getZ())
                     > maxZError // Must have realistic Z coordinate
 
