@@ -52,11 +52,19 @@ public class VisionConstants {
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
+  public static double maxSingleTagDistance = 4.0; // Meters
+  public static double maxHeadingDifference = Units.degreesToRadians(20.0); // Radians
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.25; // Meters
-  public static double angularStdDevBaseline = Units.degreesToRadians(12.0); // Radians
+  public static double linearStdDevBaseline = 0.5; // Meters
+  public static double angularStdDevBaseline = Units.degreesToRadians(200.0); // Radians
+
+  // Bump zone vision boost: temporarily trust vision more after crossing the bump
+  // to speed up pose convergence after odometry corruption from airtime
+  public static double bumpBoostFactor =
+      0.1; // Std dev multiplier when boosted (lower = more trust)
+  public static double bumpBoostDuration = 2.0; // Seconds of boost after exiting bump zone
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)

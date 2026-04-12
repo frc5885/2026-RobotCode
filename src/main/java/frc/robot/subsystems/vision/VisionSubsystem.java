@@ -9,6 +9,7 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,10 +21,14 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionIO.CameraType;
+import frc.robot.util.Zones;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutputManager;
@@ -80,6 +85,10 @@ public class VisionSubsystem extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
+  // Bump zone vision boost state
+  private boolean bumpBoostActive = false;
+  private double bumpBoostExitTimestamp = 0.0;
+
   private VisionSubsystem(VisionIO... io) {
     this.consumer = DriveSubsystem.getInstance()::addVisionMeasurement;
     this.io = io;
@@ -98,6 +107,17 @@ public class VisionSubsystem extends SubsystemBase {
               "Vision camera " + io[i].getName() + " (index " + i + ") is disconnected.",
               AlertType.kError);
     }
+
+    // Set up bump zone trigger to boost vision trust during/after bump crossings
+    Trigger inBumpZone =
+        Zones.bumpZones.contains(DriveSubsystem.getInstance()::getPose).debounce(0.1);
+    inBumpZone.onTrue(Commands.runOnce(() -> bumpBoostActive = true));
+    inBumpZone.onFalse(
+        Commands.runOnce(
+            () -> {
+              bumpBoostActive = false;
+              bumpBoostExitTimestamp = Timer.getTimestamp();
+            }));
 
     AutoLogOutputManager.addObject(this);
   }
@@ -165,8 +185,16 @@ public class VisionSubsystem extends SubsystemBase {
             observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
                     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                || (observation.tagCount() == 1
+                    && observation.averageTagDistance()
+                        > maxSingleTagDistance) // Single tag too far
                 || Math.abs(observation.pose().getZ())
                     > maxZError // Must have realistic Z coordinate
+                || Math.abs(
+                        MathUtil.angleModulus(
+                            observation.pose().getRotation().toRotation2d().getRadians()
+                                - DriveSubsystem.getInstance().getRotation().getRadians()))
+                    > maxHeadingDifference // Vision heading disagrees with gyro
 
                 // Must be within the field boundaries
                 || observation.pose().getX() < 0.0
@@ -187,10 +215,25 @@ public class VisionSubsystem extends SubsystemBase {
           continue;
         }
 
+        // Calculate bump boost multiplier for faster convergence after bump crossings
+        double boostMultiplier = 1.0;
+        if (bumpBoostActive) {
+          boostMultiplier = bumpBoostFactor;
+        } else if (bumpBoostExitTimestamp > 0.0) {
+          double elapsed = Timer.getTimestamp() - bumpBoostExitTimestamp;
+          if (elapsed < bumpBoostDuration) {
+            // Cubic decay: stays near bumpBoostFactor for most of the duration, drops off sharply
+            double t = elapsed / bumpBoostDuration;
+            boostMultiplier = bumpBoostFactor + (1.0 - bumpBoostFactor) * (t * t * t);
+          } else {
+            bumpBoostExitTimestamp = 0.0;
+          }
+        }
+
         // Calculate standard deviations
         double stdDevFactor =
             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        double linearStdDev = linearStdDevBaseline * stdDevFactor;
+        double linearStdDev = linearStdDevBaseline * stdDevFactor * boostMultiplier;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (cameraIndex < cameraStdDevFactors.length) {
           linearStdDev *= cameraStdDevFactors[cameraIndex];
@@ -231,6 +274,9 @@ public class VisionSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
     logAllCameraVectors();
+
+    // Log bump boost state
+    Logger.recordOutput("Vision/BumpBoostActive", bumpBoostActive);
 
     // Log balls in hopper
     Logger.recordOutput("Vision/FuelCount", getGamePieceCount());
