@@ -222,9 +222,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private void visualizationUpdate() {
     // Log Pose3d
-    Logger.recordOutput(
-        "Mechanism3d/1-Intake",
-        new Pose3d(0.32, 0.0, 0.18, new Rotation3d(0.0, -extensionInputs.positionRadians, 0.0)));
+    Logger.recordOutput("Mechanism3d/1-Intake", new Pose3d(0.0, 0.0, 0.18, Rotation3d.kZero));
   }
 
   private static IntakeSimulation setupSimIntake() {
