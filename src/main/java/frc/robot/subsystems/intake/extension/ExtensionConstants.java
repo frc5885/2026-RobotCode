@@ -7,46 +7,34 @@ package frc.robot.subsystems.intake.extension;
 import edu.wpi.first.math.util.Units;
 
 public class ExtensionConstants {
-  public static final double gearRatio = 60.0 / 1.0;
-  public static final double minAngleRadians = Units.degreesToRadians(7.0);
-  public static final double maxAngleRadians = Units.degreesToRadians(117.17);
-  public static final double startingAngleRadians =
-      Units.degreesToRadians(
-          117.17); // 90 degrees is defined as the forward linkage perpendicular to chassis
+  public static final double gearRatio = 20.0 / 1.0;
+  public static final double driveGearRadiusMeters = Units.inchesToMeters(0.9);
+  public static final double minExtensionMeters = 0.0;
+  public static final double maxExtensionMeters = Units.inchesToMeters(12.0);
+  public static final double startingPositionMeters = 0.0;
 
-  // first number is position when down all the way, 2nd number is real angle when down all the way
-  public static final double absoluteEncoderOffset = 1.924 - 0.157;
-  public static final double armLengthMeters = 0.2;
   public static final int leftCanId = 40;
   public static final int rightCanId = 41;
   public static final boolean leftMotorInverted = false;
-  public static final boolean motorsOppositeDirections = false;
-  public static final int currentLimit = 40;
-  // Motor Rotations -> Radians
-  public static final double positionConversionFactor = 2 * Math.PI / gearRatio;
-  // Motor RPM -> Radians per second
+  public static final boolean rightMotorInverted = false;
+  public static final int currentLimit = 20;
+  // Motor Rotations -> Meters
+  public static final double positionConversionFactor =
+      2 * Math.PI * driveGearRadiusMeters / gearRatio;
+  // Motor RPM -> Meters per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
 
-  public static final double maxVelocityRadiansPerSecond = 5.3; // found both using advantagescope
-  public static final double maxAccelerationRadiansPerSecondSquared = 80.0;
-
-  public static final double kp = 10.0;
+  public static final double kp = 100.0;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
-  // SysID Constants ⌄⌄⌄
-  public static final double ks = 0.44952;
-  public static final double kg = 0.21597;
-  public static final double kv = 1.3555;
-  public static final double ka = 0.14314;
-  public static final double armOffsetToHorizontalRadians = -0.86084;
-  // ^^^ SysID Constants
-  public static final double positionToleranceRadians = Units.degreesToRadians(1.0);
 
-  public static final double intakeStowedAngle = Units.degreesToRadians(116.0);
-  public static final double intakeExtendedAngle = Units.degreesToRadians(5.5);
+  public static final double positionToleranceMeters = 0.02;
 
-  public static final double agitateTopAngle = 0.95;
-  public static final double agitateBottomAngle = 0.6;
+  public static final double intakeStowedPosition = minExtensionMeters;
+  public static final double intakeExtendedPosition = maxExtensionMeters;
+
+  public static final double agitateFarPosition = 0.2;
+  public static final double agitateNearPosition = 0.1;
   public static final double agitateTimeSeconds = 0.5;
 
   public static final double intakeExtensionLengthMeters = Units.inchesToMeters(12.0);

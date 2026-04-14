@@ -26,9 +26,9 @@ public class AgitateIntakeCommand extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new MoveIntakeToPositionCommand(ExtensionConstants.agitateTopAngle)
+        new MoveIntakeToPositionCommand(ExtensionConstants.agitateNearPosition)
             .withTimeout(agitateTimeSeconds),
-        new MoveIntakeToPositionCommand(ExtensionConstants.agitateBottomAngle)
+        new MoveIntakeToPositionCommand(ExtensionConstants.agitateFarPosition)
             .withTimeout(agitateTimeSeconds));
   }
 

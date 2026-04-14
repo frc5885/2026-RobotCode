@@ -107,7 +107,7 @@ public class IntakeControlCommand extends Command {
       shootDelayTimer.stop();
       switch (currentState) {
         case INTAKING:
-          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedPosition);
           intakeSubsystem.setIntakeRollerVoltage(RollerConstants.intakeRollerVoltage);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
@@ -122,17 +122,17 @@ public class IntakeControlCommand extends Command {
           agitateTimer.start();
           agitateIsTop = true;
           intakeSubsystem.setIntakeRollerVoltage(RollerConstants.agitateRollerVoltage);
-          intakeSubsystem.setExtensionPosition(ExtensionConstants.agitateTopAngle);
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.agitateNearPosition);
           break;
 
         case DEPLOYED:
-          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedPosition);
           intakeSubsystem.setIntakeRollerVoltage(0);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
 
         case STOWED:
-          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedPosition);
           intakeSubsystem.setIntakeRollerVoltage(0);
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().stopIntake();
           break;
@@ -152,8 +152,8 @@ public class IntakeControlCommand extends Command {
         }
         intakeSubsystem.setExtensionPosition(
             agitateIsTop
-                ? ExtensionConstants.agitateTopAngle
-                : ExtensionConstants.agitateBottomAngle);
+                ? ExtensionConstants.agitateNearPosition
+                : ExtensionConstants.agitateFarPosition);
       }
     }
   }
