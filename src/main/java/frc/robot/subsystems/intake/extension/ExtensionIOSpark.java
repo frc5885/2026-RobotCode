@@ -29,7 +29,6 @@ public class ExtensionIOSpark implements ExtensionIO {
   private final SparkClosedLoopController rightController;
   private final Debouncer leftMotorConnectedDebounce = new Debouncer(0.5);
   private final Debouncer rightMotorConnectedDebounce = new Debouncer(0.5);
-  private boolean isEncoderZeroed = false;
 
   public ExtensionIOSpark() {
     leftMotor = new SparkMax(ExtensionConstants.leftCanId, MotorType.kBrushless);
@@ -106,15 +105,6 @@ public class ExtensionIOSpark implements ExtensionIO {
         (values) -> inputs.rightAppliedVolts = values[0] * values[1]);
     ifOk(rightMotor, rightMotor::getOutputCurrent, (value) -> inputs.rightCurrentAmps = value);
     inputs.rightMotorConnected = rightMotorConnectedDebounce.calculate(!sparkStickyFault);
-
-    // might need this later
-    // if (!isEncoderZeroed && inputs.leftMotorConnected) {
-    //   if (zeroEncoder(inputs.absolutePositionRadians) == REVLibError.kOk) {
-    //     isEncoderZeroed = true;
-    //     inputs.positionRadians = inputs.absolutePositionRadians;
-    //     System.out.println("Intake extension encoder zeroed");
-    //   }
-    // }
   }
 
   /** Run open loop at the specified voltage. */
@@ -131,18 +121,19 @@ public class ExtensionIOSpark implements ExtensionIO {
   }
 
   /** Sets encoder starting angle */
-  private REVLibError zeroEncoder(double absolutePosition) {
-    REVLibError leftStatus = leftEncoder.setPosition(absolutePosition);
-    REVLibError rightStatus = rightEncoder.setPosition(absolutePosition);
+  @Override
+  public boolean resetEncoderPosition(double positionMeters) {
+    REVLibError leftStatus = leftEncoder.setPosition(positionMeters);
+    REVLibError rightStatus = rightEncoder.setPosition(positionMeters);
     if (leftStatus != REVLibError.kOk) {
       System.out.println("Failed to zero left extension encoder: " + leftStatus);
-      return leftStatus;
+      return false;
     }
     if (rightStatus != REVLibError.kOk) {
       System.out.println("Failed to zero right extension encoder: " + rightStatus);
-      return rightStatus;
+      return false;
     }
-    return REVLibError.kOk;
+    return true;
   }
 
   /**

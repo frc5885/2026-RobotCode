@@ -7,11 +7,13 @@ package frc.robot.subsystems.intake;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -214,5 +216,37 @@ public class IntakeSubsystem extends SubsystemBase {
   public void setBrakeMode(boolean brakeModeEnabled) {
     extensionIO.setBrakeMode(brakeModeEnabled);
     runExtensionOpenLoop(0.0);
+  }
+
+  /**
+   * Returns a command that homes the intake by running the extension in reverse until it hits the
+   * hard stop, then zeroing the encoders. This should only be used if the encoders lose their
+   * position and need to be re-zeroed, not as part of normal operation. The command will time out
+   * after 5 seconds to prevent damage to the motors in case something goes wrong with the homing
+   * process.
+   *
+   * @return A command that homes the intake.
+   */
+  public Command homeIntakeCommand() {
+    Debouncer extensionHomeDebouncer = new Debouncer(0.2);
+    double currentThresholdAmps = 5.0; // Threshold current to detect stall, may need to be tuned
+    double velocityThresholdMetersPerSecond =
+        0.01; // Threshold velocity to consider the extension as stopped, may need to be tuned
+    return run(() -> runExtensionOpenLoop(-2.0))
+        .until(
+            () ->
+                extensionHomeDebouncer.calculate(
+                    Math.abs(extensionInputs.leftVelocityMetersPerSecond)
+                            < velocityThresholdMetersPerSecond
+                        && Math.abs(extensionInputs.rightVelocityMetersPerSecond)
+                            < velocityThresholdMetersPerSecond
+                        && extensionInputs.leftCurrentAmps > currentThresholdAmps
+                        && extensionInputs.rightCurrentAmps > currentThresholdAmps))
+        .withTimeout(5.0)
+        .andThen(
+            () -> {
+              extensionIO.resetEncoderPosition(ExtensionConstants.minExtensionMeters);
+              setExtensionPosition(ExtensionConstants.minExtensionMeters);
+            });
   }
 }

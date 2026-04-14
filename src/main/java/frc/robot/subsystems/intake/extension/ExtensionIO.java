@@ -33,6 +33,11 @@ public interface ExtensionIO {
   /** Run the motor to position. */
   public default void setMotorPosition(double positionMeters) {}
 
+  /** Sets the encoder position of the motor (for homing). */
+  public default boolean resetEncoderPosition(double positionMeters) {
+    return false;
+  }
+
   /**
    * Sets the brake mode of the motor.
    *
