@@ -15,12 +15,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.shooter.hood.HoodConstants;
 import java.util.function.DoubleSupplier;
 
 public class ExtensionIOSpark implements ExtensionIO {
@@ -55,10 +52,6 @@ public class ExtensionIOSpark implements ExtensionIO {
         .positionConversionFactor(ExtensionConstants.positionConversionFactor)
         .velocityConversionFactor(ExtensionConstants.velocityConversionFactor);
     leftMotorConfig
-        .absoluteEncoder
-        .positionConversionFactor(Units.rotationsToRadians(1.0))
-        .velocityConversionFactor(Units.rotationsPerMinuteToRadiansPerSecond(1.0));
-    leftMotorConfig
         .signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs(20)
@@ -67,7 +60,8 @@ public class ExtensionIOSpark implements ExtensionIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
-    leftMotorConfig.closedLoop.pid(HoodConstants.kp, HoodConstants.ki, HoodConstants.kd);
+    leftMotorConfig.closedLoop.pid(
+        ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
     tryUntilOk(
         leftMotor,
         5,
@@ -75,8 +69,8 @@ public class ExtensionIOSpark implements ExtensionIO {
             leftMotor.configure(
                 leftMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
-    SparkBaseConfig rightMotorConfig =
-        leftMotorConfig.inverted(ExtensionConstants.rightMotorInverted);
+    SparkMaxConfig rightMotorConfig = new SparkMaxConfig();
+    rightMotorConfig.apply(leftMotorConfig).inverted(ExtensionConstants.rightMotorInverted);
     tryUntilOk(
         rightMotor,
         5,
@@ -127,6 +121,7 @@ public class ExtensionIOSpark implements ExtensionIO {
   @Override
   public void setMotorVoltage(double volts) {
     leftMotor.setVoltage(volts);
+    rightMotor.setVoltage(volts);
   }
 
   @Override
