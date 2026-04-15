@@ -457,4 +457,21 @@ public class DriveSubsystem extends SubsystemBase {
   public SwerveDriveSimulation getSwerveDriveSimulation() {
     return swerveDriveSimulation;
   }
+
+  /**
+   * Sets the brake mode of the motor.
+   *
+   * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
+   */
+  public void setBrakeMode(boolean brakeModeEnabled) {
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setBrakeMode(brakeModeEnabled);
+    }
+  }
+
+  public void setCurrentLimit(int currentLimit) {
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setCurrentLimit(currentLimit);
+    }
+  }
 }

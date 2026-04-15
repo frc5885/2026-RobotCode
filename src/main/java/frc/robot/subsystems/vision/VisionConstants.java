@@ -32,22 +32,28 @@ public class VisionConstants {
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =
       new Transform3d(
-          -0.325795 + Units.inchesToMeters(1.0),
-          -0.291894 + Units.inchesToMeters(10.0),
-          0.423041 + Units.inchesToMeters(4.0),
-          new Rotation3d(0.0, -Units.degreesToRadians(20.0), 0.0));
+          -0.312, -0.048, 0.525, new Rotation3d(0.0, -Units.degreesToRadians(20.0), 0.0));
 
   public static Transform3d robotToCamera1 =
       new Transform3d(
-          -0.325795, -0.291894, 0.423041, new Rotation3d(0.0, 0.0, Units.degreesToRadians(170.0)));
+          -0.314,
+          -0.283,
+          0.410,
+          new Rotation3d(0.0, -Units.degreesToRadians(20.0), Units.degreesToRadians(170.0)));
 
   public static Transform3d robotToCamera2 =
       new Transform3d(
-          -0.291822, -0.325782, 0.423041, new Rotation3d(0.0, 0.0, Units.degreesToRadians(280.0)));
+          -0.283,
+          -0.314,
+          0.410,
+          new Rotation3d(0.0, -Units.degreesToRadians(20.0), Units.degreesToRadians(280.0)));
 
   public static Transform3d robotToCamera3 =
       new Transform3d(
-          -0.01075, 0.32925, 0.46304286, new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
+          -0.0086,
+          0.313,
+          0.401,
+          new Rotation3d(0.0, -Units.degreesToRadians(20.0), Units.degreesToRadians(90.0)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -55,8 +61,14 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.25; // Meters
-  public static double angularStdDevBaseline = Units.degreesToRadians(12.0); // Radians
+  public static double linearStdDevBaseline = 0.5; // Meters
+  public static double angularStdDevBaseline = Units.degreesToRadians(60.0); // Radians
+
+  // Bump zone vision boost: temporarily trust vision more after crossing the bump
+  // to speed up pose convergence after odometry corruption from airtime
+  public static double bumpBoostFactor =
+      0.1; // Std dev multiplier when boosted (lower = more trust)
+  public static double bumpBoostDuration = 2.0; // Seconds of boost after exiting bump zone
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)

@@ -66,7 +66,8 @@ public class DriveConstants {
   public static final int backRightTurnCanId = 21;
 
   // Drive motor configuration
-  public static final int driveMotorCurrentLimit = 40;
+  public static final int teleopDriveMotorCurrentLimit = 40;
+  public static final int autoDriveMotorCurrentLimit = 60;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.944);
   public static final double driveMotorReduction = (6.75) / (1.0); // SDS Mk4i L2
   public static final DCMotor driveGearbox = DCMotor.getNEO(1);
@@ -128,7 +129,7 @@ public class DriveConstants {
               maxSpeedMetersPerSec,
               wheelCOF,
               driveGearbox.withReduction(driveMotorReduction),
-              driveMotorCurrentLimit,
+              teleopDriveMotorCurrentLimit,
               1),
           moduleTranslations);
 

@@ -40,7 +40,7 @@ public class ModuleIOSim implements ModuleIO {
     this.driveMotor =
         moduleSimulation
             .useGenericMotorControllerForDrive()
-            .withCurrentLimit(Amps.of(driveMotorCurrentLimit));
+            .withCurrentLimit(Amps.of(teleopDriveMotorCurrentLimit));
     this.turnMotor =
         moduleSimulation
             .useGenericControllerForSteer()

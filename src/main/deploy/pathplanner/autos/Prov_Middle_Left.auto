@@ -11,9 +11,15 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "OP_Depot_Quick.0"
+            "pathName": "Prov_Middle_Left.0"
           }
         },
         {
@@ -23,7 +29,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_Quick.1"
+                  "pathName": "Prov_Middle_Left.1"
                 }
               },
               {
@@ -36,22 +42,9 @@
           }
         },
         {
-          "type": "deadline",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "OP_Depot_Quick.2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PreSpinFlywheel"
-                }
-              }
-            ]
+            "pathName": "Prov_Middle_Left.2"
           }
         },
         {
@@ -61,28 +54,22 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "OP_Depot_Quick.3"
+                  "pathName": "Prov_Middle_Left.3"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ContinuousShootWithAgitate"
+                  "name": "ShootWithAgitate"
                 }
               }
             ]
           }
         },
         {
-          "type": "deadline",
+          "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "OP_Depot_Quick.4"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -92,16 +79,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "ContinuousShoot"
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Prov_Middle_Left.4"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ContinuousShootWithAgitate"
           }
         }
       ]
