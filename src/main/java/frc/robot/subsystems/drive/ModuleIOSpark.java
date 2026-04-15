@@ -105,7 +105,7 @@ public class ModuleIOSpark implements ModuleIO {
     var driveConfig = new SparkMaxConfig();
     driveConfig
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(driveMotorCurrentLimit)
+        .smartCurrentLimit(teleopDriveMotorCurrentLimit)
         .voltageCompensation(12.0);
     driveConfig
         .encoder
@@ -283,6 +283,18 @@ public class ModuleIOSpark implements ModuleIO {
   public void setBrakeMode(boolean brakeModeEnabled) {
     SparkMaxConfig config = new SparkMaxConfig();
     config.idleMode(brakeModeEnabled ? IdleMode.kBrake : IdleMode.kCoast);
+    tryUntilOk(
+        driveSpark,
+        5,
+        () ->
+            driveSpark.configure(
+                config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters));
+  }
+
+  @Override
+  public void setCurrentLimit(int currentLimit) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.smartCurrentLimit(currentLimit);
     tryUntilOk(
         driveSpark,
         5,

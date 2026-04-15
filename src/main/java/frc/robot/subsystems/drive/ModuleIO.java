@@ -53,4 +53,6 @@ public interface ModuleIO {
    * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.
    */
   public default void setBrakeMode(boolean brakeModeEnabled) {}
+
+  public default void setCurrentLimit(int currentLimit) {}
 }

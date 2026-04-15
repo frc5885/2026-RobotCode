@@ -293,4 +293,8 @@ public class DriveCommands {
   public static Command setDriveBrakeModeCommand(boolean brakeModeEnabled) {
     return new InstantCommand(() -> DriveSubsystem.getInstance().setBrakeMode(brakeModeEnabled));
   }
+
+  public static Command setDriveCurrentLimitCommand(int currentLimit) {
+    return new InstantCommand(() -> DriveSubsystem.getInstance().setCurrentLimit(currentLimit));
+  }
 }

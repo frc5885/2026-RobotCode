@@ -468,4 +468,10 @@ public class DriveSubsystem extends SubsystemBase {
       modules[i].setBrakeMode(brakeModeEnabled);
     }
   }
+
+  public void setCurrentLimit(int currentLimit) {
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setCurrentLimit(currentLimit);
+    }
+  }
 }

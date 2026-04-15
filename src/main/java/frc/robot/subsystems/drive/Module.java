@@ -137,4 +137,8 @@ public class Module {
   public void setBrakeMode(boolean brakeModeEnabled) {
     io.setBrakeMode(brakeModeEnabled);
   }
+
+  public void setCurrentLimit(int currentLimit) {
+    io.setCurrentLimit(currentLimit);
+  }
 }
