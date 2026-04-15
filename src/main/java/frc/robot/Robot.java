@@ -162,6 +162,8 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     HubShiftUtil.initialize();
+
+    // DriveCommands.setDriveBrakeModeCommand(true);
   }
 
   /** This function is called periodically during operator control. */
