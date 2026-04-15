@@ -145,6 +145,8 @@ public class Robot extends LoggedRobot {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
     HubShiftUtil.initialize();
+
+    // DriveCommands.setDriveCurrentLimitCommand(DriveConstants.autoDriveMotorCurrentLimit);
   }
 
   /** This function is called periodically during autonomous. */
@@ -164,6 +166,7 @@ public class Robot extends LoggedRobot {
     HubShiftUtil.initialize();
 
     // DriveCommands.setDriveBrakeModeCommand(true);
+    // DriveCommands.setDriveCurrentLimitCommand(DriveConstants.teleopDriveMotorCurrentLimit);
   }
 
   /** This function is called periodically during operator control. */
