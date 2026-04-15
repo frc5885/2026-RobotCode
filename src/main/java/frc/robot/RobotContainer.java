@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
 import frc.robot.commands.DefaultCommands;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToClimbPoseSequentialCommand;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.OuttakeCommand;
@@ -93,6 +94,9 @@ public class RobotContainer {
         new ParallelDeadlineGroup(
                 new ShootUntilHopperEmptyCommand().withAgitation(0.0), new StopDrivingCommand())
             .withTimeout(0.5));
+
+    NamedCommands.registerCommand(
+        "EnableDriveCoast", DriveCommands.setDriveBrakeModeCommand(false));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
