@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AltKill_depot.0"
+            "pathName": "Prov_Right.0"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AltKill_depot.1"
+                  "pathName": "Prov_Right.1"
                 }
               },
               {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AltKill_depot.2"
+                  "pathName": "Prov_Right.2"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AltKill_depot.3"
+                  "pathName": "Prov_Right.3"
                 }
               },
               {
@@ -88,7 +88,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "AltKill_depot.4"
+                              "pathName": "Prov_Right.4"
                             }
                           },
                           {
@@ -103,7 +103,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "AltKill_depot.5"
+                        "pathName": "Prov_Right.5"
                       }
                     }
                   ]
@@ -121,13 +121,39 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AltKill_depot.6"
+            "pathName": "Prov_Right.6"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ContinuousShootWithAgitate"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Prov_Right.3"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Stop"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ContinuousShootWithAgitate"
+                }
+              }
+            ]
           }
         }
       ]
