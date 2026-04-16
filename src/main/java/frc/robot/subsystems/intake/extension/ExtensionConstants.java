@@ -10,7 +10,7 @@ public class ExtensionConstants {
   public static final double gearRatio = 7.5 / 1.0;
   public static final double driveGearRadiusMeters = Units.inchesToMeters(0.9);
   public static final double minExtensionMeters = 0.0;
-  public static final double maxExtensionMeters = 0.34;
+  public static final double maxExtensionMeters = 0.39;
   public static final double startingPositionMeters = 0.0;
 
   public static final int leftCanId = 40;
@@ -30,7 +30,9 @@ public class ExtensionConstants {
 
   public static final double positionToleranceMeters = 0.02;
 
-  /** Maximum allowed position difference between left and right before sync correction activates. */
+  /**
+   * Maximum allowed position difference between left and right before sync correction activates.
+   */
   public static final double syncCorrectionThresholdMeters = 0.02;
 
   public static final double intakeStowedPosition = minExtensionMeters;

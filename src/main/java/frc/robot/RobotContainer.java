@@ -182,7 +182,7 @@ public class RobotContainer {
         .onTrue(
             OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER)
                 .ignoringDisable(true));
-    operatorController.b().onTrue(IntakeSubsystem.getInstance().homeIntakeCommand());
+    operatorController.a().onTrue(IntakeSubsystem.getInstance().homeIntakeCommand());
   }
 
   /**
