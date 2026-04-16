@@ -30,6 +30,9 @@ public class ExtensionConstants {
 
   public static final double positionToleranceMeters = 0.02;
 
+  /** Maximum allowed position difference between left and right before sync correction activates. */
+  public static final double syncCorrectionThresholdMeters = 0.02;
+
   public static final double intakeStowedPosition = minExtensionMeters;
   public static final double intakeExtendedPosition = maxExtensionMeters;
 

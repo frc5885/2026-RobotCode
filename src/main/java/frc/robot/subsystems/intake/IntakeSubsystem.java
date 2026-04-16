@@ -67,6 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final Alert extensionRightMotorDisconnectedAlert;
   private final Alert rollerLeftMotorDisconnectedAlert;
   private final Alert rollerRightMotorDisconnectedAlert;
+  private final Alert extensionDesyncWarningAlert;
   private final ExtensionIO extensionIO;
   private final RollerIO rollerIO;
   private final ExtensionIOInputsAutoLogged extensionInputs = new ExtensionIOInputsAutoLogged();
@@ -75,6 +76,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private boolean runExtensionClosedLoop =
       false; // Closed loop will enable as soon as we command a goal
+  private boolean extensionSyncCorrectionActive = false;
 
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
@@ -88,6 +90,8 @@ public class IntakeSubsystem extends SubsystemBase {
         new Alert("Intake roller left motor disconnected!", AlertType.kError);
     rollerRightMotorDisconnectedAlert =
         new Alert("Intake roller right motor disconnected!", AlertType.kError);
+    extensionDesyncWarningAlert =
+        new Alert("Intake extension desync detected, sync correction active!", AlertType.kWarning);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -104,9 +108,10 @@ public class IntakeSubsystem extends SubsystemBase {
     extensionRightMotorDisconnectedAlert.set(!extensionInputs.rightMotorConnected);
     rollerLeftMotorDisconnectedAlert.set(!rollerInputs.leftMotorConnected);
     rollerRightMotorDisconnectedAlert.set(!rollerInputs.rightMotorConnected);
+    extensionDesyncWarningAlert.set(extensionSyncCorrectionActive);
 
     if (runExtensionClosedLoop) {
-      extensionIO.setMotorPosition(extensionSetpoint);
+      runSyncProtectedClosedLoop();
     }
     visualizationUpdate();
   }
@@ -125,8 +130,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public double getExtensionPosition() {
-    return extensionInputs
-        .leftPositionMeters; // left and right should be the same, so just return left
+    return (extensionInputs.leftPositionMeters + extensionInputs.rightPositionMeters) / 2.0;
   }
 
   /** Returns true if the extension is out (more than 6 inches). */
@@ -162,6 +166,39 @@ public class IntakeSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Intake/Extension/GoalPositionMeters", setPoint);
     runExtensionClosedLoop = true;
+  }
+
+  /**
+   * Runs the extension closed loop with sync protection. Detects desync between left and right
+   * motors and corrects by pausing the leading motor at the lagging motor's position.
+   */
+  private void runSyncProtectedClosedLoop() {
+    double leftPos = extensionInputs.leftPositionMeters;
+    double rightPos = extensionInputs.rightPositionMeters;
+    double posDifference = Math.abs(leftPos - rightPos);
+
+    Logger.recordOutput("Intake/Extension/PositionDifferenceMeters", posDifference);
+    Logger.recordOutput("Intake/Extension/SyncCorrectionActive", extensionSyncCorrectionActive);
+
+    if (posDifference >= ExtensionConstants.syncCorrectionThresholdMeters) {
+      // Determine which side is leading (closer to the goal setpoint)
+      double leftDistToGoal = Math.abs(leftPos - extensionSetpoint);
+      double rightDistToGoal = Math.abs(rightPos - extensionSetpoint);
+      boolean leftIsLeading = leftDistToGoal < rightDistToGoal;
+
+      extensionSyncCorrectionActive = true;
+      if (leftIsLeading) {
+        // Left is ahead: hold left at right's position, let right continue to goal
+        extensionIO.setMotorPositions(rightPos, extensionSetpoint);
+      } else {
+        // Right is ahead: let left continue to goal, hold right at left's position
+        extensionIO.setMotorPositions(extensionSetpoint, leftPos);
+      }
+    } else {
+      // In sync — normal operation
+      extensionSyncCorrectionActive = false;
+      extensionIO.setMotorPosition(extensionSetpoint);
+    }
   }
 
   @AutoLogOutput(key = "Intake/Extension/AtSetPoint")

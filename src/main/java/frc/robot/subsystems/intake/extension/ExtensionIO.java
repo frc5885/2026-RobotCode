@@ -33,6 +33,11 @@ public interface ExtensionIO {
   /** Run the motor to position. */
   public default void setMotorPosition(double positionMeters) {}
 
+  /** Run the left and right motors to independent positions (for sync correction). */
+  public default void setMotorPositions(double leftPositionMeters, double rightPositionMeters) {
+    setMotorPosition(leftPositionMeters);
+  }
+
   /** Sets the encoder position of the motor (for homing). */
   public default boolean resetEncoderPosition(double positionMeters) {
     return false;

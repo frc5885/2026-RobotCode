@@ -120,6 +120,12 @@ public class ExtensionIOSpark implements ExtensionIO {
     rightController.setSetpoint(positionMeters, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
+  @Override
+  public void setMotorPositions(double leftPositionMeters, double rightPositionMeters) {
+    leftController.setSetpoint(leftPositionMeters, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    rightController.setSetpoint(rightPositionMeters, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
+
   /** Sets encoder starting angle */
   @Override
   public boolean resetEncoderPosition(double positionMeters) {
