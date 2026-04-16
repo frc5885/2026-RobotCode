@@ -7,10 +7,10 @@ package frc.robot.subsystems.intake.extension;
 import edu.wpi.first.math.util.Units;
 
 public class ExtensionConstants {
-  public static final double gearRatio = 20.0 / 1.0;
+  public static final double gearRatio = 7.5 / 1.0;
   public static final double driveGearRadiusMeters = Units.inchesToMeters(0.9);
   public static final double minExtensionMeters = 0.0;
-  public static final double maxExtensionMeters = Units.inchesToMeters(12.0);
+  public static final double maxExtensionMeters = 0.34;
   public static final double startingPositionMeters = 0.0;
 
   public static final int leftCanId = 40;
@@ -24,7 +24,7 @@ public class ExtensionConstants {
   // Motor RPM -> Meters per second
   public static final double velocityConversionFactor = positionConversionFactor / 60;
 
-  public static final double kp = 100.0;
+  public static final double kp = 10.0;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
 
@@ -33,8 +33,8 @@ public class ExtensionConstants {
   public static final double intakeStowedPosition = minExtensionMeters;
   public static final double intakeExtendedPosition = maxExtensionMeters;
 
-  public static final double agitateFarPosition = 0.2;
-  public static final double agitateNearPosition = 0.1;
+  public static final double agitateFarPosition = 0.29;
+  public static final double agitateNearPosition = 0.14;
   public static final double agitateTimeSeconds = 0.5;
 
   public static final double intakeExtensionLengthMeters = Units.inchesToMeters(12.0);
