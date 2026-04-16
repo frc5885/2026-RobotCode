@@ -204,7 +204,13 @@ public class IntakeSubsystem extends SubsystemBase {
   @AutoLogOutput(key = "Intake/Extension/AtSetPoint")
   public boolean isExtensionAtSetPoint() {
     return EqualsUtil.epsilonEquals(
-        getExtensionPosition(), extensionSetpoint, ExtensionConstants.positionToleranceMeters);
+            extensionInputs.leftPositionMeters,
+            extensionSetpoint,
+            ExtensionConstants.positionToleranceMeters)
+        && EqualsUtil.epsilonEquals(
+            extensionInputs.rightPositionMeters,
+            extensionSetpoint,
+            ExtensionConstants.positionToleranceMeters);
   }
 
   private void visualizationUpdate() {

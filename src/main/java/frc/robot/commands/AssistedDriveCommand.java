@@ -203,8 +203,8 @@ public class AssistedDriveCommand extends Command {
     // Angles where the robot's intake faces away from the ±X direction (intake trails)
     Rotation2d[] intakeTrailingAngles = {Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)};
 
-    boolean isIntakeDown = IntakeSubsystem.getInstance().isExtensionOut();
-    if (!isIntakeDown) {
+    boolean isIntakeExtended = IntakeSubsystem.getInstance().isExtensionOut();
+    if (!isIntakeExtended) {
       return GeometryUtil.getNearestRotation(
           driveSubsystem.getRotation(),
           intakeFirstAngles[0],
