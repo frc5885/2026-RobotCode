@@ -4,39 +4,47 @@
 
 package frc.robot.subsystems.intake.extension;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants;
 
 /** Sim extension implementation */
 public class ExtensionIOSim implements ExtensionIO {
 
   private double appliedVolts;
-  private final SingleJointedArmSim extensionSim;
+  private final ElevatorSim extensionSim;
+
+  private final PIDController extensionPID =
+      new PIDController(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
 
   public ExtensionIOSim() {
     extensionSim =
-        new SingleJointedArmSim(
-            LinearSystemId.identifyPositionSystem(ExtensionConstants.kv, ExtensionConstants.ka),
+        new ElevatorSim(
             DCMotor.getNEO(2),
             ExtensionConstants.gearRatio,
-            ExtensionConstants.armLengthMeters,
-            ExtensionConstants.minAngleRadians,
-            ExtensionConstants.maxAngleRadians,
+            1.0,
+            ExtensionConstants.driveGearRadiusMeters,
+            ExtensionConstants.minExtensionMeters,
+            ExtensionConstants.maxExtensionMeters,
             false,
-            ExtensionConstants.startingAngleRadians);
+            ExtensionConstants.startingPositionMeters);
+    extensionPID.setTolerance(ExtensionConstants.positionToleranceMeters);
   }
 
   @Override
   public void updateInputs(ExtensionIOInputs inputs) {
     extensionSim.update(Constants.dtSeconds);
-    inputs.positionRadians = extensionSim.getAngleRads();
-    inputs.absolutePositionRadians = extensionSim.getAngleRads();
-    inputs.velocityRadiansPerSecond = extensionSim.getVelocityRadPerSec();
-    inputs.appliedVolts = appliedVolts;
+    inputs.leftPositionMeters = extensionSim.getPositionMeters();
+    inputs.rightPositionMeters = extensionSim.getPositionMeters();
+    inputs.leftVelocityMetersPerSecond = extensionSim.getVelocityMetersPerSecond();
+    inputs.rightVelocityMetersPerSecond = extensionSim.getVelocityMetersPerSecond();
+    inputs.leftAppliedVolts = appliedVolts;
+    inputs.rightAppliedVolts = appliedVolts;
     double currentPerMotor = extensionSim.getCurrentDrawAmps() / 2.0;
-    inputs.currentAmps = new double[] {currentPerMotor, currentPerMotor};
+    inputs.leftCurrentAmps = currentPerMotor;
+    inputs.rightCurrentAmps = currentPerMotor;
     inputs.leftMotorConnected = true;
     inputs.rightMotorConnected = true;
   }
@@ -45,5 +53,13 @@ public class ExtensionIOSim implements ExtensionIO {
   public void setMotorVoltage(double volts) {
     appliedVolts = volts;
     extensionSim.setInput(volts);
+  }
+
+  @Override
+  public void setMotorPosition(double positionMeters) {
+    appliedVolts =
+        MathUtil.clamp(
+            extensionPID.calculate(extensionSim.getPositionMeters(), positionMeters), -12.0, 12.0);
+    extensionSim.setInput(appliedVolts);
   }
 }

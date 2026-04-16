@@ -5,23 +5,16 @@
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -74,30 +67,16 @@ public class IntakeSubsystem extends SubsystemBase {
   private final Alert extensionRightMotorDisconnectedAlert;
   private final Alert rollerLeftMotorDisconnectedAlert;
   private final Alert rollerRightMotorDisconnectedAlert;
+  private final Alert extensionDesyncWarningAlert;
   private final ExtensionIO extensionIO;
   private final RollerIO rollerIO;
   private final ExtensionIOInputsAutoLogged extensionInputs = new ExtensionIOInputsAutoLogged();
   private final RollerIOInputsAutoLogged rollerInputs = new RollerIOInputsAutoLogged();
-  private final SysIdRoutine extensionSysId;
-  private final PIDController extensionPID =
-      new PIDController(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
-  private final ArmFeedforward extensionFF =
-      new ArmFeedforward(
-          ExtensionConstants.ks,
-          ExtensionConstants.kg,
-          ExtensionConstants.kv,
-          ExtensionConstants.ka);
+  private double extensionSetpoint = ExtensionConstants.startingPositionMeters;
 
-  private TrapezoidProfile extensionProfile =
-      new TrapezoidProfile(
-          new Constraints(
-              ExtensionConstants.maxVelocityRadiansPerSecond,
-              ExtensionConstants.maxAccelerationRadiansPerSecondSquared));
-  private TrapezoidProfile.State extensionGoalState =
-      new TrapezoidProfile.State(ExtensionConstants.startingAngleRadians, 0.0);
-  private TrapezoidProfile.State extensionPrevSetpoint = extensionGoalState;
   private boolean runExtensionClosedLoop =
       false; // Closed loop will enable as soon as we command a goal
+  private boolean extensionSyncCorrectionActive = false;
 
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
@@ -111,10 +90,8 @@ public class IntakeSubsystem extends SubsystemBase {
         new Alert("Intake roller left motor disconnected!", AlertType.kError);
     rollerRightMotorDisconnectedAlert =
         new Alert("Intake roller right motor disconnected!", AlertType.kError);
-
-    extensionSysId = extensionSysIdSetup();
-
-    extensionPID.setTolerance(ExtensionConstants.positionToleranceRadians);
+    extensionDesyncWarningAlert =
+        new Alert("Intake extension desync detected, sync correction active!", AlertType.kWarning);
 
     AutoLogOutputManager.addObject(this);
   }
@@ -131,28 +108,11 @@ public class IntakeSubsystem extends SubsystemBase {
     extensionRightMotorDisconnectedAlert.set(!extensionInputs.rightMotorConnected);
     rollerLeftMotorDisconnectedAlert.set(!rollerInputs.leftMotorConnected);
     rollerRightMotorDisconnectedAlert.set(!rollerInputs.rightMotorConnected);
+    extensionDesyncWarningAlert.set(extensionSyncCorrectionActive);
 
     if (runExtensionClosedLoop) {
-      TrapezoidProfile.State current = getExtensionCurrentState();
-      TrapezoidProfile.State setpoint =
-          extensionProfile.calculate(
-              Constants.dtSeconds, extensionPrevSetpoint, extensionGoalState);
-      extensionPrevSetpoint = setpoint;
-
-      double ffVoltage =
-          extensionFF.calculate(
-              setpoint.position + ExtensionConstants.armOffsetToHorizontalRadians,
-              setpoint.velocity);
-      double pidVoltage = extensionPID.calculate(current.position, setpoint.position);
-
-      Logger.recordOutput("Intake/Extension/FFVoltage", ffVoltage);
-      Logger.recordOutput("Intake/Extension/PIDVoltage", pidVoltage);
-      Logger.recordOutput("Intake/Extension/SetpointPositionRadians", setpoint.position);
-      Logger.recordOutput("Intake/Extension/SetpointVelocity", setpoint.velocity);
-
-      setExtensionVoltage(ffVoltage + pidVoltage);
+      runSyncProtectedClosedLoop();
     }
-
     visualizationUpdate();
   }
 
@@ -169,14 +129,13 @@ public class IntakeSubsystem extends SubsystemBase {
     setExtensionVoltage(volts);
   }
 
-  public TrapezoidProfile.State getExtensionCurrentState() {
-    return new TrapezoidProfile.State(
-        extensionInputs.positionRadians, extensionInputs.velocityRadiansPerSecond);
+  public double getExtensionPosition() {
+    return (extensionInputs.leftPositionMeters + extensionInputs.rightPositionMeters) / 2.0;
   }
 
-  /** Returns true if the extension is down (less than 45 degrees). */
-  public boolean isExtensionDown() {
-    return extensionInputs.positionRadians < Units.degreesToRadians(45);
+  /** Returns true if the extension is out (more than 6 inches). */
+  public boolean isExtensionOut() {
+    return extensionInputs.leftPositionMeters > Units.inchesToMeters(6.0);
   }
 
   /**
@@ -193,38 +152,72 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Commands the extension to move to the given angle in radians. This will reset the profile and
-   * PID and should not be called periodically
+   * Commands the extension to move to the given position in meters.
    *
-   * @param positionRadians The angle in radians to set the extension to.
+   * @param positionMeters The position in meters to set the extension to.
    */
-  public void setExtensionPosition(double positionRadians) {
-    double extensionSetpoint =
+  public void setExtensionPosition(double positionMeters) {
+    double setPoint =
         MathUtil.clamp(
-            positionRadians,
-            ExtensionConstants.minAngleRadians,
-            ExtensionConstants.maxAngleRadians);
-    extensionGoalState = new TrapezoidProfile.State(extensionSetpoint, 0.0);
-    // Reset setpoint to current state
-    extensionPrevSetpoint = getExtensionCurrentState();
-    extensionPID.reset();
-    Logger.recordOutput("Intake/Extension/GoalPositionRadians", positionRadians);
+            positionMeters,
+            ExtensionConstants.minExtensionMeters,
+            ExtensionConstants.maxExtensionMeters);
+    extensionSetpoint = setPoint;
+
+    Logger.recordOutput("Intake/Extension/GoalPositionMeters", setPoint);
     runExtensionClosedLoop = true;
+  }
+
+  /**
+   * Runs the extension closed loop with sync protection. Detects desync between left and right
+   * motors and corrects by pausing the leading motor at the lagging motor's position.
+   */
+  private void runSyncProtectedClosedLoop() {
+    double leftPos = extensionInputs.leftPositionMeters;
+    double rightPos = extensionInputs.rightPositionMeters;
+    double posDifference = Math.abs(leftPos - rightPos);
+
+    Logger.recordOutput("Intake/Extension/PositionDifferenceMeters", posDifference);
+    Logger.recordOutput("Intake/Extension/SyncCorrectionActive", extensionSyncCorrectionActive);
+
+    if (posDifference >= ExtensionConstants.syncCorrectionThresholdMeters) {
+      // Determine which side is leading (closer to the goal setpoint)
+      double leftDistToGoal = Math.abs(leftPos - extensionSetpoint);
+      double rightDistToGoal = Math.abs(rightPos - extensionSetpoint);
+      boolean leftIsLeading = leftDistToGoal < rightDistToGoal;
+
+      extensionSyncCorrectionActive = true;
+      if (leftIsLeading) {
+        // Left is ahead: hold left at right's position, let right continue to goal
+        extensionIO.setMotorPositions(rightPos, extensionSetpoint);
+      } else {
+        // Right is ahead: let left continue to goal, hold right at left's position
+        extensionIO.setMotorPositions(extensionSetpoint, leftPos);
+      }
+    } else {
+      // In sync — normal operation
+      extensionSyncCorrectionActive = false;
+      extensionIO.setMotorPosition(extensionSetpoint);
+    }
   }
 
   @AutoLogOutput(key = "Intake/Extension/AtSetPoint")
   public boolean isExtensionAtSetPoint() {
     return EqualsUtil.epsilonEquals(
-        getExtensionCurrentState().position,
-        extensionGoalState.position,
-        ExtensionConstants.positionToleranceRadians);
+            extensionInputs.leftPositionMeters,
+            extensionSetpoint,
+            ExtensionConstants.positionToleranceMeters)
+        && EqualsUtil.epsilonEquals(
+            extensionInputs.rightPositionMeters,
+            extensionSetpoint,
+            ExtensionConstants.positionToleranceMeters);
   }
 
   private void visualizationUpdate() {
     // Log Pose3d
     Logger.recordOutput(
         "Mechanism3d/1-Intake",
-        new Pose3d(0.32, 0.0, 0.18, new Rotation3d(0.0, -extensionInputs.positionRadians, 0.0)));
+        new Pose3d(extensionInputs.leftPositionMeters, 0.0, 0.18, Rotation3d.kZero));
   }
 
   private static IntakeSimulation setupSimIntake() {
@@ -268,29 +261,35 @@ public class IntakeSubsystem extends SubsystemBase {
     runExtensionOpenLoop(0.0);
   }
 
-  // Configure SysId
-  private SysIdRoutine extensionSysIdSetup() {
-    return new SysIdRoutine(
-        new SysIdRoutine.Config(
-            Volts.of(2.0).per(Second),
-            Volts.of(2.0),
-            Seconds.of(15.0),
-            (state) -> Logger.recordOutput("Intake/Extension/SysIDState", state.toString())),
-        new SysIdRoutine.Mechanism(
-            (voltage) -> runExtensionOpenLoop(voltage.in(Volts)), null, this));
-  }
-
-  /** Returns a command to run a quasistatic test in the specified direction. */
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return run(() -> runExtensionOpenLoop(0.0))
-        .withTimeout(1.0)
-        .andThen(extensionSysId.quasistatic(direction));
-  }
-
-  /** Returns a command to run a dynamic test in the specified direction. */
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return run(() -> runExtensionOpenLoop(0.0))
-        .withTimeout(1.0)
-        .andThen(extensionSysId.dynamic(direction));
+  /**
+   * Returns a command that homes the intake by running the extension in reverse until it hits the
+   * hard stop, then zeroing the encoders. This should only be used if the encoders lose their
+   * position and need to be re-zeroed, not as part of normal operation. The command will time out
+   * after 5 seconds to prevent damage to the motors in case something goes wrong with the homing
+   * process.
+   *
+   * @return A command that homes the intake.
+   */
+  public Command homeIntakeCommand() {
+    Debouncer extensionHomeDebouncer = new Debouncer(0.2);
+    double currentThresholdAmps = 5.0; // Threshold current to detect stall, may need to be tuned
+    double velocityThresholdMetersPerSecond =
+        0.01; // Threshold velocity to consider the extension as stopped, may need to be tuned
+    return run(() -> runExtensionOpenLoop(-2.0))
+        .until(
+            () ->
+                extensionHomeDebouncer.calculate(
+                    Math.abs(extensionInputs.leftVelocityMetersPerSecond)
+                            < velocityThresholdMetersPerSecond
+                        && Math.abs(extensionInputs.rightVelocityMetersPerSecond)
+                            < velocityThresholdMetersPerSecond
+                        && extensionInputs.leftCurrentAmps > currentThresholdAmps
+                        && extensionInputs.rightCurrentAmps > currentThresholdAmps))
+        .withTimeout(5.0)
+        .andThen(
+            () -> {
+              extensionIO.resetEncoderPosition(ExtensionConstants.minExtensionMeters);
+              setExtensionPosition(ExtensionConstants.minExtensionMeters);
+            });
   }
 }

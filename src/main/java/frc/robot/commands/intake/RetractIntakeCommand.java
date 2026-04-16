@@ -21,7 +21,7 @@ public class RetractIntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedAngle);
+    intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedPosition);
     if (Constants.isSim()) {
       intakeSubsystem.getIntakeSimulation().stopIntake();
     }

@@ -23,7 +23,7 @@ public class IntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedAngle);
+    intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeExtendedPosition);
     if (Constants.isSim()) {
       intakeSubsystem.getIntakeSimulation().startIntake();
     }

@@ -14,11 +14,14 @@ public interface ExtensionIO {
   public static class ExtensionIOInputs {
     public boolean leftMotorConnected = false;
     public boolean rightMotorConnected = false;
-    public double positionRadians = 0.0;
-    public double absolutePositionRadians = 0.0;
-    public double velocityRadiansPerSecond = 0.0;
-    public double appliedVolts = 0.0;
-    public double[] currentAmps = {0.0, 0.0};
+    public double leftPositionMeters = 0.0;
+    public double rightPositionMeters = 0.0;
+    public double leftVelocityMetersPerSecond = 0.0;
+    public double rightVelocityMetersPerSecond = 0.0;
+    public double leftAppliedVolts = 0.0;
+    public double rightAppliedVolts = 0.0;
+    public double leftCurrentAmps = 0.0;
+    public double rightCurrentAmps = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
@@ -26,6 +29,19 @@ public interface ExtensionIO {
 
   /** Run the motor at the specified voltage. */
   public default void setMotorVoltage(double volts) {}
+
+  /** Run the motor to position. */
+  public default void setMotorPosition(double positionMeters) {}
+
+  /** Run the left and right motors to independent positions (for sync correction). */
+  public default void setMotorPositions(double leftPositionMeters, double rightPositionMeters) {
+    setMotorPosition(leftPositionMeters);
+  }
+
+  /** Sets the encoder position of the motor (for homing). */
+  public default boolean resetEncoderPosition(double positionMeters) {
+    return false;
+  }
 
   /**
    * Sets the brake mode of the motor.
