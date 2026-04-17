@@ -35,6 +35,14 @@ public class ExtensionConstants {
    */
   public static final double syncCorrectionThresholdMeters = 0.02;
 
+  /**
+   * Max rate of change applied to each side's commanded setpoint to prevent choppy motion from
+   * setpoint jumps (e.g. when sync correction engages/releases). Must stay well below {@link
+   * #syncCorrectionThresholdMeters} / robotLoopSeconds so the limiter alone cannot manufacture a
+   * false desync.
+   */
+  public static final double maxSetpointVelocityMetersPerSecond = 0.5;
+
   public static final double intakeStowedPosition = minExtensionMeters;
   public static final double intakeExtendedPosition = maxExtensionMeters;
 
