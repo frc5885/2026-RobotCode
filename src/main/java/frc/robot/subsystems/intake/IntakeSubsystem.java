@@ -275,7 +275,10 @@ public class IntakeSubsystem extends SubsystemBase {
     double currentThresholdAmps = 5.0; // Threshold current to detect stall, may need to be tuned
     double velocityThresholdMetersPerSecond =
         0.01; // Threshold velocity to consider the extension as stopped, may need to be tuned
-    return run(() -> runExtensionOpenLoop(-2.0))
+    return run(() -> {
+          runExtensionOpenLoop(-2.0);
+          setIntakeRollerVoltage(6.0);
+        })
         .until(
             () ->
                 extensionHomeDebouncer.calculate(
@@ -290,6 +293,7 @@ public class IntakeSubsystem extends SubsystemBase {
             () -> {
               extensionIO.resetEncoderPosition(ExtensionConstants.minExtensionMeters);
               setExtensionPosition(ExtensionConstants.minExtensionMeters);
+              setIntakeRollerVoltage(0.0);
             });
   }
 }

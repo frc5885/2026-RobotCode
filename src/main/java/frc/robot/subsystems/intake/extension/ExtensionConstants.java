@@ -10,7 +10,7 @@ public class ExtensionConstants {
   public static final double gearRatio = 7.5 / 1.0;
   public static final double driveGearRadiusMeters = Units.inchesToMeters(0.9);
   public static final double minExtensionMeters = 0.0;
-  public static final double maxExtensionMeters = 0.39;
+  public static final double maxExtensionMeters = 0.383;
   public static final double startingPositionMeters = 0.0;
 
   public static final int leftCanId = 40;

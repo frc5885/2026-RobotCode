@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -182,7 +183,10 @@ public class RobotContainer {
         .onTrue(
             OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER)
                 .ignoringDisable(true));
-    operatorController.a().onTrue(IntakeSubsystem.getInstance().homeIntakeCommand());
+    operatorController
+        .a()
+        .and(() -> DriverStation.isTest())
+        .onTrue(IntakeSubsystem.getInstance().homeIntakeCommand());
   }
 
   /**

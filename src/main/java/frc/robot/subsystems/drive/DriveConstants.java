@@ -30,7 +30,7 @@ public class DriveConstants {
   public static final double shootOnTheMoveSpeedMultiplier = 0.20;
   public static final double passOnTheMoveSpeedMultiplier = 0.33;
   // Reduced max speed in teleop when not shooting/passing, to make it easier to control the robot
-  public static final double teleopMaxSpeed = 3.0;
+  public static final double teleopMaxSpeed = 2.5;
 
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(24.25);
