@@ -59,8 +59,10 @@ public class ExtensionIOSpark implements ExtensionIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
-    leftMotorConfig.closedLoop.pid(
-        ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
+    leftMotorConfig
+        .closedLoop
+        .pid(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd)
+        .outputRange(-0.5, 0.5);
     tryUntilOk(
         leftMotor,
         5,
