@@ -17,7 +17,7 @@ public class ExtensionIOSim implements ExtensionIO {
   private final ElevatorSim extensionSim;
 
   private final PIDController extensionPID =
-      new PIDController(ExtensionConstants.kp, ExtensionConstants.ki, ExtensionConstants.kd);
+      new PIDController(ExtensionConstants.kp * 5.0, ExtensionConstants.ki, ExtensionConstants.kd);
 
   public ExtensionIOSim() {
     extensionSim =

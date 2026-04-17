@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -78,6 +79,15 @@ public class IntakeSubsystem extends SubsystemBase {
       false; // Closed loop will enable as soon as we command a goal
   private boolean extensionSyncCorrectionActive = false;
 
+  // Per-side rate limiters on the commanded extension setpoint. Smooths out the setpoint jumps
+  // caused by sync correction entering/releasing, plus normal goal changes. Reset on the rising
+  // edge of runExtensionClosedLoop (see periodic()).
+  private final SlewRateLimiter leftSetpointLimiter =
+      new SlewRateLimiter(ExtensionConstants.maxSetpointVelocityMetersPerSecond);
+  private final SlewRateLimiter rightSetpointLimiter =
+      new SlewRateLimiter(ExtensionConstants.maxSetpointVelocityMetersPerSecond);
+  private boolean extensionClosedLoopWasActive = false;
+
   /** Creates a new Intake. */
   private IntakeSubsystem(ExtensionIO extensionIO, RollerIO rollerIO) {
     this.extensionIO = extensionIO;
@@ -109,6 +119,14 @@ public class IntakeSubsystem extends SubsystemBase {
     rollerLeftMotorDisconnectedAlert.set(!rollerInputs.leftMotorConnected);
     rollerRightMotorDisconnectedAlert.set(!rollerInputs.rightMotorConnected);
     extensionDesyncWarningAlert.set(extensionSyncCorrectionActive);
+
+    // On the rising edge of closed-loop activation, seed each limiter to its own side's current
+    // measurement so the first commanded setpoint ramps from where the mechanism really is.
+    if (runExtensionClosedLoop && !extensionClosedLoopWasActive) {
+      leftSetpointLimiter.reset(extensionInputs.leftPositionMeters);
+      rightSetpointLimiter.reset(extensionInputs.rightPositionMeters);
+    }
+    extensionClosedLoopWasActive = runExtensionClosedLoop;
 
     if (runExtensionClosedLoop) {
       runSyncProtectedClosedLoop();
@@ -180,8 +198,11 @@ public class IntakeSubsystem extends SubsystemBase {
     Logger.recordOutput("Intake/Extension/PositionDifferenceMeters", posDifference);
     Logger.recordOutput("Intake/Extension/SyncCorrectionActive", extensionSyncCorrectionActive);
 
+    // Pick the raw per-side target. During sync correction, the leading side's raw target snaps
+    // to the lagging side's current position; the slew limiters below smooth that out.
+    double rawLeft;
+    double rawRight;
     if (posDifference >= ExtensionConstants.syncCorrectionThresholdMeters) {
-      // Determine which side is leading (closer to the goal setpoint)
       double leftDistToGoal = Math.abs(leftPos - extensionSetpoint);
       double rightDistToGoal = Math.abs(rightPos - extensionSetpoint);
       boolean leftIsLeading = leftDistToGoal < rightDistToGoal;
@@ -189,16 +210,26 @@ public class IntakeSubsystem extends SubsystemBase {
       extensionSyncCorrectionActive = true;
       if (leftIsLeading) {
         // Left is ahead: hold left at right's position, let right continue to goal
-        extensionIO.setMotorPositions(rightPos, extensionSetpoint);
+        rawLeft = rightPos;
+        rawRight = extensionSetpoint;
       } else {
         // Right is ahead: let left continue to goal, hold right at left's position
-        extensionIO.setMotorPositions(extensionSetpoint, leftPos);
+        rawLeft = extensionSetpoint;
+        rawRight = leftPos;
       }
     } else {
-      // In sync — normal operation
       extensionSyncCorrectionActive = false;
-      extensionIO.setMotorPosition(extensionSetpoint);
+      rawLeft = extensionSetpoint;
+      rawRight = extensionSetpoint;
     }
+
+    double leftCmd = leftSetpointLimiter.calculate(rawLeft);
+    double rightCmd = rightSetpointLimiter.calculate(rawRight);
+
+    Logger.recordOutput("Intake/Extension/LeftCommandedMeters", leftCmd);
+    Logger.recordOutput("Intake/Extension/RightCommandedMeters", rightCmd);
+
+    extensionIO.setMotorPositions(leftCmd, rightCmd);
   }
 
   @AutoLogOutput(key = "Intake/Extension/AtSetPoint")
