@@ -15,7 +15,7 @@ public class ExtensionConstants {
           117.17); // 90 degrees is defined as the forward linkage perpendicular to chassis
 
   // first number is position when down all the way, 2nd number is real angle when down all the way
-  public static final double absoluteEncoderOffset = 1.924 - 0.157;
+  public static final double absoluteEncoderOffset = 2.673 - 0.157;
   public static final double armLengthMeters = 0.2;
   public static final int leftCanId = 40;
   public static final int rightCanId = 41;
