@@ -89,14 +89,14 @@ public class IntakeControlCommand extends Command {
     // was agitating or waiting to agitate (shooting done): auto-stow
     else if (currentState == IntakeState.AGITATING
         || currentState == IntakeState.WAITING_TO_AGITATE) {
-      newState = IntakeState.STOWED;
+      newState = IntakeState.STOWING;
     } else {
       newState = currentState;
     }
 
     // stow button overrides from any state
     if (stowPressed) {
-      newState = IntakeState.STOWED;
+      newState = IntakeState.STOWING;
     }
 
     // Handle state entry side effects on transition
@@ -131,6 +131,12 @@ public class IntakeControlCommand extends Command {
           if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().startIntake();
           break;
 
+        case STOWING:
+          intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedPosition);
+          // Keep rollers spinning while retracting to hold game pieces
+          intakeSubsystem.setIntakeRollerVoltage(RollerConstants.agitateRollerVoltage);
+          break;
+
         case STOWED:
           intakeSubsystem.setExtensionPosition(ExtensionConstants.intakeStowedPosition);
           intakeSubsystem.setIntakeRollerVoltage(0);
@@ -142,7 +148,7 @@ public class IntakeControlCommand extends Command {
       }
     }
 
-    // the states are the same check if its agitating
+    // the states are the same check if its agitating or stowing
     else {
       if (currentState == IntakeState.AGITATING) {
         if (agitateTimer.hasElapsed(ExtensionConstants.agitateTimeSeconds)) {
@@ -154,6 +160,12 @@ public class IntakeControlCommand extends Command {
             agitateIsTop
                 ? ExtensionConstants.agitateNearPosition
                 : ExtensionConstants.agitateFarPosition);
+      }
+      // Transition from STOWING -> STOWED once the extension reaches the stowed position
+      else if (currentState == IntakeState.STOWING && intakeSubsystem.isExtensionAtSetPoint()) {
+        currentState = IntakeState.STOWED;
+        intakeSubsystem.setIntakeRollerVoltage(0);
+        if (Constants.isSim()) intakeSubsystem.getIntakeSimulation().stopIntake();
       }
     }
   }
@@ -178,6 +190,7 @@ public class IntakeControlCommand extends Command {
     INTAKING,
     WAITING_TO_AGITATE,
     AGITATING,
+    STOWING,
     STOWED,
     DEPLOYED,
     OUTAKING
