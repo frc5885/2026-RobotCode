@@ -172,12 +172,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public TrapezoidProfile.State getExtensionCurrentState() {
     return new TrapezoidProfile.State(
-        extensionInputs.positionRadians, extensionInputs.velocityRadiansPerSecond);
+        getExtentionIoPosition(), extensionInputs.velocityRadiansPerSecond);
   }
 
   /** Returns true if the extension is down (less than 45 degrees). */
   public boolean isExtensionDown() {
-    return extensionInputs.positionRadians < Units.degreesToRadians(45);
+    return getExtentionIoPosition() < Units.degreesToRadians(45);
+  }
+
+  /** Get the IO position from either the absolute or relative encoder */
+  private double getExtentionIoPosition() {
+    return extensionInputs.positionRadians;
   }
 
   /**
@@ -225,7 +230,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // Log Pose3d
     Logger.recordOutput(
         "Mechanism3d/1-Intake",
-        new Pose3d(0.32, 0.0, 0.18, new Rotation3d(0.0, -extensionInputs.positionRadians, 0.0)));
+        new Pose3d(0.32, 0.0, 0.18, new Rotation3d(0.0, -getExtentionIoPosition(), 0.0)));
   }
 
   private static IntakeSimulation setupSimIntake() {
