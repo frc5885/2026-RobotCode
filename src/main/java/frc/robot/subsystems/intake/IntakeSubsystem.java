@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -292,5 +293,34 @@ public class IntakeSubsystem extends SubsystemBase {
     return run(() -> runExtensionOpenLoop(0.0))
         .withTimeout(1.0)
         .andThen(extensionSysId.dynamic(direction));
+  }
+
+  /**
+   * Returns a command that homes the intake by driving the extension up until it hits the hard
+   * stop, then zeroing the encoders. This should only be used if the encoders lose their position
+   * and need to be re-zeroed, not as part of normal operation. The command will time out after 5
+   * seconds to prevent damage to the motors in case something goes wrong with the homing process.
+   *
+   * @return A command that homes the intake.
+   */
+  public Command homeIntakeCommand() {
+    Debouncer extensionHomeDebouncer = new Debouncer(0.2);
+    double currentThresholdAmps = 5.0; // Threshold current to detect stall, may need to be tuned
+    double velocityThresholdRadiansPerSecond =
+        0.02; // Threshold velocity to consider the extension as stopped, may need to be tuned
+    return run(() -> runExtensionOpenLoop(2.0)) // drive extension up
+        .until(
+            () ->
+                extensionHomeDebouncer.calculate(
+                    Math.abs(extensionInputs.velocityRadiansPerSecond)
+                            < velocityThresholdRadiansPerSecond
+                        && extensionInputs.currentAmps[0] > currentThresholdAmps
+                        && extensionInputs.currentAmps[1] > currentThresholdAmps))
+        .withTimeout(5.0)
+        .andThen(
+            () -> {
+              extensionIO.zeroEncoder(ExtensionConstants.maxAngleRadians);
+              setExtensionPosition(ExtensionConstants.maxAngleRadians);
+            });
   }
 }

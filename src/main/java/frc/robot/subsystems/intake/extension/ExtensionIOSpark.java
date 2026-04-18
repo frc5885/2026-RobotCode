@@ -105,7 +105,7 @@ public class ExtensionIOSpark implements ExtensionIO {
     inputs.currentAmps = currents;
 
     if (!isEncoderZeroed && inputs.leftMotorConnected) {
-      if (zeroEncoder(inputs.absolutePositionRadians) == REVLibError.kOk) {
+      if (zeroEncoder(inputs.absolutePositionRadians)) {
         isEncoderZeroed = true;
         inputs.positionRadians = inputs.absolutePositionRadians;
         System.out.println("Intake extension encoder zeroed");
@@ -119,9 +119,14 @@ public class ExtensionIOSpark implements ExtensionIO {
     leftMotor.setVoltage(volts);
   }
 
-  /** Sets encoder starting angle */
-  private REVLibError zeroEncoder(double absolutePosition) {
-    return encoder.setPosition(absolutePosition);
+  /**
+   * Sets the encoder position of the motor (for homing).
+   *
+   * @return true if the encoder was successfully zeroed, false otherwise.
+   */
+  @Override
+  public boolean zeroEncoder(double absolutePosition) {
+    return encoder.setPosition(absolutePosition) == REVLibError.kOk;
   }
 
   /**

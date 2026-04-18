@@ -28,6 +28,15 @@ public interface ExtensionIO {
   public default void setMotorVoltage(double volts) {}
 
   /**
+   * Sets the encoder position of the motor (for homing).
+   *
+   * @return true if the encoder was successfully zeroed, false otherwise.
+   */
+  public default boolean zeroEncoder(double absolutePosition) {
+    return true;
+  }
+
+  /**
    * Sets the brake mode of the motor.
    *
    * @param brakeModeEnabled True to enable brake mode, false to enable coast mode.

@@ -37,6 +37,7 @@ import frc.robot.commands.shooting.TurretCommands;
 import frc.robot.controllers.ControllerConstants;
 import frc.robot.controllers.OperatorPanel;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.leds.LEDConstants.LEDState;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.util.HubShiftUtil;
@@ -181,6 +182,7 @@ public class RobotContainer {
         .onTrue(
             OverrideUtil.setShootingLocationCommand(ShootingLocation.RIGHT_WALL_CORNER)
                 .ignoringDisable(true));
+    operatorController.a().onTrue(IntakeSubsystem.getInstance().homeIntakeCommand());
   }
 
   /**

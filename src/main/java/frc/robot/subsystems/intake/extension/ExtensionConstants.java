@@ -8,8 +8,8 @@ import edu.wpi.first.math.util.Units;
 
 public class ExtensionConstants {
   public static final double gearRatio = 60.0 / 1.0;
-  public static final double minAngleRadians = Units.degreesToRadians(7.0);
-  public static final double maxAngleRadians = Units.degreesToRadians(117.17);
+  public static final double minAngleRadians = Units.degreesToRadians(7.0); // bottom
+  public static final double maxAngleRadians = Units.degreesToRadians(117.17); // top
   public static final double startingAngleRadians =
       Units.degreesToRadians(
           117.17); // 90 degrees is defined as the forward linkage perpendicular to chassis
