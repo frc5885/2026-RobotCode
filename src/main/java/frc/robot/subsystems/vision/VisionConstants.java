@@ -61,7 +61,7 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.25; // Meters
+  public static double linearStdDevBaseline = 0.30; // Meters
   public static double angularStdDevBaseline = Units.degreesToRadians(60.0); // Radians
 
   // Bump zone vision boost: temporarily trust vision more after crossing the bump

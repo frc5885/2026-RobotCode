@@ -55,6 +55,6 @@ public class TurretConstants {
   public static final int bigGearTeeth = 145;
 
   // keep the negative sign
-  public static final double absoluteEncoder1OffsetRotations = -0.1248;
-  public static final double absoluteEncoder2OffsetRotations = -0.529;
+  public static final double absoluteEncoder1OffsetRotations = -0.6945;
+  public static final double absoluteEncoder2OffsetRotations = -0.8438;
 }

@@ -182,7 +182,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Get the IO position from either the absolute or relative encoder */
   private double getExtentionIoPosition() {
-    return extensionInputs.positionRadians;
+    return extensionInputs.absolutePositionRadians;
   }
 
   /**
@@ -324,8 +324,8 @@ public class IntakeSubsystem extends SubsystemBase {
         .withTimeout(5.0)
         .andThen(
             () -> {
-              extensionIO.zeroEncoder(ExtensionConstants.maxAngleRadians);
-              setExtensionPosition(ExtensionConstants.maxAngleRadians);
+              extensionIO.zeroEncoder(ExtensionConstants.intakeStowedAngle);
+              setExtensionPosition(ExtensionConstants.intakeStowedAngle);
             });
   }
 }
