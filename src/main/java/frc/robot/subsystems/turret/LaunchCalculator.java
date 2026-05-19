@@ -21,7 +21,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.OverrideUtil;
 import org.littletonrobotics.junction.Logger;
@@ -136,11 +135,8 @@ public class LaunchCalculator {
 
     if (OverrideUtil.isManualMode()) {
       launchMode = LaunchMode.MANUAL_SHOOTING;
-    } else if (AllianceFlipUtil.applyX(estimatedPose.getX())
-        <= FieldConstants.LinesVertical.hubCenter) {
-      launchMode = LaunchMode.SHOOTING;
     } else {
-      launchMode = LaunchMode.PASSING;
+      launchMode = LaunchMode.SHOOTING;
     }
 
     // Calculate distance from turret to target

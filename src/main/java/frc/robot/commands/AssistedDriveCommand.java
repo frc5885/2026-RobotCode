@@ -134,10 +134,6 @@ public class AssistedDriveCommand extends Command {
             // negate hub area trigger so that hub and bump don't fight each other
             .and(inHubDropAreaTrigger.negate());
 
-    inTrenchZoneTrigger.onTrue(updateDriveMode(DriveMode.TRENCH_LOCK));
-    inBumpZoneTrigger.onTrue(updateDriveMode(DriveMode.BUMP_LOCK));
-    inTowerZoneTrigger.onTrue(updateDriveMode(DriveMode.TOWER_LOCK));
-    inHubDropAreaTrigger.onTrue(updateDriveMode(DriveMode.HUB_LOCK));
     inTrenchZoneTrigger
         .or(inBumpZoneTrigger)
         .or(inTowerZoneTrigger)
