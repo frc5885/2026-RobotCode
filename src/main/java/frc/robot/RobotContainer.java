@@ -64,6 +64,8 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private final AssistedDriveCommand assistedDriveCommand = new AssistedDriveCommand(controller);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Init all subsystems
@@ -128,7 +130,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
+    DefaultCommands.setDefaultDriveCommand(assistedDriveCommand);
     DefaultCommands.setDefaultTurretCommand(
         TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
     TurretCommands.registerManualModeOverride();
@@ -167,6 +169,9 @@ public class RobotContainer {
         .whileTrue(
             LEDSubsystem.getInstance().applyState(LEDState.BOGUS_CALL).ignoringDisable(true));
     operatorPanel.getFastDriveSpeedSwitch().whileTrue(DriveSubsystem.getInstance().turboMode());
+    operatorPanel
+        .getRotisserieChickenSwitch()
+        .whileTrue(assistedDriveCommand.updateDriveMode(AssistedDriveCommand.DriveMode.ROTISSERIE));
     operatorController
         .povDown()
         .onTrue(

@@ -430,6 +430,11 @@ public class DriveSubsystem extends SubsystemBase {
     return maxSpeedMetersPerSec * actionSpeedMultiplier / driveBaseRadius;
   }
 
+  /** Returns the rotation speed for rotisserie chicken mode */
+  public double getRotisserieChickenAngularSpeedRadPerSec() {
+    return rotisserieChickenRadPerSec;
+  }
+
   /**
    * Sets the action speed multiplier used during shooting/passing. Applied relative to the true max
    * speed (maxSpeedMetersPerSec), not the teleop cap.

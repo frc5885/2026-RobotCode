@@ -235,7 +235,7 @@ public class AssistedDriveCommand extends Command {
     }
   }
 
-  private Command updateDriveMode(DriveMode driveMode) {
+  public Command updateDriveMode(DriveMode driveMode) {
     return Commands.runOnce(
         () -> {
           currentDriveMode = driveMode;
@@ -377,6 +377,15 @@ public class AssistedDriveCommand extends Command {
                 RadiansPerSecond.of(rotSpeedToSidewaysHub)));
 
         break;
+
+        // slowly rotates the robot like a rotisserie chicken
+      case ROTISSERIE:
+        driveSubsystem.runVelocityFieldRelative(
+            new ChassisSpeeds(
+                MetersPerSecond.of(0),
+                MetersPerSecond.of(0),
+                RadiansPerSecond.of(driveSubsystem.getRotisserieChickenAngularSpeedRadPerSec())));
+        break;
     }
   }
 
@@ -390,11 +399,12 @@ public class AssistedDriveCommand extends Command {
     return false;
   }
 
-  private enum DriveMode {
+  public enum DriveMode {
     NORMAL,
     TRENCH_LOCK,
     BUMP_LOCK,
     TOWER_LOCK,
-    HUB_LOCK
+    HUB_LOCK,
+    ROTISSERIE
   }
 }

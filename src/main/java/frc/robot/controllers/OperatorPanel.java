@@ -63,4 +63,9 @@ public class OperatorPanel {
   public Trigger getFastDriveSpeedSwitch() {
     return overrideSwitch(2);
   }
+
+  /** Returns the rotisserie chicken mode switch (2nd switch from the left) */
+  public Trigger getRotisserieChickenSwitch() {
+    return overrideSwitch(1);
+  }
 }

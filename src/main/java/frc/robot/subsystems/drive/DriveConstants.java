@@ -26,6 +26,9 @@ public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.1; // Tuned on poseidon, actual max speed
   public static final double maxAccelerationMetersPerSec2 = 10.0;
 
+  // Speed for rotisserie chicken mode
+  public static final double rotisserieChickenRadPerSec = 0.2;
+
   // Multiplies the max speed when the robot is shooting/passing and moving at the same time
   public static final double shootOnTheMoveSpeedMultiplier = 0.20;
   public static final double passOnTheMoveSpeedMultiplier = 0.33;
