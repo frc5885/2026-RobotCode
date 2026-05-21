@@ -4,6 +4,7 @@
 
 package frc.robot.commands.intake;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -67,8 +68,8 @@ public class IntakeControlCommand extends Command {
     if (intakeHeld) {
       newState = IntakeState.INTAKING;
     }
-    // agitate if not intaking and shooting
-    else if (shootHeld) {
+    // agitate if not intaking and shooting and not in test mode
+    else if (shootHeld && !DriverStation.isTest()) {
       if (currentState == IntakeState.AGITATING || currentState == IntakeState.INTAKING) {
         newState = IntakeState.AGITATING;
       } else if (currentState == IntakeState.WAITING_TO_AGITATE) {
