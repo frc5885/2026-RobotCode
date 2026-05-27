@@ -20,9 +20,9 @@ public class AimHoodAndSpinFlywheelCommand extends Command {
   private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
 
   private final DoubleSupplier testModeHoodAngle =
-      TunableDouble.register("Shooter/HoodAngleDegrees", 70.0);
+      TunableDouble.register("Shooter/HoodAngleDegrees", 65.0);
   private final DoubleSupplier testFlywheelRPM =
-      TunableDouble.register("Shooter/FlywheelRPM", 1000.0);
+      TunableDouble.register("Shooter/FlywheelRPM", 1800.0);
   /** Creates a new AimHoodAndSpinFlywheelCommand. */
   public AimHoodAndSpinFlywheelCommand() {
     // Use addRequirements() here to declare subsystem dependencies.

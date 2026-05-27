@@ -171,7 +171,8 @@ public class RobotContainer {
     operatorPanel.getFastDriveSpeedSwitch().whileTrue(DriveSubsystem.getInstance().turboMode());
     operatorPanel
         .getRotisserieChickenSwitch()
-        .whileTrue(assistedDriveCommand.updateDriveMode(AssistedDriveCommand.DriveMode.ROTISSERIE));
+        .whileTrue(assistedDriveCommand.updateDriveMode(AssistedDriveCommand.DriveMode.ROTISSERIE))
+        .onFalse(assistedDriveCommand.updateDriveMode(AssistedDriveCommand.DriveMode.NORMAL));
     operatorController
         .povDown()
         .onTrue(
