@@ -42,7 +42,12 @@ public class AssistedDriveCommand extends Command {
   private final DoubleSupplier ySupplier;
   private final DoubleSupplier omegaSupplier;
   private final SlewRateLimiter2d driveLimiter;
-  private int flipFactor = 1; // 1 for normal, -1 for flipped
+
+  // The field direction that "joystick forward" maps to.
+  // null = use alliance default (0° for blue, 180° for red).
+  // Set via setForwardToCurrentHeading() to override (e.g. for outreach setups where
+  // the driver station isn't on the usual alliance wall).
+  private Rotation2d userForwardOverride = null;
 
   @AutoLogOutput private final Trigger inTrenchZoneTrigger;
 
@@ -78,8 +83,8 @@ public class AssistedDriveCommand extends Command {
 
   /** Creates a new TeleopDrive. */
   public AssistedDriveCommand(CommandXboxController controller) {
-    this.xSupplier = () -> -controller.getLeftY() * flipFactor;
-    this.ySupplier = () -> -controller.getLeftX() * flipFactor;
+    this.xSupplier = () -> -controller.getLeftY();
+    this.ySupplier = () -> -controller.getLeftX();
     this.omegaSupplier = () -> -controller.getRightX();
     this.driveLimiter = new SlewRateLimiter2d(DriveConstants.maxAccelerationMetersPerSec2);
 
@@ -253,11 +258,36 @@ public class AssistedDriveCommand extends Command {
     trenchYController.reset();
     rotationController.reset();
     driveLimiter.reset(new Translation2d());
-    flipFactor =
+    // Note: userForwardOverride intentionally NOT reset here — we want manual
+    // overrides set via setForwardToCurrentHeading() to persist across command
+    // interruptions (e.g. when ShootCommandGroup takes over and ends).
+  }
+
+  /**
+   * Returns the field-frame direction that "joystick forward" currently maps to. When the user has
+   * set a manual override via {@link #setForwardToCurrentHeading()}, that override is used.
+   * Otherwise, returns the alliance default (0° for blue, 180° for red) so the standard
+   * field-relative behavior is preserved.
+   */
+  @AutoLogOutput
+  public Rotation2d getJoystickForwardDirection() {
+    if (userForwardOverride != null) {
+      return userForwardOverride;
+    }
+    boolean isRed =
         DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-            ? -1
-            : 1;
+            && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+    return isRed ? Rotation2d.kPi : Rotation2d.kZero;
+  }
+
+  /**
+   * Captures the robot's current heading and uses it as the new "joystick forward" direction. This
+   * does NOT reset the robot's pose — it only affects how joystick translation input is mapped to
+   * field-relative chassis speeds. Intended for outreach events where the driver may be standing in
+   * a non-standard position relative to the robot.
+   */
+  public void setForwardToCurrentHeading() {
+    userForwardOverride = driveSubsystem.getRotation();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -267,6 +297,10 @@ public class AssistedDriveCommand extends Command {
         getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
     linearVelocity = linearVelocity.times(driveSubsystem.getMaxLinearSpeedMetersPerSec());
     linearVelocity = driveLimiter.calculate(linearVelocity);
+    // Rotate the joystick translation vector into the field frame the driver expects.
+    // For default alliance behavior this is 0°/180° (matching the old flipFactor); when the
+    // driver has pressed "back" to reset forward, this is the robot's heading at that moment.
+    linearVelocity = linearVelocity.rotateBy(getJoystickForwardDirection());
 
     double omega =
         MathUtil.applyDeadband(omegaSupplier.getAsDouble(), ControllerConstants.controllerDeadband);
