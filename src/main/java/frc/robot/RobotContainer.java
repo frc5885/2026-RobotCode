@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AssistedDriveCommand;
@@ -128,7 +129,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    DefaultCommands.setDefaultDriveCommand(new AssistedDriveCommand(controller));
+    AssistedDriveCommand driveCommand = new AssistedDriveCommand(controller);
+    DefaultCommands.setDefaultDriveCommand(driveCommand);
     DefaultCommands.setDefaultTurretCommand(
         TurretCommands.trackTargetInTeleopAndStraightForwardInTest());
     TurretCommands.registerManualModeOverride();
@@ -146,6 +148,11 @@ public class RobotContainer {
     // controller.povRight().whileTrue(new DriveToClimbPoseSequentialCommand());
 
     controller.b().whileTrue(new OuttakeCommand());
+
+    // Re-orient field-relative drive: capture the robot's current heading and use it as
+    // "joystick forward". Does not reset the robot's pose (vision would overwrite that anyway).
+    // Useful at outreach events where the driver station isn't in its usual location.
+    controller.back().onTrue(Commands.runOnce(driveCommand::setForwardToCurrentHeading));
 
     // temp for testing
     controller
